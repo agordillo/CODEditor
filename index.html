@@ -14,22 +14,34 @@
 	<script src="app.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
-	<div id="header"></div>
-	<div id="content">
-		<div id="editor_header">
-			<ul class="menu">
-				<li id="editorModeMenu" class="mitem mitemmode"></li>
-				<li viewMode="CODE" class="mitem first" group="view"><img src="img/glyphicons-151-edit.png" alt="Vista Edición"/></li>
-				<li viewMode="HYBRID" class="mitem" group="view"><img src="img/glyphicons-489-multiple-displays.png" alt="Vista Híbrida"/></li>
-				<li viewMode="RESULT" class="mitem last" group="view"><img src="img/glyphicons-545-eye-plus.png" alt="Vista Resultado"/></li>
-				<li id="run" class="mitem unique"><img src="img/glyphicons-221-play-button.png" alt="Run"/></li>
-				<li id="settings" class="mitem unique"><img src="img/glyphicons-137-cogwheel.png" alt="Settings"/></li>
-			</ul>
-		</div>
-		<div id="editor"></div>
-		<div id="preview"></div>
+	<div id="header">
+		<ul class="menu">
+			<li id="editorModeMenu" class="mitem mitemmode" title="Cambiar Lenguaje"></li>
+			<li viewMode="CODE" class="mitem first" group="view"><img src="img/glyphicons-151-edit.png" title="Vista Edición"/></li>
+			<li viewMode="HYBRID" class="mitem" group="view"><img src="img/glyphicons-489-multiple-displays.png" title="Vista Híbrida"/></li>
+			<li viewMode="RESULT" class="mitem last" group="view"><img src="img/glyphicons-545-eye-plus.png" title="Vista Resultado"/></li>
+			<li id="run" class="mitem unique"><img src="img/glyphicons-221-play-button.png" title="Run Code"/></li>
+			<li id="settings" class="mitem unique"><img src="img/glyphicons-137-cogwheel.png" title="Settings"/></li>
+		</ul>
 	</div>
+
+	<div id="content">
+		<div id="editor_wrapper">
+			<div id="editor_header">
+				<div id="editor_tab_wrapper">
+					<div id="editor_tab"><p><p></div>
+				</div>
+			</div>
+			<div id="editor"></div>
+		</div>
+		<div id="preview_wrapper">
+			<div id="preview_header"></div>
+			<div id="preview"></div>
+		</div>
+	</div>
+
 	<div id="footer"></div>
+
 	<div id="settings_panel">
 		<img id="closeSettingsButton" src="img/glyphicons-198-remove.png"/>
 		<div class="title">Opciones</div>
