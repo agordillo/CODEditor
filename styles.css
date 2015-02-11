@@ -188,6 +188,9 @@ ul.menu li.mitemmode {
 	cursor: pointer;
 }
 
+ul.menu li#fullscreen_button img#fullscreen_img {
+	padding-bottom: 2px
+}
 
 #settings_panel {
 	display: none;

@@ -29,6 +29,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var init = function(options){
 		CODEditor.Utils.init();
+		CODEditor.FullScreen.init();
 
 		//Default view mode (CODE)
 		_changeViewMode(_viewModes[0]);
