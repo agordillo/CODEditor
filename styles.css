@@ -173,12 +173,21 @@ ul.menu li.unique {
 	border-right: 1px solid #666;
 }
 
+ul.menu li.withoutLeftBorder {
+	border-left: none !important;
+}
+
+ul.menu li.withoutRightBorder {
+	border-right: none !important;
+}
+
 ul.menu li.mitemmode {
 	position: absolute;
 	left: 5px;
 	top: 5px;
 	cursor: pointer;
 }
+
 
 #settings_panel {
 	display: none;

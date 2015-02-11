@@ -114,6 +114,120 @@ CODEditor.CORE = (function(C,$,undefined){
 		$("#run").click(function(){
 			_runCode();
 		});
+
+		$("#open").click(function(){
+			_openFile();		
+		});
+
+		$("#save").click(function(){
+			_saveFile();
+		});
+	};
+
+	var _openFile = function(){
+		//FileReader API support (doc at https://developer.mozilla.org/en-US/docs/Web/API/FileReader)
+		var isFileReaderSupported = false;
+		try {
+			if(window.File && window.FileReader && window.FileList && window.Blob){
+				isFileReaderSupported = true;
+			}
+		} catch (e) {}
+
+		if(!isFileReaderSupported){
+			return alert("Lo siento, tu navegador no puede leer ficheros.");
+		}
+
+		var fileInput = document.getElementById('openFileInput');
+		fileInput.addEventListener('change', _fileHandler);
+	};
+
+	var _fileHandler = function(){
+		var fileInput = document.getElementById('openFileInput');
+		var file = fileInput.files[0];
+		var fileType = _isValidFileType(file.type);
+
+		if (fileType!==false) {
+			var reader = new FileReader();
+
+			reader.onload = function(e){
+				_resetFileHandler(fileInput);
+				_processFile(reader.result,fileType);
+			}
+
+			reader.onerror = function(e){
+				_resetFileHandler(fileInput);
+				alert("Se produjo un error leyendo el fichero.");
+			}
+
+			reader.readAsText(file);
+		} else {
+			_resetFileHandler(fileInput);
+			alert("Formato de fichero no soportado.");
+		}
+	};
+
+	var _resetFileHandler = function(fileInput){
+		fileInput.removeEventListener('change', _fileHandler);
+		$(fileInput).val("");
+		fileInput.addEventListener('change', _fileHandler);
+	};
+
+	var _isValidFileType = function(fileType){
+		if(typeof fileType != "string"){
+			return false;
+		}
+
+		var acceptedTypes = ["text/html","application/javascript",/text.*/];
+
+		for(var i=0; i<acceptedTypes.length; i++){
+			if(fileType.match(acceptedTypes[i])){
+				return acceptedTypes[i];
+			}
+		}
+
+		return false;
+	};
+
+	var _processFile = function(fileContent,fileType){
+		if(fileType=="text/html"){
+			//HTML file
+			_changeEditorMode("HTML");
+		} else if (fileType=="application/javascript"){
+			//JS file.
+			_changeEditorMode("JavaScript");
+		} else  if(fileType.match(/text.*/)){
+			//Text file.
+			_changeEditorMode("HTML");
+		}
+
+		_editor.setValue(fileContent);
+	};
+
+	var _saveFile = function(){
+		var isFileSaverSupported = false;
+		try {
+			isFileSaverSupported = !!new Blob;
+		} catch (e) {}
+
+		if(!isFileSaverSupported){
+			alert("Lo siento, tu navegador no puede descargar ficheros.");
+		}
+
+		var filename = "file.txt";
+		switch(_currentEditorMode){
+			case "HTML":
+				filename = "index.html";
+				break;
+			case "JavaScript":
+				filename = "script.js";
+				break;
+			default:
+				return;
+		}
+
+		var dataToDownload = _editor.getValue();
+		var blob = new Blob([dataToDownload], {type: "text/plain;charset=utf-8"});
+		saveAs(blob, filename);
 	};
 
 	var _changeViewMode = function(viewMode){
