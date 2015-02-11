@@ -30,6 +30,26 @@ CODEditor.JS = (function(C,$,undefined){
 		$(wrapper).append("<pre></pre>");
 		container = $(wrapper).find("pre");
 		$(container).html(result);
+
+		//Check if an exercise is currently tried
+		var currentExercise = CODEditor.CORE.getCurrentExercise();
+		if(typeof currentExercise !== "undefined"){
+			$(wrapper).append("<p></p>");
+			$(wrapper).append("<pre class='feedback'></pre>");
+			var feedback = $(wrapper).find("pre.feedback");
+
+			var score = currentExercise.score_function(evaluation.response);
+
+			if(score >= 5){
+				$(feedback).addClass("passed");
+				$(feedback).append("¡Bien!\n");
+				$(feedback).append("Puntuación: " + score.toString() + "/10");
+			} else {
+				$(feedback).addClass("failed");
+				$(feedback).append("La respuesta no es correcta.");
+			}
+		}
+
 		$("#preview").append(wrapper);
 	};
 
@@ -48,7 +68,7 @@ CODEditor.JS = (function(C,$,undefined){
 		var jsCodeEval = _evalInFunctionContextAndLookForVars(jscode,["result"]);
 
 		if(jsCodeEval[0]===true){
-			if(Object.keys(jsCodeEval[1]).indexOf("result") != -1){
+			if(Object.keys(jsCodeEval[1]).indexOf("result") !== -1){
 				evaluation.response = jsCodeEval[1]["result"];
 				// console.log("Result in Result Var");
 				return evaluation;
@@ -124,10 +144,32 @@ CODEditor.JS = (function(C,$,undefined){
 		}
 	};
 
+	var validateScoreFunction = function(jscode){
+		var evaluation = {};
+		evaluation.errors = [];
+		evaluation.response = undefined;
+
+		//Check if the eval function stores any data in the 'score' var.
+		var jsCodeEval = _evalInFunctionContextAndLookForVars(jscode,["score"]);
+
+		if(jsCodeEval[0]===true){
+			if(Object.keys(jsCodeEval[1]).indexOf("score") !== -1){
+				evaluation.response = jsCodeEval[1]["score"];
+			} else {
+				evaluation.errors.push("Error: No 'score' var found.")
+			}
+		} else {
+			//Fail, exception raised
+			evaluation.errors.push("Error: " + jsCodeEval[1].message);
+		}
+		return evaluation;
+	};
+
 
 	return {
-		init 				: init,
-		runJavaScriptcode	: runJavaScriptcode
+		init 					: init,
+		runJavaScriptcode		: runJavaScriptcode,
+		validateScoreFunction	: validateScoreFunction
 	};
 
 }) (CODEditor,jQuery);

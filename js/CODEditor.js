@@ -26,6 +26,8 @@ CODEditor.CORE = (function(C,$,undefined){
 	var _editorThemes = ["Chrome","Twilight"];
 	var _currentEditorTheme;
 
+	var _currentExercise;
+
 
 	var init = function(options){
 		CODEditor.Utils.init();
@@ -42,6 +44,9 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		CODEditor.JS.init();
 		CODEditor.HTML.init();
+
+		//Testing
+		_loadExercise(CODEditor.Samples.js_sample);
 	};
 
 	var getCurrentViewMode = function(){
@@ -55,6 +60,14 @@ CODEditor.CORE = (function(C,$,undefined){
 	var getCurrentEditorTheme = function(){
 		return _currentEditorTheme;
 	};
+
+	var getEditor = function(){
+		return _editor;
+	};
+
+	var getCurrentExercise = function(){
+		return _currentExercise;
+	}
 
 	var _initEditor = function(options){
 		_editor = ace.edit("editor");
@@ -348,12 +361,67 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 	};
 
+	var _loadExercise = function(json){
+		if(!_isValidExercise(json)){
+			return alert("El ejercicio a cargar no es válido.");
+		}
+
+		var exerciseDOM = $("#exercise_wrapper")
+		$(exerciseDOM).addClass("open");
+
+		//Load title
+		var exerciseTitleDOM = $(exerciseDOM).find("#exercise_title");
+		if(json.title){
+			$(exerciseTitleDOM).html(json.title);
+			$(exerciseTitleDOM).show();
+		} else {
+			$(exerciseTitleDOM).hide();
+		}
+
+		//Load description
+		$(exerciseDOM).find("#exercise_description").html(json.description);
+		
+		CODEditor.UI.adjustView();
+	};
+
+	var _isValidExercise = function(json){
+		if(typeof json !== "object"){
+			return false;
+		}
+		if(json.type !== "exercise"){
+			return false;
+		}
+		if((typeof json.editorMode !== "string")||(_editorModes.indexOf(json.editorMode)===-1)){
+			return false;
+		}
+		if(typeof json.description !== "string"){
+			return false;
+		}
+		if(typeof json.score_function !== "string"){
+			return false;
+		}
+
+		//Check if score_function is well formed
+		//The score_function is retrieved in the scoreFunctionEvaluation.response var.
+		var scoreFunctionEvaluation = CODEditor.JS.validateScoreFunction(json.score_function);
+		if((scoreFunctionEvaluation.errors.length > 0)||(typeof scoreFunctionEvaluation.response !== "function")){
+			return false;
+		}
+
+		_currentExercise = json;
+		_currentExercise.score_function = scoreFunctionEvaluation.response;
+
+		return true;
+	};
+
 
 	return {
 		init 					: init,
 		getCurrentViewMode		: getCurrentViewMode,
 		getCurrentEditorMode 	: getCurrentEditorMode,
-		getCurrentEditorTheme	: getCurrentEditorTheme
+		getCurrentEditorTheme	: getCurrentEditorTheme,
+		getEditor 				: getEditor,
+		getCurrentExercise 		: getCurrentExercise
 	};
 
 }) (CODEditor,jQuery);

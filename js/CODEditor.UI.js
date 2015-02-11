@@ -6,21 +6,30 @@ CODEditor.UI = (function(C,$,undefined){
 
 	var adjustView = function(){
 		//Adjust Heights
-		var window_height = $(window).height();
-		var header_height = $("#header").height();
-		var content_height = window_height-header_height;
-		$("#editor_wrapper, #preview_wrapper").height(content_height);
+		var windowHeight = $(window).height();
+		var headerHeight = $("#header").height();
+		var contentHeight = windowHeight-headerHeight;
+
+		var exerciseHeight = $("#exercise_wrapper").height()+$("#exercise_wrapper").cssNumber("padding-top")+$("#exercise_wrapper").cssNumber("padding-bottom");
+		var editorWrapperHeight = contentHeight - exerciseHeight;
+		$("#editor_wrapper, #preview_wrapper").height(editorWrapperHeight);
 
 		var subheadersHeight = $("#editor_header").height();
-		var editorHeight = content_height - subheadersHeight;
-		$("#editor, #preview").height(content_height);
+		var editorHeight = editorWrapperHeight - subheadersHeight;
+		$("#editor, #preview").height(editorHeight);
 
 		//Adjust Settings
-		$("#settings_panel").height(content_height*0.95-$("#settings_panel").cssNumber("padding-right")*2);
-		$("#settings_panel").css("top",40+content_height*0.025);
+		$("#settings_panel").height(contentHeight*0.95-$("#settings_panel").cssNumber("padding-right")*2);
+		$("#settings_panel").css("top",40+contentHeight*0.025);
 
 		//More adjustments...
 		// var glutterWidth = $("div.ace_layer.ace_gutter-layer.ace_folding-enabled").width();
+
+
+		var editor = CODEditor.CORE.getEditor();
+		if(typeof editor !== "undefined"){
+			editor.resize();
+		};
 	};
 
 	var updateSettingsPanel = function(){

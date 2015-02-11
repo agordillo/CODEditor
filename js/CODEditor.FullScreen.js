@@ -2,7 +2,7 @@
  * Enable FullScreen for CODEditor
  */
 
-CODEditor.FullScreen = (function(V,$,undefined){
+CODEditor.FullScreen = (function(C,$,undefined){
 
 	//Internals
 	var _canFullScreen;

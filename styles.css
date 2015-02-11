@@ -100,6 +100,32 @@ html, body {
 	cursor: pointer;
 }
 
+#exercise_wrapper {
+	height: 0;
+	padding: 20px;
+	padding-top: 15px;
+	font-size: 1.1rem;
+	background: #4C4C4C;
+	color: white;
+	overflow: auto;
+}
+
+#exercise_wrapper.open {
+	min-height: 50px;
+	max-height: 200px;
+	height: auto;
+}
+
+#exercise_title{
+	font-size: 1.6rem;
+	margin: 0px;
+	margin-bottom: 16px;
+}
+
+#exercise_description{
+
+}
+
 #editor, #preview {
 	width: 100%;
 }
@@ -238,10 +264,18 @@ div.js_code {
 div.js_code pre {
 	max-width: 95%;
 	white-space: -moz-pre-wrap; /* Mozilla, supported since 1999 */
-    white-space: -pre-wrap; /* Opera */
-    white-space: -o-pre-wrap; /* Opera */
-    white-space: pre-wrap; /* CSS3 - Text module (Candidate Recommendation) http://www.w3.org/TR/css3-text/#white-space */
-    word-wrap: break-word;
+	white-space: -pre-wrap; /* Opera */
+	white-space: -o-pre-wrap; /* Opera */
+	white-space: pre-wrap; /* CSS3 - Text module (Candidate Recommendation) http://www.w3.org/TR/css3-text/#white-space */
+	word-wrap: break-word;
+}
+
+div.js_code pre.passed {
+	color: green;
+}
+
+div.js_code pre.failed {
+	color: red;
 }
 
 
