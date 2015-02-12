@@ -62,85 +62,13 @@ CODEditor.JS = (function(C,$,undefined){
 		if(!hasErrors){
 			if(typeof currentExercise !== "undefined"){
 				if(typeof currentExercise.parsed_score_function == "function"){
-					var score = CODEditor.Utils.getScoreFromScoreFunction(currentExercise.parsed_score_function,evaluation.response,evaluation.variablesHash);
-					if(typeof score == "object"){
-						//Valid returned score object (may include feedback)
-
-						//Successes
-						if((score.successes instanceof Array)&&(score.successes.length > 0)){
-							$(wrapper).append("<p class='separator'></p>");
-							var successesWrapper = $("<div class='successes_wrapper'></div>");
-							var successesHeader = $("<div class='successes_header output_header'></div>");
-							var successesContentWrapper = $("<div class='successes_content_wrapper output_content_wrapper'></div>");
-							var successesContent = $("<pre class='successes'></pre>");
-							
-							$(successesHeader).append("Aciertos");
-							for(var s=0; s<score.successes.length; s++){
-								$(successesContent).append("<img class='success_icon' src='img/success_icon.png'/>" + score.successes[s] + "\n");
-							}
-
-							$(successesContentWrapper).append(successesContent);
-							$(successesWrapper).append(successesHeader);
-							$(successesWrapper).append(successesContentWrapper);
-							$(wrapper).append(successesWrapper);
-						}
-
-						//Errors
-						if((score.errors instanceof Array)&&(score.errors.length > 0)){
-							$(wrapper).append("<p class='separator'></p>");
-							var errorsWrapper = $("<div class='errors_wrapper'></div>");
-							var errorsHeader = $("<div class='errors_header output_header'></div>");
-							var errorsContentWrapper = $("<div class='errors_content_wrapper output_content_wrapper'></div>");
-							var errorsContent = $("<pre class='errors'></pre>");
-							
-							$(errorsHeader).append("Errores");
-							for(var e=0; e<score.errors.length; e++){
-								$(errorsContent).append("<img class='error_icon' src='img/error_icon.png'/>" + score.errors[e] + "\n");
-							}
-
-							$(errorsContentWrapper).append(errorsContent);
-							$(errorsWrapper).append(errorsHeader);
-							$(errorsWrapper).append(errorsContentWrapper);
-							$(wrapper).append(errorsWrapper);
-						}
-
-						//Feedback
-						if((score.feedback instanceof Array)&&(score.feedback.length > 0)){
-							$(wrapper).append("<p class='separator'></p>");
-							var feedbackWrapper = $("<div class='feedback_wrapper'></div>");
-							var feedbackHeader = $("<div class='feedback_header output_header'></div>");
-							var feedbackContentWrapper = $("<div class='feedback_content_wrapper output_content_wrapper'></div>");
-							var feedbackContent = $("<pre class='feedback'></pre>");
-							
-							$(feedbackHeader).append("Feedback");
-							for(var f=0; f<score.feedback.length; f++){
-								$(feedbackContent).append(score.feedback[f] + "\n");
-							}
-
-							$(feedbackContentWrapper).append(feedbackContent);
-							$(feedbackWrapper).append(feedbackHeader);
-							$(feedbackWrapper).append(feedbackContentWrapper);
-							$(wrapper).append(feedbackWrapper);
-						}
-
-						//Overall score
-						$(wrapper).append("<p class='separator'></p>");
-						$(wrapper).append("<pre class='overall_score'></pre>");
-						var overallScoreDOM = $(wrapper).find("pre.overall_score");
-
-						if(score.score >= 5){
-							$(overallScoreDOM).addClass("passed");
-							$(overallScoreDOM).append("¡La solución es correcta!\n");
-							$(overallScoreDOM).append("Puntuación: <span class='overall_score'>" + score.score.toString() + "</span>/10");
-						} else {
-							$(overallScoreDOM).addClass("failed");
-							$(overallScoreDOM).append("La solución no es correcta.");
-						}
-					}
+					var score = CODEditor.Score.getScoreFromScoreFunction(currentExercise.parsed_score_function,evaluation.response,evaluation.variablesHash);
+					CODEditor.Score.displayScore(score,wrapper);
 				}
 			}
 		} else {
 			if(!CODEditor.Utils.isCodeEmpty(jscode)){
+				//TODO. Move to Score module
 				$(wrapper).append("<p class='separator'></p>");
 				var errorsWrapper = $("<div class='errors_wrapper'></div>");
 				var errorsHeader = $("<div class='errors_header output_header'></div>");

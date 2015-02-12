@@ -142,6 +142,120 @@ CODEditor.Samples = (function(C,$,undefined){
 		"score_function_vars": ["a","b"]
 	};
 
+	/* Example 4*/
+	var html_sample_score = function(document){
+		try {
+			var text = $(document).find("body").text().trim();
+			text = text.replace(/'|"/g, ''); //ignore '' or ""
+			if(text==="Hello World"){
+				return 10;
+			}
+			if(text.toLowerCase()===("Hello World").toLowerCase()){
+				return 5;
+			}
+		} catch (e) {}
+		
+		return 0;
+	};
+
+	var html_sample = {
+		"type": "exercise",
+		"title": "Hello World con HTML",
+		"description":"Escriba una página web que ponga 'Hello World' en el body.",
+		"editorMode":"HTML",
+		"content": "<html>\n  <head></head>\n  <body>\n\n  </body>\n</html>",
+		"score_function": ("var score = " + html_sample_score.toString())
+	};
+
+	/* Example 5*/
+	var html_css_sample_score = function(document){
+		var grade = {};
+		grade.successes = [];
+		grade.errors = [];
+		grade.feedback = [];
+		grade.score = 0;
+
+		var getStyleFromCSSSelector = function(document,selectorName) {
+			var classes = document.styleSheets[0].rules || document.styleSheets[0].cssRules;
+			for(var x=0;x<classes.length;x++) {
+				if(classes[x].selectorText===selectorName){
+					if(typeof classes[x].cssText === "string"){
+						return classes[x].cssText;
+					} else if(typeof classes[x].style != "undefined") {
+						return classes[x].style.cssText;
+					} else {
+						return undefined;
+					}
+				}
+			}
+		};
+
+		var p = $(document).find("body").find("p");
+		if(p.length === 0){
+			grade.errors.push("No se encontró la etiqueta p.");
+			grade.feedback.push("Incluya una etiqueta <p> detro de la etiqueta <body>.");
+		} else {
+			grade.successes.push("La etiqueta <p> fue colocada correctamente.");
+			grade.score += 2;
+
+			try {
+				var textFound = false;
+				var text = $(p).text().trim();
+				text = text.replace(/'|"/g, ''); //ignore '' or ""
+
+				if(text==="Hello World"){
+					textFound = true;
+					grade.score += 2;
+				} else if(text.toLowerCase()===("Hello World").toLowerCase()){
+					textFound = true;
+					grade.score += 1;
+					grade.feedback.push("Debes prestar más atención a las mayúsculas y minúsculas, \"" + text + "\" no es lo mismo que Hello World.");
+				}
+
+				if(textFound){
+					grade.successes.push("El texto 'Hello World' fue escrito correctamente.");
+				} else {
+					grade.errors.push("El texto 'Hello World' no fue correctamente incluido.");
+				}
+			} catch(e) {}
+
+			if($(p).hasClass("rojo")){
+				grade.score += 2;
+				grade.successes.push("La etiqueta <p> tiene la clase 'rojo'.");
+
+				var pColor = $(p).css("color");
+				if(pColor==="rgb(255, 0, 0)"){
+					grade.successes.push("El texto es de color rojo.");
+					grade.score += 4;
+
+					//Check if the class 'rojo' has the property color: red.
+					var cssTextRojo = (getStyleFromCSSSelector(document,".rojo") || getStyleFromCSSSelector(document,"p.rojo"));
+					if(typeof cssTextRojo === "undefined"){
+						grade.score -= 1;
+						grade.feedback.push("No se encontró ningún selector para la clase rojo.\n¿Seguro que la ha definido correctamente?\nPruebe a definir el selector CSS como <b>.rojo</b> o <b>p.rojo</b>.");
+					}
+
+				} else {
+					grade.errors.push("El texto no es de color rojo.");
+				}
+
+			} else {
+				grade.errors.push("La etiqueta <p> no tiene la clase 'rojo'.");
+			}
+
+		}
+
+		return grade;
+	};
+
+	var html_css_sample = {
+		"type": "exercise",
+		"title": "Hello World con HTML y CSS",
+		"description":"Escriba una página web que ponga la palabra <b>'Hello World'</b> en el body y en color rojo. Esta palabra estará dentro de una etiqueta '<p>' que tendrá la clase 'rojo'.",
+		"editorMode":"HTML",
+		"content": "<html>\n  <head></head>\n  <body>\n\n  </body>\n</html>",
+		"score_function": ("var score = " + html_css_sample_score.toString())
+	};
 
 	var getExample = function(exampleName){
 		var example = undefined;

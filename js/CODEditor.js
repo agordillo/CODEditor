@@ -32,6 +32,7 @@ CODEditor.CORE = (function(C,$,undefined){
 	var init = function(options){
 		CODEditor.Utils.init();
 		CODEditor.FullScreen.init();
+		CODEditor.Score.init();
 
 		//Default view mode (CODE)
 		_changeViewMode(_viewModes[0]);
@@ -52,7 +53,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 
 		//Testing
-		// _loadExercise(CODEditor.Samples.getExample("js_sample_multivar"));
+		_loadExercise(CODEditor.Samples.getExample("html_css_sample"));
 	};
 
 	var getCurrentViewMode = function(){
@@ -102,6 +103,11 @@ CODEditor.CORE = (function(C,$,undefined){
 	var _loadEvents = function(){
 		window.onresize = function(event){
 			CODEditor.UI.adjustView();
+			if(typeof _currentExercise !== "undefined"){
+				if(_currentExercise.editorMode === "HTML"){
+					CODEditor.HTML.adjustHTMLPreviewUI($("#preview div.html_result_wrapper").is(":visible"));
+				}
+			}
 		};
 
 		$("ul.menu > li[group='view']").click(function(){
@@ -484,6 +490,10 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 
 		//Load description
+		json.description = CODEditor.Utils.purgeTextString(json.description);
+		//Look for code tags.
+		json.description = json.description.replace(/&lt;code&gt;/g, '<span class="code">');
+		json.description = json.description.replace(/&lt;\/code&gt;/g, '</span>');
 		$(exerciseDOM).find("#exercise_description").html(json.description);
 
 		//Editor mode

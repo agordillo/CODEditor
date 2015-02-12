@@ -53,6 +53,10 @@ html, body {
 	border-right: 2px solid black;
 }
 
+#editor_wrapper.RESULT #editor_header{
+	display: none;
+}
+
 #preview_wrapper.HYBRID {
 	width: 50% !important;
 }
@@ -260,16 +264,46 @@ ul.menu li[group='exercise'] {
 iframe.iframe_code {
 	overflow: auto;
 	width: 100%;
-	height: 100%;
+	height: 99%;
 	border: none;
 }
 
-div.js_code {
+iframe.onexercise {
+	margin-bottom: 10px;
+}
+
+div.js_code, div.html_result_wrapper {
 	padding: 10px;
 	font-size: 1.4rem;
 }
 
-div.js_code pre {
+div.html_result_header {
+	position: relative;
+	color: white;
+}
+
+div.html_result_header p{
+	margin: 0px;
+}
+
+#closeHTMLconsole{
+	position: absolute;
+	top: 0;
+	right: 0;
+	color: white;
+	cursor: pointer;
+}
+
+div.html_result_wrapper {
+	overflow: auto;
+}
+
+div.result_wrapper {
+	background: black;
+	color: white;
+}
+
+pre {
 	max-width: 95%;
 	white-space: -moz-pre-wrap; /* Mozilla, supported since 1999 */
 	white-space: -pre-wrap; /* Opera */
@@ -278,28 +312,28 @@ div.js_code pre {
 	word-wrap: break-word;
 }
 
-div.js_code p.separator {
+p.separator {
 	padding: 0;
 	margin: 0;
 	height: 20px;
 }
 
-div.js_code pre.passed {
+pre.passed {
 	color: #0BB80D; /* green */
 }
 
-div.js_code pre.failed, div.js_code pre.errors {
+pre.failed, pre.errors {
 	color: #D00E0E; /*red*/
 }
 
-div.js_code span.overall_score {
+span.overall_score {
 	font-weight: bold;
 }
 
 
 /* Output style in JS console */
 
-div.js_code div.output_header{
+div.output_header{
 	display: inline-block;
 	width: auto;
 	font-size: 1.3rem;
@@ -310,7 +344,7 @@ div.js_code div.output_header{
 	background: #202020; /* almost black */
 }
 
-div.js_code div.output_content_wrapper{
+div.output_content_wrapper{
 	border-radius: 0px 15px 15px 15px;
 	padding: 10px 15px 10px 15px;
 	font-size: 1.2rem;
@@ -319,22 +353,21 @@ div.js_code div.output_content_wrapper{
 
 /*Successes style*/
 
-div.js_code div.successes_wrapper{
+div.successes_wrapper{
 	color: #0BB80D;
 }
 
 /*Errors style*/
 
-div.js_code div.errors_wrapper{
+div.errors_wrapper{
 	color: #D00E0E;
 }
 
 /*Generic Feedback style*/
 
-div.js_code div.feedback_wrapper{
+div.feedback_wrapper{
 	color: #D08B0E; /*orange*/
 }
-
 
 img.success_icon, img.error_icon {
 	max-height: 15px;

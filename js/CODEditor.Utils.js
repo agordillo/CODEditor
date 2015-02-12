@@ -19,48 +19,21 @@ CODEditor.Utils = (function(C,$,undefined){
 		return false;
 	};
 
-	var getScoreFromScoreFunction = function(scoreFunction,response,variablesHash){
-		var score;
-
-		try {
-			score = scoreFunction(response,variablesHash);
-		} catch (e){ }
-
-		var normalizedScore = {};
-		normalizedScore.score = undefined;
-		normalizedScore.successes = [];
-		normalizedScore.errors = [];
-		normalizedScore.feedback = [];
-
-		if(typeof score == "number"){
-			normalizedScore.score = score;
-		} else if(typeof score == "object"){
-			if(typeof score.score == "number"){
-				normalizedScore.score = score.score;
-			}
-			if(score.successes instanceof Array){
-				normalizedScore.successes = score.successes;
-			}
-			if(score.errors instanceof Array){
-				normalizedScore.errors = score.errors;
-			}
-			if(score.feedback instanceof Array){
-				normalizedScore.feedback = score.feedback;
-			}
+	/*
+	 * Text that can contain HTML but is expected to be plain text.
+	 */
+	var purgeTextString = function(text){
+		if(typeof text !== "string"){
+			return text;
 		}
-
-		if(typeof normalizedScore.score == "number"){
-			return normalizedScore;
-		} else {
-			return undefined;
-		}
+		return text.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&lt;b&gt;/g, '<b>').replace(/&lt;\/b&gt;/g, '</b>');
 	};
 
 
 	return {
-		init 						: init,
-		isCodeEmpty					: isCodeEmpty,
-		getScoreFromScoreFunction 	: getScoreFromScoreFunction
+		init 					: init,
+		isCodeEmpty				: isCodeEmpty,
+		purgeTextString			: purgeTextString
 	};
 
 }) (CODEditor,jQuery);
