@@ -130,6 +130,10 @@ html, body {
 	width: 100%;
 }
 
+#preview {
+	overflow: auto;
+}
+
 #preview_wrapper.JavaScript #preview {
 	background: black;
 	color: white;

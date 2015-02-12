@@ -91,18 +91,20 @@ CODEditor.Samples = (function(C,$,undefined){
 				try {
 					b(undefined);
 					b(null);
-					b("");
 					b(8);
-					grade.score += 2;
-					grade.successes.push("La función definida en 'b' gestiona correctamente valores de entrada erróneos.");
+					var testB = b("");
+					if(typeof testB !== "undefined"){
+						grade.score += 2;
+						grade.successes.push("La función definida en 'b' gestiona correctamente valores de entrada erróneos.");
+					}
 				} catch(e){
 					grade.errors.push("La función definida en 'b' no gestiona correctamente valores de entrada erróneos.");
 					grade.feedback.push("Recuerde tomar en consideración los casos en los que la variable de entrada de una función pueda ser 'undefined', 'null', u otros valores no esperados.");
 				}
 
 				try {
-					var testB = b("Mi Gato COME cOmIdA de gat0");
-					if(testB === "mi gato come comida de gat0"){
+					var testC = b("Mi Gato COME cOmIdA de gat0");
+					if(testC === "mi gato come comida de gat0"){
 						grade.score += 3;
 						grade.successes.push("La función definida en 'b' funciona correctamente para frases.");
 					} else {
@@ -118,9 +120,14 @@ CODEditor.Samples = (function(C,$,undefined){
 			}
 		}
 
+		//Scale grade
+		grade.score = Math.min(10,Math.max(0,Math.pow(grade.score,2)/10) + 0.1);
+
+
 		if(grade.score===10){
 			grade.feedback.push("¡Enhorabuena, tu solución es perfecta!");
 		}
+
 
 		return grade;
 	};

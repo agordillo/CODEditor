@@ -45,10 +45,13 @@ if(json.score_function_vars instanceof Array){
 					}
 					for(var vai=0; vai<variablesArray.length; vai++){
 						var varValue = evaluation.variablesHash[variablesArray[vai]];
+						if(result!=""){
+							result += "\n\n";
+						}
 						if(typeof varValue === "undefined"){
-							result += "\n\nvar " + variablesArray[vai] + " = undefined";
+							result += "var " + variablesArray[vai] + " = undefined";
 						} else {
-							result += "\n\nvar " + variablesArray[vai] + " = " + varValue.toString();
+							result += "var " + variablesArray[vai] + " = " + varValue.toString();
 						}
 					}
 				}

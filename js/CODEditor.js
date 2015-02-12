@@ -46,7 +46,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		CODEditor.HTML.init();
 
 		//Testing
-		_loadExercise(CODEditor.Samples.getExample("js_sample"));
+		// _loadExercise(CODEditor.Samples.getExample("js_sample_multivar"));
 	};
 
 	var getCurrentViewMode = function(){
@@ -78,6 +78,19 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		document.getElementById('editor').style.fontSize='14px';
 		_editor.setShowPrintMargin(false);
+
+		_focusEditor();
+	};
+
+	var _focusEditor = function(){
+		if(typeof _editor !== "undefined"){
+			_editor.focus();
+			var _editorSession = _editor.getSession();
+			//Get the number of lines
+			var _count = _editorSession.getLength();
+			//Go to end of the last line
+			_editor.gotoLine(_count, _editorSession.getLine(_count-1).length);
+		}
 	};
 
 	var _loadEvents = function(){
@@ -158,7 +171,7 @@ CODEditor.CORE = (function(C,$,undefined){
 	var _fileHandler = function(){
 		var fileInput = document.getElementById('openFileInput');
 		var file = fileInput.files[0];
-		var fileType = _isValidFileType(file.type);
+		var fileType = _isValidFileType(file);
 
 		if (fileType!==false) {
 			var reader = new FileReader();
@@ -186,16 +199,26 @@ CODEditor.CORE = (function(C,$,undefined){
 		fileInput.addEventListener('change', _fileHandler);
 	};
 
-	var _isValidFileType = function(fileType){
+	var _isValidFileType = function(file){
+		var fileType = file.type;
+
 		if(typeof fileType != "string"){
 			return false;
 		}
 
-		var acceptedTypes = ["text/html","application/javascript",/text.*/];
+		var acceptedTypes = ["text/html","application/javascript","application/json",/text.*/];
 
 		for(var i=0; i<acceptedTypes.length; i++){
 			if(fileType.match(acceptedTypes[i])){
 				return acceptedTypes[i];
+			}
+		}
+
+		//Look for JSON files
+		if(fileType.trim()===""){
+			if(file.name.match(/[aA-zZ0-9-]+\.json$/)){
+				//fileName ends with ".json"
+				return "application/json";
 			}
 		}
 
@@ -212,9 +235,21 @@ CODEditor.CORE = (function(C,$,undefined){
 		} else  if(fileType.match(/text.*/)){
 			//Text file.
 			_changeEditorMode("HTML");
+		} else if (fileType=="application/json"){
+			//JSON file. Parse and load example.
+			try{
+				fileContent = JSON.parse(fileContent);
+			} catch (e) {
+				//Invalid file
+				return alert("Formato de fichero no soportado.");
+			}
+			if(_isValidExercise(fileContent,false)){
+				return _loadExercise(fileContent);
+			}
 		}
 
 		_editor.setValue(fileContent,1);
+		_focusEditor();
 	};
 
 	var _saveFile = function(){
