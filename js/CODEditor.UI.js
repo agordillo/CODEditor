@@ -44,6 +44,7 @@ CODEditor.UI = (function(C,$,undefined){
 		$("#preview").html("");
 	};
 
+
 	return {
 		init 				: init,
 		adjustView			: adjustView,

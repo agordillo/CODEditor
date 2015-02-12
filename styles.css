@@ -329,9 +329,11 @@ div.js_code div.feedback_wrapper{
 
 
 img.success_icon, img.error_icon {
-	max-height: 17px;
+	max-height: 15px;
 	margin-right: 12px;
-	margin-bottom: -3px;
+	margin-bottom: 0px;
+	padding-bottom: 0px;
+	padding-top: 10px;
 }
 
 

@@ -46,7 +46,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		CODEditor.HTML.init();
 
 		//Testing
-		_loadExercise(CODEditor.Samples.getExamples()[1]);
+		_loadExercise(CODEditor.Samples.getExample("js_sample"));
 	};
 
 	var getCurrentViewMode = function(){
@@ -214,7 +214,7 @@ CODEditor.CORE = (function(C,$,undefined){
 			_changeEditorMode("HTML");
 		}
 
-		_editor.setValue(fileContent);
+		_editor.setValue(fileContent,1);
 	};
 
 	var _saveFile = function(){
@@ -263,7 +263,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 	};
 
-	var _changeEditorMode = function(editorMode){
+	var _changeEditorMode = function(editorMode,isNew){
 		if((_editorModes.indexOf(editorMode)!=-1)&&(editorMode!=_currentEditorMode)){
 
 			var wrappersDOM = $("#editor_wrapper, #preview_wrapper");
@@ -283,8 +283,10 @@ CODEditor.CORE = (function(C,$,undefined){
 			};
 
 			if(typeof _editor != "undefined"){
+				isNew = !(isNew===false);
 				var aceMode;
 				var initialValue = "";
+
 				switch(editorMode){
 					case "HTML":
 						aceMode = "ace/mode/html";
@@ -301,9 +303,13 @@ CODEditor.CORE = (function(C,$,undefined){
 				}
 				if(typeof aceMode == "string"){
 					_editor.getSession().setMode(aceMode);
-					_editor.setValue(initialValue);
+					if(isNew){
+						_editor.setValue(initialValue,1);
+					}
 				}
 			}
+
+			CODEditor.UI.updateSettingsPanel();
 		}
 	};
 
@@ -384,6 +390,15 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		//Load description
 		$(exerciseDOM).find("#exercise_description").html(json.description);
+
+		//Editor mode
+		_changeEditorMode(json.editorMode,false);
+		//Block editorMode in settings
+		$("#settings_mode").attr("disabled","disabled");
+
+		if(typeof json.content == "string"){
+			_editor.setValue(json.content,1);
+		}
 		
 		CODEditor.UI.adjustView();
 	};
@@ -430,8 +445,18 @@ CODEditor.CORE = (function(C,$,undefined){
 					} else {
 						//Check if scoreFunction returns a valid score.
 						//score should be a number, or a object like {*score: {number}, errors: [], feedback: []}
+
+						var scoreFunctionVariablesHash = {};
+						if(json.score_function_vars instanceof Array){
+							for(var sfv=0; sfv<json.score_function_vars.length; sfv++){
+								if(typeof json.score_function_vars[sfv] == "string"){
+									scoreFunctionVariablesHash[json.score_function_vars[sfv]] = "";
+								}
+							}
+						}
+
 						try {
-							var testScore = scoreFunctionEvaluation.response("");
+							var testScore = scoreFunctionEvaluation.response("",scoreFunctionVariablesHash);
 							if(typeof testScore !== "number"){
 								if(typeof testScore === "object"){
 									if(typeof testScore.score !== "number"){

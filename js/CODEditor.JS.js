@@ -3,9 +3,29 @@ CODEditor.JS = (function(C,$,undefined){
 	var init = function(options){
 	};
 
+
+/*var scoreFunctionVariablesHash = {};
+if(json.score_function_vars instanceof Array){
+	for(var sfv=0; sfv<json.score_function_vars.length; sfv++){
+		if(typeof json.score_function_vars[sfv] == "string"){
+			scoreFunctionVariablesHash[json.score_function_vars[sfv]] = "";
+		}
+	}
+}*/
+
 	var runJavaScriptcode = function(jscode){
+
+		//Check if an excercise is currently tried
+		var variablesArray = undefined;
+		var currentExercise = CODEditor.CORE.getCurrentExercise();
+		if(typeof currentExercise !== "undefined"){
+			variablesArray = currentExercise.score_function_vars;
+		}
+
+
+		//Execute the code
 		var result;
-		var evaluation = _evalJavaScriptCode(jscode);
+		var evaluation = _evalJavaScriptCode(jscode,variablesArray);
 		var hasErrors = (evaluation.errors.length > 0);
 
 		if(hasErrors){
@@ -17,6 +37,22 @@ CODEditor.JS = (function(C,$,undefined){
 				} else {
 					result = evaluation.response.toString();
 				}
+
+				if((variablesArray instanceof Array)&&(variablesArray.length>0)){
+					//Avoid 'undefined' outputs when the exercise is looking for vars.
+					if(result==="undefined"){
+						result = "";
+					}
+					for(var vai=0; vai<variablesArray.length; vai++){
+						var varValue = evaluation.variablesHash[variablesArray[vai]];
+						if(typeof varValue === "undefined"){
+							result += "\n\nvar " + variablesArray[vai] + " = undefined";
+						} else {
+							result += "\n\nvar " + variablesArray[vai] + " = " + varValue.toString();
+						}
+					}
+				}
+
 			} catch(e){
 				result = "Error: " + e.message;
 			}
@@ -31,11 +67,9 @@ CODEditor.JS = (function(C,$,undefined){
 		$(resultDOM).html(result);
 
 		if(!hasErrors){
-			//Check if an exercise is currently tried
-			var currentExercise = CODEditor.CORE.getCurrentExercise();
 			if(typeof currentExercise !== "undefined"){
 				if(typeof currentExercise.score_function == "function"){
-					var score = CODEditor.Utils.getScoreFromScoreFunction(currentExercise.score_function,evaluation.response);
+					var score = CODEditor.Utils.getScoreFromScoreFunction(currentExercise.score_function,evaluation.response,evaluation.variablesHash);
 					if(typeof score == "object"){
 						//Valid returned score object (may include feedback)
 
@@ -133,10 +167,11 @@ CODEditor.JS = (function(C,$,undefined){
 		$("#preview").append(wrapper);
 	};
 
-	var _evalJavaScriptCode = function(jscode){
+	var _evalJavaScriptCode = function(jscode,variablesArray){
 		var evaluation = {};
 		evaluation.errors = [];
 		evaluation.response = undefined;
+		evaluation.variablesHash = {};
 
 		//1. Check if jscode is a not empty string
 		if(CODEditor.Utils.isCodeEmpty(jscode)){
@@ -144,13 +179,21 @@ CODEditor.JS = (function(C,$,undefined){
 			return evaluation;
 		}
 
-		//2. Check if the eval function stores any data in the 'result' var.
-		var jsCodeEval = _evalInFunctionContextAndLookForVars(jscode,["result"]);
+		//2. Check if the eval function stores any data in any of the variables defined in the variablesArray.
+		var defaultVariablesArray = false;
+		if(!(variablesArray instanceof Array)){
+			variablesArray = ["result"];
+			defaultVariablesArray = true;
+		}
+		var jsCodeEval = _evalInFunctionContextAndLookForVars(jscode,variablesArray);
 
 		if(jsCodeEval[0]===true){
-			if(Object.keys(jsCodeEval[1]).indexOf("result") !== -1){
+			if((defaultVariablesArray)&&(Object.keys(jsCodeEval[1]).indexOf("result") !== -1)){
 				evaluation.response = jsCodeEval[1]["result"];
 				// console.log("Result in Result Var");
+				return evaluation;
+			} else if(defaultVariablesArray===false) {
+				evaluation.variablesHash = jsCodeEval[1];
 				return evaluation;
 			}
 		}

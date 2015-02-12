@@ -19,11 +19,11 @@ CODEditor.Utils = (function(C,$,undefined){
 		return false;
 	};
 
-	var getScoreFromScoreFunction = function(scoreFunction,response){
+	var getScoreFromScoreFunction = function(scoreFunction,response,variablesHash){
 		var score;
 
 		try {
-			score = scoreFunction(response);
+			score = scoreFunction(response,variablesHash);
 		} catch (e){ }
 
 		var normalizedScore = {};
