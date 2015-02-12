@@ -149,6 +149,18 @@ CODEditor.CORE = (function(C,$,undefined){
 		$("#save").click(function(){
 			_saveFile();
 		});
+
+		$("#refresh").click(function(){
+			if(typeof _currentExercise != "undefined"){
+				var r = confirm("Si recargas el ejercicio perderás todos tus cambios. ¿Estás seguro de que deseas hacerlo?");
+				if (r === true) {
+					_loadExercise(_currentExercise);
+					CODEditor.UI.cleanPreview();
+				}
+			} else {
+				alert("No hay ningún ejercicio que reiniciar.");
+			}
+		});
 	};
 
 	var _openFile = function(){
@@ -525,7 +537,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		
 		if((errors.length===0)&&(updateCurrentExercise)){
 			_currentExercise = json;
-			_currentExercise.score_function = scoreFunctionEvaluation.response;
+			_currentExercise.parsed_score_function = scoreFunctionEvaluation.response;
 		}
 
 		return errors;

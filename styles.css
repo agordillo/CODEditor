@@ -222,6 +222,10 @@ ul.menu li#fullscreen_button img#fullscreen_img {
 	padding-bottom: 2px
 }
 
+ul.menu li[group='exercise'] {
+	display: none;
+}
+
 #settings_panel {
 	display: none;
 	position: absolute;

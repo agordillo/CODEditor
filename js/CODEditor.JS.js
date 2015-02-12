@@ -3,16 +3,6 @@ CODEditor.JS = (function(C,$,undefined){
 	var init = function(options){
 	};
 
-
-/*var scoreFunctionVariablesHash = {};
-if(json.score_function_vars instanceof Array){
-	for(var sfv=0; sfv<json.score_function_vars.length; sfv++){
-		if(typeof json.score_function_vars[sfv] == "string"){
-			scoreFunctionVariablesHash[json.score_function_vars[sfv]] = "";
-		}
-	}
-}*/
-
 	var runJavaScriptcode = function(jscode){
 
 		//Check if an excercise is currently tried
@@ -71,8 +61,8 @@ if(json.score_function_vars instanceof Array){
 
 		if(!hasErrors){
 			if(typeof currentExercise !== "undefined"){
-				if(typeof currentExercise.score_function == "function"){
-					var score = CODEditor.Utils.getScoreFromScoreFunction(currentExercise.score_function,evaluation.response,evaluation.variablesHash);
+				if(typeof currentExercise.parsed_score_function == "function"){
+					var score = CODEditor.Utils.getScoreFromScoreFunction(currentExercise.parsed_score_function,evaluation.response,evaluation.variablesHash);
 					if(typeof score == "object"){
 						//Valid returned score object (may include feedback)
 
