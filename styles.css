@@ -136,7 +136,7 @@ html, body {
 }
 
 #preview_wrapper.JavaScript #preview div.js_code_error {
-	color: red;
+	color: #D00E0E;
 }
 
 #preview_wrapper.JavaScript #preview_header {
@@ -270,12 +270,68 @@ div.js_code pre {
 	word-wrap: break-word;
 }
 
-div.js_code pre.passed {
-	color: green;
+div.js_code p.separator {
+	padding: 0;
+	margin: 0;
+	height: 20px;
 }
 
-div.js_code pre.failed {
-	color: red;
+div.js_code pre.passed {
+	color: #0BB80D; /* green */
+}
+
+div.js_code pre.failed, div.js_code pre.errors {
+	color: #D00E0E; /*red*/
+}
+
+div.js_code span.overall_score {
+	font-weight: bold;
+}
+
+
+/* Output style in JS console */
+
+div.js_code div.output_header{
+	display: inline-block;
+	width: auto;
+	font-size: 1.3rem;
+	padding: 10px;
+	margin: 0px;
+	border-radius: 10px 10px 0px 0px;
+	padding-bottom: 1px;
+	background: #202020; /* almost black */
+}
+
+div.js_code div.output_content_wrapper{
+	border-radius: 0px 15px 15px 15px;
+	padding: 10px 15px 10px 15px;
+	font-size: 1.2rem;
+	background: #202020;
+}
+
+/*Successes style*/
+
+div.js_code div.successes_wrapper{
+	color: #0BB80D;
+}
+
+/*Errors style*/
+
+div.js_code div.errors_wrapper{
+	color: #D00E0E;
+}
+
+/*Generic Feedback style*/
+
+div.js_code div.feedback_wrapper{
+	color: #D08B0E; /*orange*/
+}
+
+
+img.success_icon, img.error_icon {
+	max-height: 17px;
+	margin-right: 12px;
+	margin-bottom: -3px;
 }
 
 

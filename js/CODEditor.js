@@ -46,7 +46,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		CODEditor.HTML.init();
 
 		//Testing
-		_loadExercise(CODEditor.Samples.js_sample);
+		_loadExercise(CODEditor.Samples.getExamples()[1]);
 	};
 
 	var getCurrentViewMode = function(){
@@ -362,8 +362,12 @@ CODEditor.CORE = (function(C,$,undefined){
 	};
 
 	var _loadExercise = function(json){
-		if(!_isValidExercise(json)){
-			return alert("El ejercicio a cargar no es válido.");
+		var errors = _validateExercise(json);
+
+		if(errors.length > 0){
+			errors.unshift("El ejercicio a cargar no es válido.\n\nErrores:");
+			var errorMessage = errors.join("\n");
+			return alert(errorMessage);
 		}
 
 		var exerciseDOM = $("#exercise_wrapper")
@@ -384,34 +388,87 @@ CODEditor.CORE = (function(C,$,undefined){
 		CODEditor.UI.adjustView();
 	};
 
-	var _isValidExercise = function(json){
+	var _isValidExercise = function(json,updateCurrentExercise){
+		return (_validateExercise(json,updateCurrentExercise).length===0);
+	};
+
+	var _validateExercise = function(json,updateCurrentExercise){
+		var errors = [];
+
 		if(typeof json !== "object"){
-			return false;
+			return errors.push("Invalid json. Is not an object.");
 		}
 		if(json.type !== "exercise"){
-			return false;
+			errors.push("Type is not 'exercise'.");
 		}
 		if((typeof json.editorMode !== "string")||(_editorModes.indexOf(json.editorMode)===-1)){
-			return false;
+			errors.push("Invalid editorMode.");
 		}
 		if(typeof json.description !== "string"){
-			return false;
+			errors.push("Invalid description.");
 		}
-		if(typeof json.score_function !== "string"){
-			return false;
+		if(typeof json.content !== "undefined"){
+			if(typeof json.content !== "string"){
+				errors.push("Invalid content.");
+			}
+		}
+		if(typeof json.score_function !== "undefined"){
+			//score_function is provided
+			if (typeof json.score_function !== "string"){
+				errors.push("Invalid score function.");
+			} else {
+				//Check if score_function is well formed
+				//The score_function is retrieved in the scoreFunctionEvaluation.response var.
+				var scoreFunctionEvaluation = CODEditor.JS.validateScoreFunction(json.score_function);
+				if(scoreFunctionEvaluation.errors.length > 0){
+					for(var i=0; i<scoreFunctionEvaluation.errors.length; i++){
+						errors.push(scoreFunctionEvaluation.errors[i]);
+					}
+				} else {
+					if(typeof scoreFunctionEvaluation.response !== "function"){
+						errors.push("The score function is not a function.");
+					} else {
+						//Check if scoreFunction returns a valid score.
+						//score should be a number, or a object like {*score: {number}, errors: [], feedback: []}
+						try {
+							var testScore = scoreFunctionEvaluation.response("");
+							if(typeof testScore !== "number"){
+								if(typeof testScore === "object"){
+									if(typeof testScore.score !== "number"){
+										errors.push("The score function returns an object with an invalid or missing 'score' field.");
+									}
+									if((typeof testScore.successes !== "undefined")&&(!testScore.successes instanceof Array)){
+										errors.push("The score function returns an object with an invalid 'successes' array.");
+									}
+									if((typeof testScore.errors !== "undefined")&&(!testScore.errors instanceof Array)){
+										errors.push("The score function returns an object with an invalid 'errors' array.");
+									}
+									if((typeof testScore.feedback !== "undefined")&&(!testScore.feedback instanceof Array)){
+										errors.push("The score function returns an object with an invalid 'feedback' array.");
+									}
+								} else {
+									errors.push("The score function returns an invalid value.");
+								}
+							} else {
+								//Score is a number. Do nothing.
+							}
+						} catch(e) {
+							errors.push("Exception raised in score function: " + e.message);
+						}
+					}
+				}
+			}
 		}
 
-		//Check if score_function is well formed
-		//The score_function is retrieved in the scoreFunctionEvaluation.response var.
-		var scoreFunctionEvaluation = CODEditor.JS.validateScoreFunction(json.score_function);
-		if((scoreFunctionEvaluation.errors.length > 0)||(typeof scoreFunctionEvaluation.response !== "function")){
-			return false;
+
+		updateCurrentExercise = !(updateCurrentExercise===false);
+		
+		if((errors.length===0)&&(updateCurrentExercise)){
+			_currentExercise = json;
+			_currentExercise.score_function = scoreFunctionEvaluation.response;
 		}
 
-		_currentExercise = json;
-		_currentExercise.score_function = scoreFunctionEvaluation.response;
-
-		return true;
+		return errors;
 	};
 
 
