@@ -45,6 +45,12 @@ CODEditor.CORE = (function(C,$,undefined){
 		CODEditor.JS.init();
 		CODEditor.HTML.init();
 
+		var URLparams = _readParams();
+
+		if(typeof URLparams["file"] === "string"){
+			_getExternalFile(URLparams["file"]);
+		}
+
 		//Testing
 		// _loadExercise(CODEditor.Samples.getExample("js_sample_multivar"));
 	};
@@ -67,7 +73,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var getCurrentExercise = function(){
 		return _currentExercise;
-	}
+	};
 
 	var _initEditor = function(options){
 		_editor = ace.edit("editor");
@@ -163,6 +169,28 @@ CODEditor.CORE = (function(C,$,undefined){
 		});
 	};
 
+	//Read params when load the editor
+	var _readParams = function(){
+		var params = {};
+		try {
+			var location = window.location;
+			if(typeof location === "undefined"){
+				return params;
+			}
+			var URLparams = location.search;
+			URLparams = URLparams.substr(1,URLparams.length-1);
+			var URLparamsArray = URLparams.split("&");
+			for(var i=0; i<URLparamsArray.length; i++){
+				try {
+					var paramData = URLparamsArray[i].split("=");
+					params[paramData[0]] = paramData[1];
+				} catch(e){}
+			}
+		} catch (e) {}
+
+		return params;
+	};
+
 	var _openFile = function(){
 		//FileReader API support (doc at https://developer.mozilla.org/en-US/docs/Web/API/FileReader)
 		var isFileReaderSupported = false;
@@ -237,6 +265,24 @@ CODEditor.CORE = (function(C,$,undefined){
 		return false;
 	};
 
+	//Get external file from fileURL
+	var _getExternalFile = function(fileURL){
+		if(typeof fileURL !== "string"){
+			return;
+		}
+		
+		$.getJSON(fileURL, function(data){
+			if(_isValidExercise(data,false)){
+				_processFile(data,"application/json");
+			} else {
+				alert("El recurso cargado no es válido."); 
+			}
+		}).error(function(jqXHR,textStatus,errorThrown){
+			alert("Error loading external script from " + fileURL);
+		}).complete(function(){
+		});
+	};
+
 	var _processFile = function(fileContent,fileType){
 		if(fileType=="text/html"){
 			//HTML file
@@ -249,11 +295,13 @@ CODEditor.CORE = (function(C,$,undefined){
 			_changeEditorMode("HTML");
 		} else if (fileType=="application/json"){
 			//JSON file. Parse and load example.
-			try{
-				fileContent = JSON.parse(fileContent);
-			} catch (e) {
-				//Invalid file
-				return alert("Formato de fichero no soportado.");
+			if(typeof fileContent === "string"){
+				try{
+					fileContent = JSON.parse(fileContent);
+				} catch (e) {
+					//Invalid file
+					return alert("Formato de fichero no soportado.");
+				}
 			}
 			if(_isValidExercise(fileContent,false)){
 				return _loadExercise(fileContent);
