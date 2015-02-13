@@ -53,7 +53,8 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 
 		//Testing
-		_loadExercise(CODEditor.Samples.getExample("html_css_sample"));
+		// _loadExercise(CODEditor.Samples.getExample("html_css_sample"));
+		_loadExercise(CODEditor.Samples.getExample("js_sample_multivar"));
 	};
 
 	var getCurrentViewMode = function(){
@@ -105,7 +106,7 @@ CODEditor.CORE = (function(C,$,undefined){
 			CODEditor.UI.adjustView();
 			if(typeof _currentExercise !== "undefined"){
 				if(_currentExercise.editorMode === "HTML"){
-					CODEditor.HTML.adjustHTMLPreviewUI($("#preview div.html_result_wrapper").is(":visible"));
+					CODEditor.HTML.adjustHTMLPreviewUI();
 				}
 			}
 		};
@@ -361,6 +362,7 @@ CODEditor.CORE = (function(C,$,undefined){
 			if(typeof _editor != "undefined"){
 				_editor.resize();
 			}
+			CODEditor.UI.adjustView();
 		}
 	};
 
@@ -393,11 +395,15 @@ CODEditor.CORE = (function(C,$,undefined){
 						aceMode = "ace/mode/html";
 						initialValue = "<html>\n\n</html>"
 						$("#editor_tab p").html("index.html");
+						$("#preview_wrapper.HTML #preview_header").html("<p>Resultado</p>");
 						break;
 					case "JavaScript":
 						aceMode = "ace/mode/javascript";
 						$("#editor_tab p").html("script.js");
-						$("#preview_wrapper.JavaScript #preview_header").html("<p>Consola</p>");
+						$("#preview_wrapper.JavaScript #preview_header").html("<p>Consola</p><div id='consoleButtons'><img id='closeJSconsole' title='Cerrar consola' src='img/close_console.png'/></div>");
+						$("#closeJSconsole").click(function(){
+							_changeViewMode("CODE");
+						});
 						break;
 					default:
 						return;

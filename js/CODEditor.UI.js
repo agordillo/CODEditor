@@ -7,16 +7,20 @@ CODEditor.UI = (function(C,$,undefined){
 	var adjustView = function(){
 		//Adjust Heights
 		var windowHeight = $(window).height();
-		var headerHeight = $("#header").height();
+		var headerHeight = $("#header").outerHeight();
 		var contentHeight = windowHeight-headerHeight;
 
-		var exerciseHeight = $("#exercise_wrapper").height()+$("#exercise_wrapper").cssNumber("padding-top")+$("#exercise_wrapper").cssNumber("padding-bottom");
-		var editorWrapperHeight = contentHeight - exerciseHeight;
-		$("#editor_wrapper, #preview_wrapper").height(editorWrapperHeight);
+		var exerciseHeight = $("#exercise_wrapper").outerHeight();
+		var wrappersHeight = contentHeight - exerciseHeight;
+		$("#editor_wrapper, #preview_wrapper").height(wrappersHeight);
 
-		var subheadersHeight = $("#editor_header").height();
-		var editorHeight = editorWrapperHeight - subheadersHeight;
-		$("#editor, #preview").height(editorHeight);
+		var editorSubheaderHeight = $("#editor_header").outerHeight();
+		var editorHeight = wrappersHeight - editorSubheaderHeight;
+		$("#editor").height(editorHeight);
+
+		var previewSubheaderHeight = $("#preview_header").outerHeight();
+		var previewHeight = wrappersHeight - previewSubheaderHeight;
+		$("#preview").height(previewHeight);
 
 		//Adjust Settings
 		$("#settings_panel").height(contentHeight*0.95-$("#settings_panel").cssNumber("padding-right")*2);
@@ -28,6 +32,17 @@ CODEditor.UI = (function(C,$,undefined){
 		if(typeof CODEditor.CORE.getCurrentExercise() != "undefined"){
 			$("ul.menu li[group='exercise']").css("display","inline-block");
 		}
+
+		//Adjust widhts in hybrid mode
+		if(CODEditor.CORE.getCurrentViewMode()==="HYBRID"){
+			var totalWidth = $("#content").outerWidth();
+			var editorWrapperWidth = Math.floor(totalWidth/2);
+			$("#editor_wrapper").width(editorWrapperWidth);
+			var newEditorWrapperWidth = $("#editor_wrapper").outerWidth();
+			var previewWrapperWidth = totalWidth - newEditorWrapperWidth - 0.5;
+			$("#preview_wrapper").width(previewWrapperWidth);
+		}
+
 
 		var editor = CODEditor.CORE.getEditor();
 		if(typeof editor !== "undefined"){
