@@ -26,6 +26,7 @@ CODEditor.CORE = (function(C,$,undefined){
 	var _editorThemes = ["Chrome","Twilight"];
 	var _currentEditorTheme;
 
+	var _currentTest;
 	var _currentExercise;
 
 	var _examples = {};
@@ -53,7 +54,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		if(typeof URLparams["file"] === "string"){
 			_getExternalFile(URLparams["file"],function(data){
 				//On success
-				if(_isValidExercise(data,false)){
+				if(_isValidJSON(data)){
 					_processFile(data,"application/json");
 					// _initDefaultMode() if fails.
 				} else {
@@ -75,8 +76,9 @@ CODEditor.CORE = (function(C,$,undefined){
 		$("ul.menu li[group='examples']").css("display","inline-block");
 		_populateExamples();
 		//Testing
-		// _loadExercise(CODEditor.Samples.getExample("html_css_sample"));
-		// _loadExercise(CODEditor.Samples.getExample("js_sample_multivar"));
+		// _loadJSON(CODEditor.Samples.getExample("html_css_sample"));
+		// _loadJSON(CODEditor.Samples.getExample("js_sample_multivar"));
+		_loadJSON(CODEditor.Samples.getExample("test_sample"));
 	};
 
 	var _populateExamples = function(){
@@ -113,6 +115,10 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var getEditor = function(){
 		return _editor;
+	};
+
+	var getCurrentTest = function(){
+		return _currentTest;
 	};
 
 	var getCurrentExercise = function(){
@@ -242,9 +248,9 @@ CODEditor.CORE = (function(C,$,undefined){
 			//Load current example
 			var exampleToLoad = $("#examples_panel #examples_selection").val();
 			if(typeof _examples[exampleToLoad] !== "undefined"){
-				if(_isValidExercise(_examples[exampleToLoad])){
+				if(_isValidJSON(_examples[exampleToLoad])){
 					$("#examples").trigger("click");
-					_loadExercise(_examples[exampleToLoad]);
+					_loadJSON(_examples[exampleToLoad]);
 				}
 			}
 		});
@@ -384,8 +390,8 @@ CODEditor.CORE = (function(C,$,undefined){
 					return alert("Formato de fichero no soportado.");
 				}
 			}
-			if(_isValidExercise(fileContent,false)){
-				return _loadExercise(fileContent);
+			if(_isValidJSON(fileContent)){
+				return _loadJSON(fileContent);
 			}
 		} else {
 			//Unknown file
@@ -550,15 +556,49 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 	};
 
-	var _loadExercise = function(json){
-		var errors = _validateExercise(json);
+	var _loadJSON = function(json){
+		var errors = _validateJSON(json,true);
 
 		if(errors.length > 0){
-			errors.unshift("El ejercicio a cargar no es válido.\n\nErrores:");
+			errors.unshift("El elemento a cargar no es válido.\n\nErrores:");
 			var errorMessage = errors.join("\n");
 			return alert(errorMessage);
 		}
 
+		switch(json.type){
+			case "exercise":
+				return _loadExercise(json);
+			case "test":
+				return _loadTest(json);
+			default:
+				return alert("El elemento a cargar no es válido.");
+		}
+	};
+
+	var _loadTest = function(json){
+		var exerciseDOM = $("#exercise_wrapper");
+		$(exerciseDOM).addClass("open");
+
+
+		//Load test header
+		$("#test_header").css("display","inline-block");
+		
+		//Load title
+		var testTitle = ("#test_title");
+		$(testTitle).html(json.title);
+
+		var testMenuWrapper = $(exerciseDOM).find("#test_menu_wrapper");
+		$(testMenuWrapper).html("<p> 0 / " + _currentTest.exercisesQuantity.toString() + "</p>");
+		$(testMenuWrapper).css("display","inline-block");
+
+		_loadExercise(_getNextExercise());
+
+		// if(_hasNextExercise()){
+		// 	//Load continue button
+		// }
+	};
+
+	var _loadExercise = function(json){
 		var exerciseDOM = $("#exercise_wrapper")
 		$(exerciseDOM).addClass("open");
 
@@ -590,10 +630,93 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 		
 		CODEditor.UI.adjustView();
+
+		if(typeof _currentTest != "undefined"){
+			CODEditor.UI.updateUIAfterNewExerciseOnTest();
+		}
 	};
 
-	var _isValidExercise = function(json,updateCurrentExercise){
-		return (_validateExercise(json,updateCurrentExercise).length===0);
+	var _isValidJSON = function(json){
+		return (_validateJSON(json,false).length===0);
+	};
+
+	var _validateJSON = function(json,updateCurrent){
+		var errors = [];
+
+		if(typeof json !== "object"){
+			return errors.push("Invalid json. Is not an object.");
+		}
+
+		if((typeof json.type !== "string")||(["exercise","test"].indexOf(json.type)===-1)){
+			return errors.push("Invalid 'type' value.");
+		}
+
+		switch(json.type){
+			case "exercise":
+				return _validateExercise(json,updateCurrent);
+			case "test":
+				return _validateTest(json,updateCurrent);
+			default:
+				return errors.push("Invalid 'type' value.");
+		}
+	};
+
+	var _validateTest = function(json,updateCurrentTest){
+		var errors = [];
+
+		if(typeof json !== "object"){
+			return errors.push("Invalid json. Is not an object.");
+		}
+		if(json.type !== "test"){
+			errors.push("Type is not 'test'.");
+		}
+		if(typeof json.title !== "string"){
+			errors.push("Invalid title.");
+		}
+
+		var validExercises = true;
+		try {
+			var exercises = JSON.parse(json.exercises);		
+		} catch(e) {
+			errors.push("Invalid exercises.");
+			validExercises = false;
+		}
+
+		//Continue with the exercises validation
+		if(validExercises){
+			if(!(exercises instanceof Array)){
+				errors.push("Invalid exercises.");
+				validExercises = false;
+			} else {
+				if(exercises.length < 1){
+					errors.push("There are no exercises.");
+				} else {
+					for(var i=0; i<exercises.length; i++){
+						if(!_isValidJSON(exercises[i])){
+							errors.push("Exercise not valid found.");
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		updateCurrentTest = !(updateCurrentTest===false);
+		
+		if((errors.length===0)&&(updateCurrentTest)){
+			_currentTest = json;
+			_currentTest.exercisesQuantity = exercises.length;
+			_currentTest.currentExerciseIndex = 0;
+			_currentTest.parsed_exercises = exercises;
+			for(var j=0; j<exercises.length; j++){
+				exercises[j].progress = {
+					score: 0,
+					passed: false
+				}
+			}
+		}
+
+		return errors;
 	};
 
 	var _validateExercise = function(json,updateCurrentExercise){
@@ -674,7 +797,6 @@ CODEditor.CORE = (function(C,$,undefined){
 			}
 		}
 
-
 		updateCurrentExercise = !(updateCurrentExercise===false);
 		
 		if((errors.length===0)&&(updateCurrentExercise)){
@@ -686,13 +808,29 @@ CODEditor.CORE = (function(C,$,undefined){
 	};
 
 
+	//Test management
+
+	var _hasNextExercise = function(){
+		return ((typeof _currentTest != "undefined")&&( _currentTest.currentExerciseIndex < _currentTest.exercisesQuantity))
+	};
+
+	var _getNextExercise = function(){
+		if(_hasNextExercise()){
+			_currentTest.currentExerciseIndex += 1;
+			return _currentTest.parsed_exercises[_currentTest.currentExerciseIndex-1];
+		} else {
+			return undefined;
+		}
+	};
+
 	return {
 		init 					: init,
 		getCurrentViewMode		: getCurrentViewMode,
 		getCurrentEditorMode 	: getCurrentEditorMode,
 		getCurrentEditorTheme	: getCurrentEditorTheme,
 		getEditor 				: getEditor,
-		getCurrentExercise 		: getCurrentExercise
+		getCurrentExercise 		: getCurrentExercise,
+		getCurrentTest			: getCurrentTest
 	};
 
 }) (CODEditor,jQuery);

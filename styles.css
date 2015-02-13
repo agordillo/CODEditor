@@ -102,9 +102,8 @@ html, body {
 }
 
 #exercise_wrapper {
+	position: relative;
 	height: 0;
-	padding: 20px;
-	padding-top: 15px;
 	font-size: 1.1rem;
 	background: #4C4C4C;
 	color: white;
@@ -119,14 +118,61 @@ html, body {
 	display: block;
 }
 
+#exercise_title_wrapper {
+	padding: 20px;
+	padding-top: 15px;
+}
+
 #exercise_title{
 	font-size: 1.6rem;
 	margin: 0px;
 	margin-bottom: 16px;
 }
 
-#exercise_description{
+#test_header {
+	width: 100%;
+	display: none;
+	min-height: 20px;
+	background: #ebebeb;
+	padding: 10px 20px 10px 20px;
+}
 
+#test_title {
+	display: "inline-block";
+	color: black;
+	font-size: 1.2rem;
+	color: #969696;
+	float: left;
+}
+
+#test_menu_wrapper {
+	display: "inline-block";
+	top: 7px;
+	right: 30px;
+	border-radius: 15px;
+	border: 1px solid #4C4C4C;
+	text-align: center;
+	cursor: pointer;
+	opacity: 0.5;
+	float: left;
+	margin-left: 25px;
+	margin-top: -3px;
+}
+
+#test_menu_wrapper:hover {
+	opacity: 1;
+}
+
+#test_menu_wrapper p {
+	padding: 2px 8px 2px 11px;
+	margin: 0px;
+	font-size: 1.2rem;
+	font-weight: bold;
+	color: #969696;
+}
+
+#exercise_description{
+	padding: 20px;
 }
 
 #editor, #preview {

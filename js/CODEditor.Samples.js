@@ -257,6 +257,15 @@ CODEditor.Samples = (function(C,$,undefined){
 		"score_function": ("var score = " + html_css_sample_score.toString())
 	};
 
+
+
+	/* Test Example 1*/
+	var test_sample = {
+		"type": "test",
+		"title": "Introducción a JavaScript",
+		"exercises": JSON.stringify([ js_sample, js_sample_feedback, js_sample_multivar ])
+	};
+
 	var getExample = function(exampleName){
 		var example = undefined;
 		try {

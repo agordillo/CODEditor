@@ -43,6 +43,9 @@ CODEditor.UI = (function(C,$,undefined){
 			$("#preview_wrapper").width(previewWrapperWidth);
 		}
 
+		if ($("#test_header").is(":visible")){
+			$("#test_header").width($("#content").outerWidth() - $("#test_header").cssNumber("padding-right") - $("#test_header").cssNumber("padding-left"));
+		}
 
 		var editor = CODEditor.CORE.getEditor();
 		if(typeof editor !== "undefined"){
@@ -62,12 +65,20 @@ CODEditor.UI = (function(C,$,undefined){
 		$("#preview").html("");
 	};
 
+	var updateUIAfterNewExerciseOnTest = function(){
+		var currentTest = CODEditor.CORE.getCurrentTest();
+
+		var testMenuWrapper = ("#test_menu_wrapper");
+		$(testMenuWrapper).html("<p> " + currentTest.currentExerciseIndex.toString() + " / " + currentTest.exercisesQuantity.toString() + "</p>");
+	};
+
 
 	return {
-		init 				: init,
-		adjustView			: adjustView,
-		updateSettingsPanel : updateSettingsPanel,
-		cleanPreview		: cleanPreview
+		init 							: init,
+		adjustView						: adjustView,
+		updateSettingsPanel 			: updateSettingsPanel,
+		cleanPreview					: cleanPreview,
+		updateUIAfterNewExerciseOnTest	: updateUIAfterNewExerciseOnTest
 	};
 
 }) (CODEditor,jQuery);
