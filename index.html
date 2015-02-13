@@ -27,6 +27,8 @@
 		<ul class="menu">
 			<li id="editorModeMenu" class="mitem mitemmode" title="Cambiar Lenguaje"></li>
 
+			<li id="examples" class="mitem first last withoutRightBorder" group="examples"><img src="img/glyphicons-156-show-big-thumbnails.png" title="Cargar ejemplos"/></li>
+
 			<li id="refresh" class="mitem first last withoutRightBorder" group="exercise"><img src="img/glyphicons-82-refresh.png" title="Recargar ejemplo"/></li>
 
 			<li id="open" class="mitem first" group="files">
@@ -68,47 +70,83 @@
 
 	<div id="footer"></div>
 
-	<div id="settings_panel">
-		<img id="closeSettingsButton" src="img/glyphicons-198-remove.png"/>
+	<div id="settings_panel" class="cpanel" >
+		<img id="closeSettingsButton" class="close_panel_button" src="img/glyphicons-198-remove.png"/>
 		<div class="title">Opciones</div>
-		<table id="controls">
+		<table>
 			<tr>
-			  <td>Modo</td>
-			  <td>
-				<select id="settings_mode" size="1">
-					<option value="HTML">HTML</option>
-					<option value="JavaScript">JavaScript</option>
-				</select>
-			  </td>
+				<td>Modo</td>
+				<td>
+					<select id="settings_mode" size="1">
+						<option value="HTML">HTML</option>
+						<option value="JavaScript">JavaScript</option>
+					</select>
+			  	</td>
 			</tr>
 			<tr>
-			  <td >Theme</td>
-			  <td>
-			    <select id="settings_theme" size="1">
-					<option value="Chrome">Chrome</option>
-					<option value="Twilight">Twilight</option>
-				</select>
-			  </td>
+				<td>Theme</td>
+				<td>
+					<select id="settings_theme" size="1">
+						<option value="Chrome">Chrome</option>
+						<option value="Twilight">Twilight</option>
+					</select>
+				</td>
 			</tr>
 			<tr>
-			  <td>Font Size</td>
-			  <td>
-			    <select id="settings_fontsize" size="1">
-			      <option value="10px">10px</option>
-			      <option value="11px">11px</option>
-			      <option value="12px">12px</option>
-			      <option value="13px">13px</option>
-			      <option value="14px">14px</option>
-			      <option value="16px">16px</option>
-			      <option value="18px">18px</option>
-			      <option value="20px">20px</option>
-			      <option value="24px">24px</option>
-			    </select>
-			  </td>
+				<td>Font Size</td>
+				<td>
+					<select id="settings_fontsize" size="1">
+						<option value="10px">10px</option>
+						<option value="11px">11px</option>
+						<option value="12px">12px</option>
+						<option value="13px">13px</option>
+						<option value="14px">14px</option>
+						<option value="16px">16px</option>
+						<option value="18px">18px</option>
+						<option value="20px">20px</option>
+						<option value="24px">24px</option>
+					</select>
+				</td>
 			</tr>
-    		<tr><td colspan="2"></td></tr>
-  		</table>
+			<tr><td colspan="2"></td></tr>
+		</table>
 	</div>
+
+	<div id="examples_panel" class="cpanel">
+		<img id="closeExamplesButton" class="close_panel_button" src="img/glyphicons-198-remove.png"/>
+		<div class="title">Ejemplos</div>
+
+		<table>
+			<tr>
+				<td>Modo</td>
+				<td>
+					<select id="examples_mode" size="1">
+						<option value="HTML">HTML</option>
+						<option value="JavaScript">JavaScript</option>
+					</select>
+			  	</td>
+			</tr>
+			<tr>
+				<td>Ejemplos</td>
+				<td>
+					<select id="examples_selection" size="1"></select>
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>
+					<div class="panel_button_wrapper">
+						<div class="panel_button_header"><p>Cargar ejemplo</p></div>
+						<div class="panel_button_content"><img id="loadExample" class="panel_button" src="img/glyphicons-416-disk-open.png"/></div>
+					</div>
+				</td>
+			</tr>
+			<tr><td colspan="1"></td></tr>
+		</table>
+		
+	</div>
+
+
 </body>
 <script type="text/javascript">
 	$(document).ready(function(){

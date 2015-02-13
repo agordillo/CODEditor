@@ -11,7 +11,7 @@ CODEditor.Samples = (function(C,$,undefined){
 
 	var js_sample = {
 		"type": "exercise",
-		"title": "Hello World",
+		"title": "Hello World con JavaScript",
 		"description":"Escriba 'Hello World'.",
 		"editorMode":"JavaScript",
 		"content": "/*\n * Escriba \"Hello World\" y ejecute el código.\n */\n ",
@@ -44,7 +44,7 @@ CODEditor.Samples = (function(C,$,undefined){
 
 	var js_sample_feedback = {
 		"type": "exercise",
-		"title": "Hello World con feedback",
+		"title": "Hello World con feedback en JavaScript",
 		"description":"Escriba 'Hello World'.",
 		"editorMode":"JavaScript",
 		"content": "/*\n * Escriba \"Hello World\" y ejecute el código.\n */\n ",
@@ -269,6 +269,9 @@ CODEditor.Samples = (function(C,$,undefined){
 		var examples = [];
 		examples.push(js_sample);
 		examples.push(js_sample_feedback);
+		examples.push(js_sample_multivar);
+		examples.push(html_sample);
+		examples.push(html_css_sample);
 		return examples;
 	};
 

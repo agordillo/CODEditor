@@ -68,20 +68,7 @@ CODEditor.JS = (function(C,$,undefined){
 			}
 		} else {
 			if(!CODEditor.Utils.isCodeEmpty(jscode)){
-				//TODO. Move to Score module
-				$(wrapper).append("<p class='separator'></p>");
-				var errorsWrapper = $("<div class='errors_wrapper'></div>");
-				var errorsHeader = $("<div class='errors_header output_header'></div>");
-				var errorsContentWrapper = $("<div class='errors_content_wrapper output_content_wrapper'></div>");
-				var errorsContent = $("<pre class='errors'></pre>");
-				
-				$(errorsHeader).append("Errores");
-				$(errorsContent).append("Se produjo un error de ejecución." + "\n");
-
-				$(errorsContentWrapper).append(errorsContent);
-				$(errorsWrapper).append(errorsHeader);
-				$(errorsWrapper).append(errorsContentWrapper);
-				$(wrapper).append(errorsWrapper);
+				CODEditor.Score.displayErrors(["Se produjo un error de ejecución."],wrapper);
 			}
 		}
 

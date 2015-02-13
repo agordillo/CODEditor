@@ -28,6 +28,8 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _currentExercise;
 
+	var _examples = {};
+
 
 	var init = function(options){
 		CODEditor.Utils.init();
@@ -49,12 +51,52 @@ CODEditor.CORE = (function(C,$,undefined){
 		var URLparams = _readParams();
 
 		if(typeof URLparams["file"] === "string"){
-			_getExternalFile(URLparams["file"]);
+			_getExternalFile(URLparams["file"],function(data){
+				//On success
+				if(_isValidExercise(data,false)){
+					_processFile(data,"application/json");
+					// _initDefaultMode() if fails.
+				} else {
+					alert("El recurso cargado no es válido.");
+					_initDefaultMode();
+				}
+			}, function(jqXHR,textStatus,errorThrown){
+				//On failure
+				alert("Error loading external script from " + URLparams["file"]);
+				_initDefaultMode();
+			});
+		} else {
+			_initDefaultMode();
 		}
+	};
 
+	//Init CODeditor when no excercise is loaded
+	var _initDefaultMode = function(){
+		$("ul.menu li[group='examples']").css("display","inline-block");
+		_populateExamples();
 		//Testing
 		// _loadExercise(CODEditor.Samples.getExample("html_css_sample"));
-		_loadExercise(CODEditor.Samples.getExample("js_sample_multivar"));
+		// _loadExercise(CODEditor.Samples.getExample("js_sample_multivar"));
+	};
+
+	var _populateExamples = function(){
+		var allExamples = CODEditor.Samples.getExamples();
+		var selector = $("#examples_panel #examples_selection");
+		for(var i=0; i<allExamples.length; i++){
+			var example = allExamples[i];
+			// <option group="js" value="js_sample">Hello World with JavaScript</option>
+			$(selector).append('<option group="'+ example.editorMode + '" value="'+ i.toString() +'">' + example.title + '</option>');
+			_examples[i] = example;
+		}
+	};
+
+	var _loadExamples = function(editorMode){
+		if(_editorModes.indexOf(editorMode)===-1){
+			editorMode = _currentEditorMode;
+		}
+		$("#examples_panel #examples_selection option").removeAttr("selected").hide();
+		$("#examples_panel #examples_selection option[group='" + editorMode + "']").show();
+		$($("#examples_panel #examples_selection option[group='" + editorMode + "']")[0]).attr("selected","selected");
 	};
 
 	var getCurrentViewMode = function(){
@@ -127,6 +169,18 @@ CODEditor.CORE = (function(C,$,undefined){
 			}
 		});
 
+		$("#examples").click(function(e){
+			if($(this).hasClass("active")){
+				$(this).removeClass("active");
+				$("#examples_panel").hide();
+			} else {
+				$("#examples_panel #examples_mode option[value='"+CODEditor.CORE.getCurrentEditorMode()+"']").attr("selected","selected");
+				_loadExamples();
+				$(this).addClass("active");
+				$("#examples_panel").show();
+			}
+		});
+
 		$("#editorModeMenu").click(function(){
 			$("#settings").trigger("click");
 		});
@@ -134,6 +188,11 @@ CODEditor.CORE = (function(C,$,undefined){
 		$("#closeSettingsButton").click(function(){
 			$("#settings").removeClass("active");
 			$("#settings_panel").hide();
+		});
+
+		$("#closeExamplesButton").click(function(){
+			$("#examples").removeClass("active");
+			$("#examples_panel").hide();
 		});
 
 		$("#settings_fontsize").change(function(event) {
@@ -144,6 +203,10 @@ CODEditor.CORE = (function(C,$,undefined){
 		$("#settings_mode").change(function(event) {
 			var newEditorMode = $(this).val();
 			_changeEditorMode(newEditorMode);
+		});
+
+		$("#examples_mode").change(function(event) {
+			_loadExamples($(this).val());
 		});
 
 		$("#settings_theme").change(function(event) {
@@ -172,6 +235,17 @@ CODEditor.CORE = (function(C,$,undefined){
 				}
 			} else {
 				alert("No hay ningún ejercicio que reiniciar.");
+			}
+		});
+
+		$("#loadExample").click(function(){
+			//Load current example
+			var exampleToLoad = $("#examples_panel #examples_selection").val();
+			if(typeof _examples[exampleToLoad] !== "undefined"){
+				if(_isValidExercise(_examples[exampleToLoad])){
+					$("#examples").trigger("click");
+					_loadExercise(_examples[exampleToLoad]);
+				}
 			}
 		});
 	};
@@ -273,19 +347,19 @@ CODEditor.CORE = (function(C,$,undefined){
 	};
 
 	//Get external file from fileURL
-	var _getExternalFile = function(fileURL){
+	var _getExternalFile = function(fileURL,successCallback,failCallback){
 		if(typeof fileURL !== "string"){
 			return;
 		}
 		
 		$.getJSON(fileURL, function(data){
-			if(_isValidExercise(data,false)){
-				_processFile(data,"application/json");
-			} else {
-				alert("El recurso cargado no es válido."); 
+			if(typeof successCallback == "function"){
+				successCallback(data);
 			}
 		}).error(function(jqXHR,textStatus,errorThrown){
-			alert("Error loading external script from " + fileURL);
+			if(typeof failCallback == "function"){
+				failCallback(jqXHR,textStatus,errorThrown);
+			}
 		}).complete(function(){
 		});
 	};
@@ -313,6 +387,8 @@ CODEditor.CORE = (function(C,$,undefined){
 			if(_isValidExercise(fileContent,false)){
 				return _loadExercise(fileContent);
 			}
+		} else {
+			//Unknown file
 		}
 
 		_editor.setValue(fileContent,1);
@@ -506,6 +582,8 @@ CODEditor.CORE = (function(C,$,undefined){
 		_changeEditorMode(json.editorMode,false);
 		//Block editorMode in settings
 		$("#settings_mode").attr("disabled","disabled");
+
+		CODEditor.UI.cleanPreview();
 
 		if(typeof json.content == "string"){
 			_editor.setValue(json.content,1);

@@ -22,9 +22,9 @@ CODEditor.UI = (function(C,$,undefined){
 		var previewHeight = wrappersHeight - previewSubheaderHeight;
 		$("#preview").height(previewHeight);
 
-		//Adjust Settings
-		$("#settings_panel").height(contentHeight*0.95-$("#settings_panel").cssNumber("padding-right")*2);
-		$("#settings_panel").css("top",40+contentHeight*0.025);
+		//Adjust Panels (Settings, Examples, ...)
+		$(".cpanel").height(contentHeight*0.95-$(".cpanel").cssNumber("padding-right")*2);
+		$(".cpanel").css("top",40+contentHeight*0.025);
 
 		//More adjustments...
 		// var glutterWidth = $("div.ace_layer.ace_gutter-layer.ace_folding-enabled").width();
