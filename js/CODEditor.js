@@ -254,6 +254,54 @@ CODEditor.CORE = (function(C,$,undefined){
 				}
 			}
 		});
+
+		$("#test_menu_wrapper").click(function(){
+			var dialogDOM = $("#test_exercises_dialog");
+			$(dialogDOM).attr("Title",_currentTest.title);
+
+			var dialogWidth = 400;
+			var dialogHeight = 175;
+
+			$(dialogDOM).dialog({
+				autoOpen: true,
+				dialogClass:'testMenuWrapper',
+				closeOnEscape: true,
+				resizable: false,
+				draggable: false,
+				width: dialogWidth,
+				height: dialogHeight,
+				modal: true,
+				position: {my: "center top", at: "center bottom", of: "#test_menu_wrapper"}
+			});
+
+			//Add some extra top margin.
+			var newDialogDOM = $(".testMenuWrapper");
+			$(newDialogDOM).css("margin-top", $(newDialogDOM).cssNumber("margin-top") + 10 + "px");
+
+			addArrowToDialog(newDialogDOM,"top");
+
+			return false;
+		});
+	};
+
+	var addArrowToDialog = function(dialogDOM, position){
+		//Remove old arrows
+		$(dialogDOM).find(".dialog_arrow").remove();
+
+		var arrowDOM = $('<div class="dialog_arrow"></div>');
+		var arrowShape = $('<div class="arrow_shape"></div>');
+		$(arrowDOM).prepend(arrowShape);
+
+		if(position==="top"){
+			$(arrowShape).addClass("arrow-top");
+		} else {
+			$(arrowShape).addClass("arrow-bottom");
+		}
+
+		$(dialogDOM).prepend(arrowDOM);
+
+		var arrowLeft = ($(dialogDOM).width()-12)/2;
+		$(arrowDOM).css("left",arrowLeft);
 	};
 
 	//Read params when load the editor
@@ -587,7 +635,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		var testTitle = ("#test_title");
 		$(testTitle).html(json.title);
 
-		var testMenuWrapper = $(exerciseDOM).find("#test_menu_wrapper");
+		var testMenuWrapper = $("#test_menu_wrapper");
 		$(testMenuWrapper).html("<p> 0 / " + _currentTest.exercisesQuantity.toString() + "</p>");
 		$(testMenuWrapper).css("display","inline-block");
 
@@ -603,7 +651,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		$(exerciseDOM).addClass("open");
 
 		//Load title
-		var exerciseTitleDOM = $(exerciseDOM).find("#exercise_title");
+		var exerciseTitleDOM = $("#exercise_title");
 		if(json.title){
 			$(exerciseTitleDOM).html(json.title);
 			$(exerciseTitleDOM).show();
@@ -616,7 +664,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		//Look for code tags.
 		json.description = json.description.replace(/&lt;code&gt;/g, '<span class="code">');
 		json.description = json.description.replace(/&lt;\/code&gt;/g, '</span>');
-		$(exerciseDOM).find("#exercise_description").html(json.description);
+		$("#exercise_description").html(json.description);
 
 		//Editor mode
 		_changeEditorMode(json.editorMode,false);

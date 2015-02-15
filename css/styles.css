@@ -130,6 +130,7 @@ html, body {
 }
 
 #test_header {
+	positon: relative;
 	width: 100%;
 	display: none;
 	min-height: 20px;
@@ -138,6 +139,7 @@ html, body {
 }
 
 #test_title {
+	positon: relative;
 	display: "inline-block";
 	color: black;
 	font-size: 1.2rem;
@@ -146,16 +148,15 @@ html, body {
 }
 
 #test_menu_wrapper {
+	positon: relative;
 	display: "inline-block";
-	top: 7px;
-	right: 30px;
 	border-radius: 15px;
 	border: 1px solid #4C4C4C;
 	text-align: center;
 	cursor: pointer;
 	opacity: 0.5;
 	float: left;
-	margin-left: 25px;
+	margin-left: 15px;
 	margin-top: -3px;
 }
 
@@ -169,6 +170,10 @@ html, body {
 	font-size: 1.2rem;
 	font-weight: bold;
 	color: #969696;
+}
+
+#test_exercises_dialog{
+	position: relative;
 }
 
 #exercise_description{
@@ -477,6 +482,67 @@ img.success_icon, img.error_icon {
 	margin-bottom: 0px;
 	padding-bottom: 0px;
 	padding-top: 10px;
+}
+
+
+/* Dialogs */
+
+.testMenuWrapper .ui-dialog-titlebar-close {
+	display: none;
+}
+
+.dialog_arrow {
+	position: absolute;
+	width: 20px;
+    height: 20px;
+    z-index: 90;
+    top: -22px;
+}
+
+.arrow_shape::before, .arrow_shape::after {
+	z-index: 90;
+	content: "";
+    width: 0;
+    height: 0;
+    position: absolute;
+    border-style: solid;
+}
+
+.arrow_shape::before {
+	border-width: 15px;
+}
+
+.arrow_shape::after {
+	border-width: 10px;
+}
+
+.arrow-bottom.arrow_shape::before {
+    border-color: black transparent transparent transparent;
+    top: 2px;
+}
+
+.arrow-bottom.arrow_shape::after {
+    border-color: #fff transparent transparent transparent;
+    top: 1px;
+}
+
+.arrow-top.arrow_shape::before {
+	border-color: transparent transparent black transparent;
+	top: -8px;
+	left: -5px;
+}
+
+.arrow-top.arrow_shape:after {
+    border-color: transparent transparent #fff transparent;
+    top: 2px;
+}
+
+.ui-dialog, .ui-dialog {
+    overflow:visible;
+}
+
+.ui-dialog.ui-widget {
+    border: 3px solid black;
 }
 
 
