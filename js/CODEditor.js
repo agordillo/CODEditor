@@ -236,7 +236,7 @@ CODEditor.CORE = (function(C,$,undefined){
 			if(typeof _currentExercise != "undefined"){
 				var r = confirm("Si recargas el ejercicio perderás todos tus cambios. ¿Estás seguro de que deseas hacerlo?");
 				if (r === true) {
-					_loadExercise(_currentExercise);
+					_loadJSON(_currentExercise);
 					CODEditor.UI.cleanPreview();
 				}
 			} else {
@@ -260,7 +260,7 @@ CODEditor.CORE = (function(C,$,undefined){
 			$(dialogDOM).attr("Title",_currentTest.title);
 
 			var dialogWidth = 400;
-			var dialogHeight = 175;
+			var dialogHeight = "auto";
 
 			$(dialogDOM).dialog({
 				autoOpen: true,
@@ -271,7 +271,16 @@ CODEditor.CORE = (function(C,$,undefined){
 				width: dialogWidth,
 				height: dialogHeight,
 				modal: true,
-				position: {my: "center top", at: "center bottom", of: "#test_menu_wrapper"}
+				position: {my: "center top", at: "center bottom", of: "#test_menu_wrapper"},
+				open: function(event, ui) {
+					//Close dialog when click outside
+					$('.ui-widget-overlay').bind('click', function(){ 
+						$(dialogDOM).dialog('close'); 
+					});
+				},
+				close: function(event, ui){
+					$("#test_menu_wrapper > div").removeClass("open");
+				}
 			});
 
 			//Add some extra top margin.
@@ -279,6 +288,8 @@ CODEditor.CORE = (function(C,$,undefined){
 			$(newDialogDOM).css("margin-top", $(newDialogDOM).cssNumber("margin-top") + 10 + "px");
 
 			addArrowToDialog(newDialogDOM,"top");
+
+			$("#test_menu_wrapper > div").addClass("open");
 
 			return false;
 		});
@@ -605,7 +616,7 @@ CODEditor.CORE = (function(C,$,undefined){
 	};
 
 	var _loadJSON = function(json){
-		var errors = _validateJSON(json,true);
+		var errors = _validateJSON(json);
 
 		if(errors.length > 0){
 			errors.unshift("El elemento a cargar no es válido.\n\nErrores:");
@@ -636,10 +647,12 @@ CODEditor.CORE = (function(C,$,undefined){
 		$(testTitle).html(json.title);
 
 		var testMenuWrapper = $("#test_menu_wrapper");
-		$(testMenuWrapper).html("<p> 0 / " + _currentTest.exercisesQuantity.toString() + "</p>");
 		$(testMenuWrapper).css("display","inline-block");
 
-		_loadExercise(_getNextExercise());
+		_loadJSON(_getNextExercise());
+
+		//Populate MenuWrapper
+		CODEditor.UI.updateTestMenuDialog();
 
 		// if(_hasNextExercise()){
 		// 	//Load continue button
@@ -756,8 +769,8 @@ CODEditor.CORE = (function(C,$,undefined){
 			_currentTest.exercisesQuantity = exercises.length;
 			_currentTest.currentExerciseIndex = 0;
 			_currentTest.parsed_exercises = exercises;
-			for(var j=0; j<exercises.length; j++){
-				exercises[j].progress = {
+			for(var j=0; j<_currentTest.parsed_exercises.length; j++){
+				_currentTest.parsed_exercises[j].progress = {
 					score: 0,
 					passed: false
 				}
@@ -871,6 +884,25 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 	};
 
+	var loadTestExercise = function(exerciseIndex){
+		_currentTest.currentExerciseIndex = exerciseIndex;
+		var excercise = _currentTest.parsed_exercises[_currentTest.currentExerciseIndex-1];
+		_loadJSON(excercise);
+		CODEditor.UI.updateTestMenuDialog();
+	};
+
+	var onPassCurrentExercise = function(){
+		if(typeof _currentTest != "undefined"){
+			if(typeof _currentExercise != "undefined"){
+				_currentExercise.progress.passed = true;
+				CODEditor.UI.updateTestMenuDialog();
+				if(_hasNextExercise()){
+					//TODO: Load dialog to propose advance to the next exercise...
+				}
+			}
+		}
+	};
+
 	return {
 		init 					: init,
 		getCurrentViewMode		: getCurrentViewMode,
@@ -878,7 +910,9 @@ CODEditor.CORE = (function(C,$,undefined){
 		getCurrentEditorTheme	: getCurrentEditorTheme,
 		getEditor 				: getEditor,
 		getCurrentExercise 		: getCurrentExercise,
-		getCurrentTest			: getCurrentTest
+		getCurrentTest			: getCurrentTest,
+		loadTestExercise		: loadTestExercise,
+		onPassCurrentExercise	: onPassCurrentExercise
 	};
 
 }) (CODEditor,jQuery);

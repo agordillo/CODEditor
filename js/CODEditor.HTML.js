@@ -34,6 +34,10 @@ CODEditor.HTML = (function(C,$,undefined){
 					adjustHTMLPreviewUI();
 
 					CODEditor.Score.displayScore(score,htmlResultContent);
+
+					if(score.score >= 5){
+						CODEditor.CORE.onPassCurrentExercise();
+					}
 				}
 			}		
 		}

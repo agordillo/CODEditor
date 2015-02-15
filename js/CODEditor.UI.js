@@ -69,7 +69,41 @@ CODEditor.UI = (function(C,$,undefined){
 		var currentTest = CODEditor.CORE.getCurrentTest();
 
 		var testMenuWrapper = ("#test_menu_wrapper");
-		$(testMenuWrapper).html("<p> " + currentTest.currentExerciseIndex.toString() + " / " + currentTest.exercisesQuantity.toString() + "</p>");
+		$(testMenuWrapper).find("p").html(currentTest.currentExerciseIndex.toString() + "/" + currentTest.exercisesQuantity.toString());
+	};
+
+	var updateTestMenuDialog = function(){
+		var currentTest = CODEditor.CORE.getCurrentTest();
+		var currentExercise = CODEditor.CORE.getCurrentExercise();
+
+		var menuDOM = $("#test_exercises_dialog");
+		$(menuDOM).html("");
+
+		var exercisesList = $("<ul></ul>");
+		for(var i=0; i<currentTest.parsed_exercises.length; i++){
+			var exercise = currentTest.parsed_exercises[i];
+			var exerciseIndex = (i+1);
+			var li = $("<li exerciseIndex='" + exerciseIndex.toString() + "'><div class='exerciseProgressIcon'></div><span class='exerciseIndex'>" + exerciseIndex.toString() + ".</span> " + exercise.title + "</li>");
+			if(exercise.progress.passed === true){
+				$(li).addClass("passed");
+				$(li).find(".exerciseProgressIcon").append("<img src='img/success_icon.png'/>");
+			// } else if(exercise===currentExercise){
+			} else if(exerciseIndex===currentTest.currentExerciseIndex){
+				$(li).addClass("current");
+				$(li).find(".exerciseProgressIcon").append("<span>></span>");
+			}
+			$(exercisesList).append(li);
+		}
+		$(menuDOM).append(exercisesList);
+
+		//Reload events
+		$("#test_exercises_dialog ul li").click(function(){
+			var exerciseIndex = parseInt($(this).attr("exerciseindex"));
+			if((typeof exerciseIndex === "number")&&(!isNaN(exerciseIndex))){
+				CODEditor.CORE.loadTestExercise(exerciseIndex);
+				$("#test_exercises_dialog").dialog('close');
+			}
+		});
 	};
 
 
@@ -78,7 +112,8 @@ CODEditor.UI = (function(C,$,undefined){
 		adjustView						: adjustView,
 		updateSettingsPanel 			: updateSettingsPanel,
 		cleanPreview					: cleanPreview,
-		updateUIAfterNewExerciseOnTest	: updateUIAfterNewExerciseOnTest
+		updateUIAfterNewExerciseOnTest	: updateUIAfterNewExerciseOnTest,
+		updateTestMenuDialog			: updateTestMenuDialog
 	};
 
 }) (CODEditor,jQuery);

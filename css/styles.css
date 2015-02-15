@@ -136,14 +136,13 @@ html, body {
 	min-height: 20px;
 	background: #ebebeb;
 	padding: 10px 20px 10px 20px;
+	color: #969696;
 }
 
 #test_title {
 	positon: relative;
 	display: "inline-block";
-	color: black;
 	font-size: 1.2rem;
-	color: #969696;
 	float: left;
 }
 
@@ -154,10 +153,11 @@ html, body {
 	border: 1px solid #4C4C4C;
 	text-align: center;
 	cursor: pointer;
-	opacity: 0.5;
+	opacity: 0.7;
 	float: left;
 	margin-left: 15px;
 	margin-top: -3px;
+	padding-right: 10px;
 }
 
 #test_menu_wrapper:hover {
@@ -170,6 +170,26 @@ html, body {
 	font-size: 1.2rem;
 	font-weight: bold;
 	color: #969696;
+	float: left;
+}
+
+#test_menu_wrapper > div {
+	border-top-color: rgba(255,255,255,0.78);
+	position: relative;
+	top: 8px;
+	margin-left: 0px;
+	display: inline-block;
+	border-color: #000 transparent transparent transparent;
+	border-style: solid inset inset inset;
+	border-width: 3px;
+	width: 0;
+	height: 0;
+	float: left;
+}
+
+#test_menu_wrapper > div.open {
+	transform: rotate(180deg);
+	top: 5px !important;
 }
 
 #test_exercises_dialog{
@@ -543,6 +563,68 @@ img.success_icon, img.error_icon {
 
 .ui-dialog.ui-widget {
     border: 3px solid black;
+}
+
+.testMenuWrapper ul {
+	list-style: none;
+	padding: 0px;
+	position: relative;
+}
+
+.testMenuWrapper ul li {
+	padding: 12px 0px 12px 0px;
+	cursor: pointer;
+}
+
+.testMenuWrapper ul li:hover {
+	font-weight: bold;
+}
+
+.testMenuWrapper ul li:not(.passed):hover div.exerciseProgressIcon {
+	background-color: black;
+}
+
+.testMenuWrapper span.exerciseIndex {
+	font-weight: bold;
+}
+
+.testMenuWrapper div.exerciseProgressIcon {
+	position: relative;
+	z-index: 2;
+	width: 15px;
+	border-radius: 30px;
+	border: 2px solid #d2d2d2;
+	height: 15px;
+	float: left;
+	margin-right: 13px;
+	background-color: white;
+	text-align: center;
+}
+
+.testMenuWrapper ul li.current div.exerciseProgressIcon {
+	background: black;
+	color: white;
+	font-weight: bold;
+	font-size: 0.9rem;
+}
+
+div.exerciseProgressIcon img {
+	max-height: 70%;
+	max-width: 70%;
+}
+
+.testMenuWrapper ul:before {
+	display: block;
+	height: auto;
+	width: 1px;
+	content: "";
+	z-index: 1;
+	position: absolute;
+	top: 14px;
+	bottom: 0;
+	left: 9px;
+	margin: 10px 0;
+	background-color: rgba(16, 16, 16, 0.14);
 }
 
 
