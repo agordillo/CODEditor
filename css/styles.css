@@ -422,9 +422,6 @@ div#consoleButtons > * {
 	margin-top: 9px;
 }
 
-div.html_result_wrapper {
-}
-
 div.result_wrapper {
 	background: black;
 	color: white;
@@ -483,6 +480,10 @@ span.overall_score {
 	padding: 12px;
 	width: auto;
 	margin-top: 3px;
+}
+
+div.html_result_wrapper div.html_resultContent .nextExerciseButtonWrapper {
+	padding-bottom: 20px;
 }
 
 pre.failed, pre.errors {

@@ -67,6 +67,11 @@ CODEditor.CORE = (function(C,$,undefined){
 				_initDefaultMode();
 			});
 		} else {
+			//Testing
+			// _loadJSON(CODEditor.Samples.getExample("html_css_sample"));
+			// _loadJSON(CODEditor.Samples.getExample("js_sample_multivar"));
+			// _loadJSON(CODEditor.Samples.getExample("test_sample"));
+
 			_initDefaultMode();
 		}
 	};
@@ -75,20 +80,36 @@ CODEditor.CORE = (function(C,$,undefined){
 	var _initDefaultMode = function(){
 		$("ul.menu li[group='examples']").css("display","inline-block");
 		_populateExamples();
-		//Testing
-		// _loadJSON(CODEditor.Samples.getExample("html_css_sample"));
-		// _loadJSON(CODEditor.Samples.getExample("js_sample_multivar"));
-		// _loadJSON(CODEditor.Samples.getExample("test_sample"));
-		_loadJSON(CODEditor.Samples.getExample("mooc_sample "));
 	};
 
 	var _populateExamples = function(){
 		var allExamples = CODEditor.Samples.getExamples();
 		var selector = $("#examples_panel #examples_selection");
+
 		for(var i=0; i<allExamples.length; i++){
 			var example = allExamples[i];
-			// <option group="js" value="js_sample">Hello World with JavaScript</option>
-			$(selector).append('<option group="'+ example.editorMode + '" value="'+ i.toString() +'">' + example.title + '</option>');
+			var eEditorMode;
+			var eTitle;
+
+			if(example.type==="test"){
+				var eEditorModeArray = [];
+				var testExercises = JSON.parse(example.exercises);
+				//Infer editorMode
+				for(var j=0; j<testExercises.length; j++){
+					var testExercise = testExercises[j];
+					if(eEditorModeArray.indexOf(testExercise.editorMode)===-1){
+						eEditorModeArray.push(testExercise.editorMode);
+					}
+				}
+				eEditorMode = eEditorModeArray.join(" ");
+				eTitle = example.title + " (Test)";
+			} else {
+				//exercise
+				eEditorMode = example.editorMode;
+				eTitle = example.title;
+			}
+
+			$(selector).append('<option group="'+ eEditorMode + '" value="'+ i.toString() +'">' + eTitle + '</option>');
 			_examples[i] = example;
 		}
 	};
@@ -98,8 +119,8 @@ CODEditor.CORE = (function(C,$,undefined){
 			editorMode = _currentEditorMode;
 		}
 		$("#examples_panel #examples_selection option").removeAttr("selected").hide();
-		$("#examples_panel #examples_selection option[group='" + editorMode + "']").show();
-		$($("#examples_panel #examples_selection option[group='" + editorMode + "']")[0]).attr("selected","selected");
+		$("#examples_panel #examples_selection option[group*='" + editorMode + "']").show();
+		$($("#examples_panel #examples_selection option[group*='" + editorMode + "']")[0]).attr("selected","selected");
 	};
 
 	var getCurrentViewMode = function(){

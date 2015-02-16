@@ -291,10 +291,33 @@ CODEditor.Samples = (function(C,$,undefined){
 	};
 
 	/* Test Example 2*/
-	var mooc_sample = {
+	var mooc_test_sample = {
 		"type": "test",
 		"title": "MOOC Módulo 1",
 		"exercises": JSON.stringify([ mooc11, mooc12, mooc13 ])
+	};
+
+
+	var js_sample_without_grading = {
+		"type": "exercise",
+		"title": "Hello World con JavaScript sin corrección",
+		"description":"Escriba 'Hello World'.",
+		"editorMode":"JavaScript",
+		"content": "/*\n * Escriba \"Hello World\" y ejecute el código.\n */\n "
+	};
+
+	/* Test Example 3*/
+	var js_nograde = {
+		"type": "test",
+		"title": "JS without grading",
+		"exercises": JSON.stringify([ js_sample_without_grading, js_sample_without_grading, js_sample_without_grading ])
+	};
+
+	/* Test Example 4*/
+	var js_hybrid = {
+		"type": "test",
+		"title": "HTML and JS test",
+		"exercises": JSON.stringify([ mooc11, html_css_sample, js_sample_without_grading, js_sample_multivar])
 	};
 
 
@@ -314,6 +337,9 @@ CODEditor.Samples = (function(C,$,undefined){
 		examples.push(js_sample_multivar);
 		examples.push(html_sample);
 		examples.push(html_css_sample);
+		examples.push(mooc_test_sample);
+		examples.push(test_sample);
+		examples.push(js_hybrid);
 		return examples;
 	};
 
