@@ -16,6 +16,22 @@ CODEditor.Utils = (function(C,$,undefined){
 		if((typeof code != "string")||(code.trim()==="")){
 			return true;
 		}
+
+		//Remove text in comments
+		switch(CODEditor.CORE.getCurrentEditorMode()){
+			case "HTML":
+				break;
+			case "JavaScript":
+				code = code.replace(/\/\*([\*\n\s\wáéíóúÁÉÍÓÚç¡!ªº\"#~%&()=\[\]\^{}<>$'`,;\-+_\?\¿\."])*\*\//, "")
+				break;
+			default:
+				break;
+		}
+
+		if((typeof code != "string")||(code.trim()==="")){
+			return true;
+		}
+
 		return false;
 	};
 
