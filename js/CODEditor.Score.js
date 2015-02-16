@@ -107,16 +107,16 @@ CODEditor.Score = (function(C,$,undefined){
 
 			//Overall score
 			$(screenDOM).append("<p class='separator'></p>");
-			$(screenDOM).append("<pre class='overall_score'></pre>");
-			var overallScoreDOM = $(screenDOM).find("pre.overall_score");
+			$(screenDOM).append("<div class='overall_score'></div>");
+			var overallScoreDOM = $(screenDOM).find("div.overall_score");
 
 			if(score.score >= 5){
 				$(overallScoreDOM).addClass("passed");
-				$(overallScoreDOM).append("¡La solución es correcta!\n");
-				$(overallScoreDOM).append("Puntuación: <span class='overall_score'>" + score.score.toString() + "</span>/10");
+				$(overallScoreDOM).append("<p><img class='success_icon' src='img/success_icon.png'/> ¡La solución es correcta!</p>");
+				$(overallScoreDOM).append("<p>Puntuación: <span class='overall_score'>" + score.score.toString() + "</span>/10</p>");
 			} else {
 				$(overallScoreDOM).addClass("failed");
-				$(overallScoreDOM).append("La solución no es correcta.");
+				$(overallScoreDOM).append("<p>La solución no es correcta.</p>");
 			}
 		}
 	};

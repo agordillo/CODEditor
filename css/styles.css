@@ -445,16 +445,48 @@ p.separator {
 	height: 20px;
 }
 
-pre.passed {
-	color: #0BB80D; /* green */
+div.overall_score{
+	font-size: 1.5rem;
+	padding: 0px 5px 0px 5px;
 }
 
-pre.failed, pre.errors {
-	color: #D00E0E; /*red*/
+div.overall_score p{
+	margin: 0px 0px 10px 0px;
+}
+
+div.overall_score img.success_icon{
+	margin-right: 5px;
+}
+
+div.passed {
+	color: #0BB80D; /* green */
 }
 
 span.overall_score {
 	font-weight: bold;
+}
+
+.nextExerciseButtonWrapper{
+	margin: 0px;
+	padding: 0px;
+}
+
+.nextExerciseButton{
+	display: inline-block;
+	font-weight: bold;
+	font-size: 1.3rem;
+	cursor: pointer;
+	color: white;
+	margin: 0px;
+	padding: 0px;
+	background: rgba(11, 169, 13, 0.68);
+	padding: 12px;
+	width: auto;
+	margin-top: 3px;
+}
+
+pre.failed, pre.errors {
+	color: #D00E0E; /*red*/
 }
 
 

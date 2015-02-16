@@ -35,11 +35,11 @@ CODEditor.HTML = (function(C,$,undefined){
 
 					CODEditor.Score.displayScore(score,htmlResultContent);
 
-					if(score.score >= 5){
-						CODEditor.CORE.onPassCurrentExercise();
-					}
+					CODEditor.CORE.onDoCurrentExercise(score.score,htmlResultContent);
 				}
-			}		
+			} else {
+				CODEditor.CORE.onDoCurrentExercise(undefined,htmlResultContent);
+			}	
 		}
 	};
 

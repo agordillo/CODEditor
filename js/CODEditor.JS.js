@@ -64,9 +64,9 @@ CODEditor.JS = (function(C,$,undefined){
 				if(typeof currentExercise.parsed_score_function == "function"){
 					var score = CODEditor.Score.getScoreFromScoreFunction(currentExercise.parsed_score_function,evaluation.response,evaluation.variablesHash);
 					CODEditor.Score.displayScore(score,wrapper);
-					if(score.score >= 5){
-						CODEditor.CORE.onPassCurrentExercise();
-					}
+					CODEditor.CORE.onDoCurrentExercise(score.score,wrapper);
+				} else {
+					CODEditor.CORE.onDoCurrentExercise(undefined,wrapper);
 				}
 			}
 		} else {

@@ -649,14 +649,10 @@ CODEditor.CORE = (function(C,$,undefined){
 		var testMenuWrapper = $("#test_menu_wrapper");
 		$(testMenuWrapper).css("display","inline-block");
 
-		_loadJSON(_getNextExercise());
+		_loadNextTestExercise();
 
 		//Populate MenuWrapper
 		CODEditor.UI.updateTestMenuDialog();
-
-		// if(_hasNextExercise()){
-		// 	//Load continue button
-		// }
 	};
 
 	var _loadExercise = function(json){
@@ -877,10 +873,17 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _getNextExercise = function(){
 		if(_hasNextExercise()){
-			_currentTest.currentExerciseIndex += 1;
-			return _currentTest.parsed_exercises[_currentTest.currentExerciseIndex-1];
+			return _currentTest.parsed_exercises[_currentTest.currentExerciseIndex];
 		} else {
 			return undefined;
+		}
+	};
+
+	var _loadNextTestExercise = function(){
+		if(_hasNextExercise()){
+			var exercise = _getNextExercise();
+			_currentTest.currentExerciseIndex += 1;
+			_loadJSON(exercise);
 		}
 	};
 
@@ -891,14 +894,76 @@ CODEditor.CORE = (function(C,$,undefined){
 		CODEditor.UI.updateTestMenuDialog();
 	};
 
-	var onPassCurrentExercise = function(){
+	var _isCurrentTestCompleted = function(){
+		if(typeof _currentTest != "undefined"){
+			for(var i=0; i<_currentTest.parsed_exercises.length; i++){
+				if(_currentTest.parsed_exercises[i].progress.passed !== true){
+					return false;
+				}
+			}
+		} else {
+			return false;
+		}
+
+		return true;
+	};
+
+	var onDoCurrentExercise = function(score,screenDOM){
 		if(typeof _currentTest != "undefined"){
 			if(typeof _currentExercise != "undefined"){
-				_currentExercise.progress.passed = true;
-				CODEditor.UI.updateTestMenuDialog();
-				if(_hasNextExercise()){
-					//TODO: Load dialog to propose advance to the next exercise...
+
+				var attemptScore;
+				if(typeof _currentExercise.parsed_score_function == "function"){
+					if(typeof score == "number"){
+						attemptScore = score;
+					} else {
+						attemptScore = 0;
+					}
+				} else {
+					attemptScore = 10;
 				}
+				
+				if(attemptScore >= 5){
+					_currentExercise.progress.passed = true;
+					CODEditor.UI.updateTestMenuDialog();
+
+					if((_hasNextExercise())&&(!_getNextExercise().progress.passed)){
+						var nextExerciseWrapper = $("<div class='nextExerciseButtonWrapper'><div class='nextExerciseButton'>Iniciar siguiente ejercicio</div></div>");
+						if(typeof _currentExercise.parsed_score_function == "function"){
+							$(screenDOM).find("div.overall_score").after(nextExerciseWrapper);
+						} else {
+							//TODO
+							$(screenDOM).append(nextExerciseWrapper);
+						}
+						
+						$(screenDOM).find(".nextExerciseButton").click(function(){
+							_loadNextTestExercise();
+						});
+					} else {
+						var testCompleted = _isCurrentTestCompleted();
+						var messageWrapper;
+
+						if(testCompleted){
+							messageWrapper = $("<div class='nextExerciseButtonWrapper'><div class='nextExerciseButton'>¡Enhorabuena, has completado el test '" + _currentTest.title + "'!</div></div>");
+						} else {
+							messageWrapper = $("<div class='nextExerciseButtonWrapper'><div class='nextExerciseButton'>Ver más ejercicios</div></div>");
+						}
+
+						if(typeof _currentExercise.parsed_score_function == "function"){
+							$(screenDOM).find("div.overall_score").after(messageWrapper);
+						} else {
+							//TODO
+							$(screenDOM).append(messageWrapper);
+						}
+
+						if(!testCompleted){
+							$(screenDOM).find(".nextExerciseButton").click(function(){
+								$("#test_menu_wrapper").trigger("click");
+							});
+						}
+					}
+				}
+
 			}
 		}
 	};
@@ -912,7 +977,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		getCurrentExercise 		: getCurrentExercise,
 		getCurrentTest			: getCurrentTest,
 		loadTestExercise		: loadTestExercise,
-		onPassCurrentExercise	: onPassCurrentExercise
+		onDoCurrentExercise		: onDoCurrentExercise
 	};
 
 }) (CODEditor,jQuery);
