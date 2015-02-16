@@ -78,7 +78,8 @@ CODEditor.CORE = (function(C,$,undefined){
 		//Testing
 		// _loadJSON(CODEditor.Samples.getExample("html_css_sample"));
 		// _loadJSON(CODEditor.Samples.getExample("js_sample_multivar"));
-		_loadJSON(CODEditor.Samples.getExample("test_sample"));
+		// _loadJSON(CODEditor.Samples.getExample("test_sample"));
+		_loadJSON(CODEditor.Samples.getExample("mooc_sample "));
 	};
 
 	var _populateExamples = function(){
@@ -271,7 +272,7 @@ CODEditor.CORE = (function(C,$,undefined){
 				width: dialogWidth,
 				height: dialogHeight,
 				modal: true,
-				position: {my: "center top", at: "center bottom", of: "#test_menu_wrapper"},
+				position: {my: "left top", at: "left bottom", of: "#test_menu_wrapper"},
 				open: function(event, ui) {
 					//Close dialog when click outside
 					$('.ui-widget-overlay').bind('click', function(){ 
@@ -280,6 +281,8 @@ CODEditor.CORE = (function(C,$,undefined){
 				},
 				close: function(event, ui){
 					$("#test_menu_wrapper > div").removeClass("open");
+					// $(this).empty().dialog('destroy');
+					$(this).dialog('destroy');
 				}
 			});
 
@@ -311,7 +314,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		$(dialogDOM).prepend(arrowDOM);
 
-		var arrowLeft = ($(dialogDOM).width()-12)/2;
+		var arrowLeft = ($("#test_menu_wrapper").offset().left - $(dialogDOM).offset().left) + 10;
 		$(arrowDOM).css("left",arrowLeft);
 	};
 
@@ -669,11 +672,16 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 
 		//Load description
-		json.description = CODEditor.Utils.purgeTextString(json.description);
-		//Look for code tags.
-		json.description = json.description.replace(/&lt;code&gt;/g, '<span class="code">');
-		json.description = json.description.replace(/&lt;\/code&gt;/g, '</span>');
-		$("#exercise_description").html(json.description);
+		if(typeof json.description === "string"){
+			json.description = CODEditor.Utils.purgeTextString(json.description);
+			//Look for code tags.
+			json.description = json.description.replace(/&lt;code&gt;/g, '<span class="code">');
+			json.description = json.description.replace(/&lt;\/code&gt;/g, '</span>');
+			$("#exercise_description").show();
+			$("#exercise_description").html(json.description);
+		} else {
+			$("#exercise_description").hide();
+		}
 
 		//Editor mode
 		_changeEditorMode(json.editorMode,false);
@@ -788,8 +796,10 @@ CODEditor.CORE = (function(C,$,undefined){
 		if((typeof json.editorMode !== "string")||(_editorModes.indexOf(json.editorMode)===-1)){
 			errors.push("Invalid editorMode.");
 		}
-		if(typeof json.description !== "string"){
-			errors.push("Invalid description.");
+		if(typeof json.description !== "undefined"){
+			if(typeof json.description !== "string"){
+				errors.push("Invalid description.");
+			}
 		}
 		if(typeof json.content !== "undefined"){
 			if(typeof json.content !== "string"){
@@ -858,7 +868,9 @@ CODEditor.CORE = (function(C,$,undefined){
 		
 		if((errors.length===0)&&(updateCurrentExercise)){
 			_currentExercise = json;
-			_currentExercise.parsed_score_function = scoreFunctionEvaluation.response;
+			if(typeof json.score_function !== "undefined"){
+				_currentExercise.parsed_score_function = scoreFunctionEvaluation.response;
+			}
 		}
 
 		return errors;
@@ -912,58 +924,49 @@ CODEditor.CORE = (function(C,$,undefined){
 		if(typeof _currentTest != "undefined"){
 			if(typeof _currentExercise != "undefined"){
 
-				var attemptScore;
-				if(typeof _currentExercise.parsed_score_function == "function"){
-					if(typeof score == "number"){
-						attemptScore = score;
-					} else {
-						attemptScore = 0;
-					}
-				} else {
-					attemptScore = 10;
-				}
-				
-				if(attemptScore >= 5){
+				if(typeof _currentExercise.parsed_score_function != "function"){
+					//Non graded exercise
 					_currentExercise.progress.passed = true;
-					CODEditor.UI.updateTestMenuDialog();
+				} else {
+					//Exercise with grading
+					score = (typeof score === "number") ? score : 0;
 
-					if((_hasNextExercise())&&(!_getNextExercise().progress.passed)){
-						var nextExerciseWrapper = $("<div class='nextExerciseButtonWrapper'><div class='nextExerciseButton'>Iniciar siguiente ejercicio</div></div>");
-						if(typeof _currentExercise.parsed_score_function == "function"){
-							$(screenDOM).find("div.overall_score").after(nextExerciseWrapper);
-						} else {
-							//TODO
-							$(screenDOM).append(nextExerciseWrapper);
-						}
-						
-						$(screenDOM).find(".nextExerciseButton").click(function(){
-							_loadNextTestExercise();
-						});
-					} else {
-						var testCompleted = _isCurrentTestCompleted();
-						var messageWrapper;
+					if(score >= 5){
+						_currentExercise.progress.passed = true;
 
-						if(testCompleted){
-							messageWrapper = $("<div class='nextExerciseButtonWrapper'><div class='nextExerciseButton'>¡Enhorabuena, has completado el test '" + _currentTest.title + "'!</div></div>");
-						} else {
-							messageWrapper = $("<div class='nextExerciseButtonWrapper'><div class='nextExerciseButton'>Ver más ejercicios</div></div>");
-						}
-
-						if(typeof _currentExercise.parsed_score_function == "function"){
-							$(screenDOM).find("div.overall_score").after(messageWrapper);
-						} else {
-							//TODO
-							$(screenDOM).append(messageWrapper);
-						}
-
-						if(!testCompleted){
+						if((_hasNextExercise())&&(!_getNextExercise().progress.passed)){
+							var nextExerciseWrapper = $("<div class='nextExerciseButtonWrapper'><div class='nextExerciseButton'>Iniciar siguiente ejercicio</div></div>");
+							if(typeof _currentExercise.parsed_score_function == "function"){
+								$(screenDOM).find("div.overall_score").after(nextExerciseWrapper);
+							}
+							
 							$(screenDOM).find(".nextExerciseButton").click(function(){
-								$("#test_menu_wrapper").trigger("click");
+								_loadNextTestExercise();
 							});
+						} else {
+							var testCompleted = _isCurrentTestCompleted();
+							var messageWrapper;
+
+							if(testCompleted){
+								messageWrapper = $("<div class='nextExerciseButtonWrapper'><div class='nextExerciseButton'>¡Enhorabuena, has completado el test '" + _currentTest.title + "'!</div></div>");
+							} else {
+								messageWrapper = $("<div class='nextExerciseButtonWrapper'><div class='nextExerciseButton'>Ver más ejercicios</div></div>");
+							}
+
+							if(typeof _currentExercise.parsed_score_function == "function"){
+								$(screenDOM).find("div.overall_score").after(messageWrapper);
+							}
+
+							if(!testCompleted){
+								$(screenDOM).find(".nextExerciseButton").click(function(){
+									$("#test_menu_wrapper").trigger("click");
+								});
+							}
 						}
 					}
 				}
 
+				CODEditor.UI.updateTestMenuDialog();
 			}
 		}
 	};

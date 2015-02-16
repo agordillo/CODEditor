@@ -258,13 +258,46 @@ CODEditor.Samples = (function(C,$,undefined){
 	};
 
 
-
 	/* Test Example 1*/
 	var test_sample = {
 		"type": "test",
 		"title": "Introducción a JavaScript",
 		"exercises": JSON.stringify([ js_sample, js_sample_feedback, js_sample_multivar ])
 	};
+
+
+	/* MOOC 1-1*/
+	var mooc11 = {
+		"type": "exercise",
+		"title": "Date",
+		"editorMode":"HTML",
+		"content": '<!DOCTYPE html><html>\n<head>\n<title>Script</title>\n<meta charset="UTF-8">\n</head>\n\n<body>\n<h3>Fecha y hora</h3>\n\n<script type="text/javascript">\ndocument.write("Fecha: " + (new Date()));\n</script>\n</body>\n</html>'
+	};
+
+	/* MOOC 1-2*/
+	var mooc12 = {
+		"type": "exercise",
+		"title": "Date 2",
+		"editorMode":"HTML",
+		"content": '<!DOCTYPE html><html>\n<head>\n  <title>Ejemplo</title>\n  <meta charset="UTF-8">\n\n  <style type="text/css">     \nbody {color: blue;}   \n</style>\n</head>\n\n<body>\n  <h3>Fecha y hora</h3>\n\n  <script type="text/javascript">\n    document.write(new Date());\n  </script>\n</body>\n</html>'
+	};
+
+	/* MOOC 1-3*/
+	var mooc13 = {
+		"type": "exercise",
+		"title": "1",
+		"editorMode":"HTML",
+		"content": '<!DOCTYPE html><html>\n<head>\n  <title>Ejemplo</title>\n  <meta charset="UTF-8">\n\n  <style type="text/css">     \nbody {color: blue;}   \n</style>\n</head>\n\n<body>\n  <h3>Fecha y hora</h3>\n\n  <script type="text/javascript">\n    document.write(new Date());\n  </script>\n</body>\n</html>'
+	};
+
+	/* Test Example 2*/
+	var mooc_sample = {
+		"type": "test",
+		"title": "MOOC Módulo 1",
+		"exercises": JSON.stringify([ mooc11, mooc12, mooc13 ])
+	};
+
+
 
 	var getExample = function(exampleName){
 		var example = undefined;

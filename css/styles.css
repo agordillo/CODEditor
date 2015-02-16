@@ -543,6 +543,10 @@ img.success_icon, img.error_icon {
 	display: none;
 }
 
+.testMenuWrapper div.ui-dialog-titlebar.ui-widget-header {
+	margin: 3px 3px 0px 3px;
+}
+
 .dialog_arrow {
 	position: absolute;
 	width: 20px;
@@ -601,6 +605,7 @@ img.success_icon, img.error_icon {
 	list-style: none;
 	padding: 0px;
 	position: relative;
+	margin-top: 2px;
 }
 
 .testMenuWrapper ul li {
