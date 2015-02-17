@@ -65,11 +65,61 @@ CODEditor.Utils = (function(C,$,undefined){
 		});
 	};
 
+	var isHistorySupported = function(){
+		return ((typeof history === "object")&&(typeof history.pushState === "function"));
+	};
+
+	var readURLparams = function(){
+		var params = {};
+		try {
+			var location = window.location;
+			if(typeof location === "undefined"){
+				return params;
+			}
+			var URLparams = location.search;
+			URLparams = URLparams.substr(1,URLparams.length-1);
+			var URLparamsArray = URLparams.split("&");
+			for(var i=0; i<URLparamsArray.length; i++){
+				try {
+					var paramData = URLparamsArray[i].split("=");
+					if(typeof paramData[1] === "string"){
+						params[paramData[0]] = paramData[1];
+					}
+				} catch(e){}
+			}
+		} catch (e) {}
+
+		return params;
+	};
+
+	var buildURLwithParams = function(URLparams){
+		var url = "index.html";
+		var index = 0;
+
+		if(typeof URLparams === "object"){
+			for(var key in URLparams){
+				if(index===0){
+					url += "?";
+				} else {
+					url += "&";
+				}
+				index++;
+				url += (key + "=" + URLparams[key])
+			}
+		}
+
+		return url;
+	};
+
 	return {
 		init 					: init,
 		isCodeEmpty				: isCodeEmpty,
 		purgeTextString			: purgeTextString,
-		showDialog				: showDialog
+		showDialog				: showDialog,
+		isHistorySupported		: isHistorySupported,
+		readURLparams			: readURLparams,
+		buildURLwithParams		: buildURLwithParams
+
 	};
 
 }) (CODEditor,jQuery);

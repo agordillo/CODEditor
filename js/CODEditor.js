@@ -51,7 +51,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		CODEditor.JS.init();
 		CODEditor.HTML.init();
 
-		var URLparams = _readParams();
+		var URLparams = CODEditor.Utils.readURLparams();
 
 		if(typeof URLparams["file"] === "string"){
 			_onGetExternalJSONFile(URLparams["file"],URLparams);
@@ -77,6 +77,14 @@ CODEditor.CORE = (function(C,$,undefined){
 		_getExternalJSONFile(fileURL,function(json){
 			//On success
 			if(_isValidJSON(json)){
+				if(CODEditor.Utils.isHistorySupported()){
+					var URLparams = CODEditor.Utils.readURLparams();
+					if(typeof URLparams["file"] === "undefined"){
+						URLparams["file"] = fileURL;
+					}
+					var newURL = CODEditor.Utils.buildURLwithParams(URLparams);
+					window.history.replaceState("","",newURL);
+				}
 				_loadJSON(json);
 			} else {
 				CODEditor.Utils.showDialog("El recurso cargado no es válido.");
@@ -409,28 +417,6 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		var arrowLeft = ($("#test_menu_wrapper").offset().left - $(dialogDOM).offset().left) + 10;
 		$(arrowDOM).css("left",arrowLeft);
-	};
-
-	//Read params when load the editor
-	var _readParams = function(){
-		var params = {};
-		try {
-			var location = window.location;
-			if(typeof location === "undefined"){
-				return params;
-			}
-			var URLparams = location.search;
-			URLparams = URLparams.substr(1,URLparams.length-1);
-			var URLparamsArray = URLparams.split("&");
-			for(var i=0; i<URLparamsArray.length; i++){
-				try {
-					var paramData = URLparamsArray[i].split("=");
-					params[paramData[0]] = paramData[1];
-				} catch(e){}
-			}
-		} catch (e) {}
-
-		return params;
 	};
 
 	var _openFile = function(){
@@ -1034,6 +1020,13 @@ CODEditor.CORE = (function(C,$,undefined){
 		_changeEditorMode(_editorModeToSet,true);
 		
 		CODEditor.UI.adjustView();
+
+		if(CODEditor.Utils.isHistorySupported()){
+			var URLparams = CODEditor.Utils.readURLparams();
+			delete URLparams.file;
+			var newURL = CODEditor.Utils.buildURLwithParams(URLparams);
+			window.history.replaceState("","",newURL);
+		}
 	};
 
 
