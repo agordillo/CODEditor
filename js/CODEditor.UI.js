@@ -29,10 +29,6 @@ CODEditor.UI = (function(C,$,undefined){
 		//More adjustments...
 		// var glutterWidth = $("div.ace_layer.ace_gutter-layer.ace_folding-enabled").width();
 
-		if(typeof CODEditor.CORE.getCurrentExercise() != "undefined"){
-			$("ul.menu li[group='exercise']").css("display","inline-block");
-		}
-
 		//Adjust widhts in hybrid mode
 		if(CODEditor.CORE.getCurrentViewMode()==="HYBRID"){
 			var totalWidth = $("#content").outerWidth();

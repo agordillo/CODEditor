@@ -45,11 +45,31 @@ CODEditor.Utils = (function(C,$,undefined){
 		return text.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&lt;b&gt;/g, '<b>').replace(/&lt;\/b&gt;/g, '</b>');
 	};
 
+	var showDialog = function(message){
+		message = (typeof message === "string") ? message : "undefined";
+		$('<div></div>').html("<p>" + message + "</p>").dialog({
+			autoOpen: true,
+			dialogClass:'notificationDialog',
+			title: "Notificación",
+			closeOnEscape: true,
+			resizable: false,
+			draggable: false,
+			modal: true,
+			open: function(event, ui) {
+				var theDialog = this;
+				//Close dialog when click outside
+				$('.ui-widget-overlay').bind('click', function(){ 
+					$(theDialog).dialog('close');
+				});
+			}
+		});
+	};
 
 	return {
 		init 					: init,
 		isCodeEmpty				: isCodeEmpty,
-		purgeTextString			: purgeTextString
+		purgeTextString			: purgeTextString,
+		showDialog				: showDialog
 	};
 
 }) (CODEditor,jQuery);

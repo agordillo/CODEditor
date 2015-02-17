@@ -338,6 +338,10 @@ ul.menu label[for=openFileInput][disabled=disabled], ul.menu label[for=openFileI
 	cursor: default;
 }
 
+ul.menu li#exit {
+	display: none;
+}
+
 .cpanel {
 	display: none;
 	position: absolute;
@@ -707,6 +711,14 @@ div.exerciseProgressIcon img {
 	background-color: rgba(16, 16, 16, 0.14);
 }
 
+div.notificationDialog {
+	text-align: center;
+}
+
+div.notificationDialog p {
+	padding: 10px 0px;
+	font-size: 1.2rem;
+}
 
 /* Themes */
 

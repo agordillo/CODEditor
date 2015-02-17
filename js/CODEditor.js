@@ -65,7 +65,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _onGetExternalJSONFile = function(fileURL,initParams){
 		if((typeof fileURL !== "string")||(fileURL.trim() === "")){
-			return alert("La URL del fichero no es válida.");
+			return CODEditor.Utils.showDialog("La URL del fichero no es válida.");
 		}
 
 		//Allow to include default ViSH URLs for JSON files uploaded to http://vishub.org.
@@ -79,14 +79,14 @@ CODEditor.CORE = (function(C,$,undefined){
 			if(_isValidJSON(json)){
 				_loadJSON(json);
 			} else {
-				alert("El recurso cargado no es válido.");
+				CODEditor.Utils.showDialog("El recurso cargado no es válido.");
 				if(typeof initParams !== "undefined"){
 					_initDefaultMode(initParams);
 				}
 			}
 		}, function(jqXHR,textStatus,errorThrown){
 			//On failure
-			alert("Error loading external script from " + fileURL);
+			CODEditor.Utils.showDialog("Error loading external script from " + fileURL);
 			if(typeof initParams !== "undefined"){
 				_initDefaultMode(initParams);
 			}
@@ -285,7 +285,7 @@ CODEditor.CORE = (function(C,$,undefined){
 					CODEditor.UI.cleanPreview();
 				}
 			} else {
-				alert("No hay ningún ejercicio que reiniciar.");
+				CODEditor.Utils.showDialog("No hay ningún ejercicio que reiniciar.");
 			}
 		});
 
@@ -380,6 +380,15 @@ CODEditor.CORE = (function(C,$,undefined){
 			$(dialogDOM).dialog('close');
 			_onGetExternalJSONFile(fileURL);
 		});
+
+		$("#exit").click(function(){
+			if(typeof _currentExercise !== "undefined"){
+				var r = confirm("Si abandonas el ejercicio perderás todos tus cambios. ¿Estás seguro de que deseas hacerlo?");
+				if (r === true) {
+					_exitFromCurrentExercise();
+				}
+			}
+		});
 	};
 
 	var addArrowToDialog = function(dialogDOM, position){
@@ -434,7 +443,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		} catch (e) {}
 
 		if(!isFileReaderSupported){
-			return alert("Lo siento, tu navegador no puede leer ficheros.");
+			return CODEditor.Utils.showDialog("Lo siento, tu navegador no puede leer ficheros.");
 		}
 
 		var fileInput = document.getElementById('openFileInput');
@@ -456,13 +465,13 @@ CODEditor.CORE = (function(C,$,undefined){
 
 			reader.onerror = function(e){
 				_resetFileHandler(fileInput);
-				alert("Se produjo un error leyendo el fichero.");
+				CODEditor.Utils.showDialog("Se produjo un error leyendo el fichero.");
 			}
 
 			reader.readAsText(file);
 		} else {
 			_resetFileHandler(fileInput);
-			alert("Formato de fichero no soportado.");
+			CODEditor.Utils.showDialog("Formato de fichero no soportado.");
 		}
 	};
 
@@ -518,7 +527,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _processFile = function(fileContent,fileType){
 		if(typeof fileContent !== "string"){
-			return alert("Formato de fichero no soportado.");
+			return CODEditor.Utils.showDialog("Formato de fichero no soportado.");
 		}
 
 		//Look for valid JSON
@@ -566,7 +575,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		} catch (e) {}
 
 		if(!isFileSaverSupported){
-			alert("Lo siento, tu navegador no puede descargar ficheros.");
+			CODEditor.Utils.showDialog("Lo siento, tu navegador no puede descargar ficheros.");
 		}
 
 		var filename = "file.txt";
@@ -720,7 +729,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		if(errors.length > 0){
 			errors.unshift("El elemento a cargar no es válido.\n\nErrores:");
 			var errorMessage = errors.join("\n");
-			return alert(errorMessage);
+			return CODEditor.Utils.showDialog(errorMessage);
 		}
 
 		switch(json.type){
@@ -729,7 +738,7 @@ CODEditor.CORE = (function(C,$,undefined){
 			case "test":
 				return _loadTest(json);
 			default:
-				return alert("El elemento a cargar no es válido.");
+				return CODEditor.Utils.showDialog("El elemento a cargar no es válido.");
 		}
 	};
 
@@ -785,11 +794,17 @@ CODEditor.CORE = (function(C,$,undefined){
 		//Block editorMode in settings
 		$("#settings_mode").attr("disabled","disabled");
 
+		//Show exercises group in toolbar
+		$("ul.menu li[group='exercise']").css("display","inline-block");
+
 		if(_isDefaultMode!==true){
 			//Disallow loading
 			$("#openFileInput").attr("disabled","disabled");
 			$("label[for=openFileInput]").attr("disabled","disabled");
 			$("#openurl").attr("disabled","disabled");
+		} else {
+			//Show exit feature
+			$("ul.menu li[group*='exercise']").css("display","inline-block");
 		}
 
 		CODEditor.UI.cleanPreview();
@@ -978,6 +993,47 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 
 		return errors;
+	};
+
+	var _exitFromCurrentExercise = function(){
+		if(typeof _currentExercise === "undefined"){
+			return;
+		}
+
+		_currentExercise = undefined;
+		_currentTest = undefined;
+
+		var exerciseDOM = $("#exercise_wrapper")
+		$(exerciseDOM).removeClass("open");
+
+		//Unload title
+		var exerciseTitleDOM = $("#exercise_title");
+		$(exerciseTitleDOM).hide();
+
+		//Unload description
+		$("#exercise_description").hide();
+
+		//Unblock editorMode in settings
+		$("#settings_mode").removeAttr("disabled");
+
+		//Hide exercises group in toolbar
+		$("ul.menu li[group*='exercise']").css("display","none");
+
+		if(_isDefaultMode!==true){
+			//Allow loading
+			$("#openFileInput").removeAttr("disabled");
+			$("label[for=openFileInput]").removeAttr("disabled");
+			$("#openurl").removeAttr("disabled");
+		}
+
+		CODEditor.UI.cleanPreview();
+
+		//Reset editor
+		_editorModeToSet = _currentEditorMode;
+		_currentEditorMode = undefined;
+		_changeEditorMode(_editorModeToSet,true);
+		
+		CODEditor.UI.adjustView();
 	};
 
 
