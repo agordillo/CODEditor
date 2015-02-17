@@ -9,7 +9,7 @@ CODEditor.Score = (function(C,$,undefined){
 		try {
 			score = scoreFunction(response,variablesHash);
 		} catch (e){
-			console.log(e.message)
+			// console.log(e.message);
 		}
 
 		var normalizedScore = {};

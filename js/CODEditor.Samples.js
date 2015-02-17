@@ -320,6 +320,17 @@ CODEditor.Samples = (function(C,$,undefined){
 		"exercises": JSON.stringify([ mooc11, html_css_sample, js_sample_without_grading, js_sample_multivar])
 	};
 
+	/* Example with 'code' in description. */
+	var js_sample_code = {
+		"type": "exercise",
+		"title": "Ejercicio con varias variables",
+		"description":"Devuelva en la variable <b>'a'</b> la palabra 'Hello World',\n<code>var a = function(){\n return a;\n}</code>\ny en la variable <b>'b'</b> una función que reciba como parámetro una string y la pase a minúsculas.",
+		"editorMode":"JavaScript",
+		"content": "/*\n * " +  "Devuelva en la variable 'a' la palabra 'Hello World', y en la variable 'b' una función que reciba como parámetro una string y la pase a minúsculas." + "\n */\n\n" + "var a;\n\nvar b = function(str){\n\n};\n",
+		"score_function": ("var score = " + js_sample_multivar_score.toString()),
+		"score_function_vars": ["a","b"]
+	};
+
 
 
 	var getExample = function(exampleName){

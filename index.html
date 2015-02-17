@@ -35,13 +35,14 @@
 
 			<li id="refresh" class="mitem first last withoutRightBorder" group="exercise"><img src="img/glyphicons-82-refresh.png" title="Recargar ejemplo"/></li>
 
-			<li id="open" class="mitem first" group="files">
+			<li id="openurl" class="mitem first" group="files"><img src="img/glyphicons-365-cloud-upload.png" title="Cargar fichero por URL"/></li>
+			<li id="open" class="mitem" group="files">
 				<label for="openFileInput">
-					<img src="img/glyphicons-416-disk-open.png" title="Abrir fichero"/>
+					<img src="img/glyphicons-415-disk-save.png" title="Cargar fichero"/>
 				</label>
 				<input id="openFileInput" type="file" style="display:none" />
 			</li>
-			<li id="save" class="mitem last" group="files"><img src="img/glyphicons-415-disk-save.png" title="Descargar como fichero"/></li>
+			<li id="save" class="mitem last" group="files"><img src="img/glyphicons-416-disk-open.png" title="Exportar a fichero"/></li>
 
 			<li viewMode="CODE" class="mitem first withoutLeftBorder" group="view"><img src="img/glyphicons-151-edit.png" title="Vista Edición"/></li>
 			<li viewMode="HYBRID" class="mitem" group="view"><img src="img/glyphicons-489-multiple-displays.png" title="Vista Híbrida"/></li>
@@ -157,6 +158,18 @@
 	</div>
 
 	<div id="test_exercises_dialog"></div>
+
+	<div id="file_url_dialog">
+		<div class="title">
+			<p>Introduzca la URL del fichero a cargar:</p>
+		</div>
+		<div>
+			URL: <input type="text"></input>
+		</div>
+		<div>
+			<div class="codeditor_button">Cargar</div>
+		</div>
+	</div>
 
 
 </body>

@@ -197,7 +197,25 @@ html, body {
 }
 
 #exercise_description{
-	padding: 20px;
+	padding: 0px 20px 20px 20px;
+}
+
+#exercise_description > pre {
+	margin: 0px;
+	padding: 0px;
+}
+
+#exercise_description pre.code {
+	background: #CCC;
+	padding: 5px 4px;
+	font-size: 1rem;
+	line-height: inherit;
+	border-radius: 2px;
+	background-color: rgba(118, 114, 114, 0.64);
+	border: 1px solid rgba(131, 131, 131, 0.51);
+	font-family: Monaco,Menlo,'Ubuntu Mono',Consolas,monospace;
+	display: inline-block;
+	margin: 3px 0px;
 }
 
 #editor, #preview {
@@ -313,6 +331,11 @@ ul.menu li[group='exercise'] {
 
 ul.menu li[group='examples'] {
 	display: none;
+}
+
+ul.menu label[for=openFileInput][disabled=disabled], ul.menu label[for=openFileInput][disabled=disabled] img:hover, ul.menu li#openurl[disabled=disabled], ul.menu li#openurl[disabled=disabled] img:hover {
+	opacity: 0.5 !important;
+	cursor: default;
 }
 
 .cpanel {
@@ -488,6 +511,25 @@ div.html_result_wrapper div.html_resultContent .nextExerciseButtonWrapper {
 
 pre.failed, pre.errors {
 	color: #D00E0E; /*red*/
+}
+
+.codeditor_button {
+	display: inline-block;
+	font-weight: bold;
+	font-size: 1.2rem;
+	cursor: pointer;
+	color: white;
+	margin: 0px;
+	padding: 0px;
+	background: rgba(11, 169, 13, 0.68);
+	padding: 5px 20px;
+	width: auto;
+	margin: 18px 5px 5px 0px;
+	border: 2px solid black;
+}
+
+div.file_url_dialog input {
+	width: 300px;
 }
 
 

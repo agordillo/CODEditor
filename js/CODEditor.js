@@ -29,6 +29,8 @@ CODEditor.CORE = (function(C,$,undefined){
 	var _currentTest;
 	var _currentExercise;
 
+	var _isDefaultMode = false;
+
 	var _examples = {};
 
 
@@ -52,34 +54,55 @@ CODEditor.CORE = (function(C,$,undefined){
 		var URLparams = _readParams();
 
 		if(typeof URLparams["file"] === "string"){
-			_getExternalFile(URLparams["file"],function(data){
-				//On success
-				if(_isValidJSON(data)){
-					_processFile(data,"application/json");
-					// _initDefaultMode() if fails.
-				} else {
-					alert("El recurso cargado no es válido.");
-					_initDefaultMode();
-				}
-			}, function(jqXHR,textStatus,errorThrown){
-				//On failure
-				alert("Error loading external script from " + URLparams["file"]);
-				_initDefaultMode();
-			});
+			_onGetExternalJSONFile(URLparams["file"],URLparams);
 		} else {
 			//Testing
-			// _loadJSON(CODEditor.Samples.getExample("html_css_sample"));
-			// _loadJSON(CODEditor.Samples.getExample("js_sample_multivar"));
-			// _loadJSON(CODEditor.Samples.getExample("test_sample"));
-
-			_initDefaultMode();
+			// _loadJSON(CODEditor.Samples.getExample("js_sample_code"));
+			_initDefaultMode(URLparams);
 		}
 	};
 
+
+	var _onGetExternalJSONFile = function(fileURL,initParams){
+		if((typeof fileURL !== "string")||(fileURL.trim() === "")){
+			return alert("La URL del fichero no es válida.");
+		}
+
+		//Allow to include default ViSH URLs for JSON files uploaded to http://vishub.org.
+		var vishDocMatching = fileURL.match(/^http:\/\/vishub.org\/documents\/[0-9]+$/);
+		if((vishDocMatching instanceof Array)&&(vishDocMatching.length === 1)){
+			fileURL = vishDocMatching[0] + ".txt";
+		}
+
+		_getExternalJSONFile(fileURL,function(json){
+			//On success
+			if(_isValidJSON(json)){
+				_loadJSON(json);
+			} else {
+				alert("El recurso cargado no es válido.");
+				if(typeof initParams !== "undefined"){
+					_initDefaultMode(initParams);
+				}
+			}
+		}, function(jqXHR,textStatus,errorThrown){
+			//On failure
+			alert("Error loading external script from " + fileURL);
+			if(typeof initParams !== "undefined"){
+				_initDefaultMode(initParams);
+			}
+		});
+	};
+
 	//Init CODeditor when no excercise is loaded
-	var _initDefaultMode = function(){
-		$("ul.menu li[group='examples']").css("display","inline-block");
+	var _initDefaultMode = function(initParams){
+		$("ul.menu li[group*='examples']").css("display","inline-block");
 		_populateExamples();
+
+		if(typeof initParams["emode"] === "string"){
+			_changeEditorMode(initParams["emode"]);
+		}
+
+		_isDefaultMode = true;
 	};
 
 	var _populateExamples = function(){
@@ -151,8 +174,8 @@ CODEditor.CORE = (function(C,$,undefined){
 		_editor = ace.edit("editor");
 
 		//Specify Default values
-		_changeEditorMode(_editorModes[1]); //It will trigger editor.getSession().setMode("ace/mode/javascript");
-		_changeEditorTheme(_editorThemes[0]); //It will trigger editor.setTheme("ace/theme/chrome");
+		_changeEditorMode(_editorModes[1]);
+		_changeEditorTheme(_editorThemes[0]);
 
 		document.getElementById('editor').style.fontSize='14px';
 		_editor.setShowPrintMargin(false);
@@ -317,6 +340,46 @@ CODEditor.CORE = (function(C,$,undefined){
 
 			return false;
 		});
+
+		$("#openurl").click(function(){
+			if($(this).attr("disabled")!=="disabled"){
+
+				var dialogDOM = $("#file_url_dialog");
+				$(dialogDOM).attr("Title","Cargar fichero de Internet");
+
+				var dialogWidth = 400;
+				var dialogHeight = "auto";
+
+				$(dialogDOM).dialog({
+					autoOpen: true,
+					dialogClass:'file_url_dialog',
+					closeOnEscape: true,
+					resizable: false,
+					draggable: false,
+					width: dialogWidth,
+					height: dialogHeight,
+					modal: true,
+					open: function(event, ui) {
+						//Close dialog when click outside
+						$('.ui-widget-overlay').bind('click', function(){
+							$(dialogDOM).dialog('close'); 
+						});
+					},
+					close: function(event, ui){
+						$(dialogDOM).find("input").val("");
+						$(this).dialog('destroy');
+					}
+				});
+			}
+		});
+
+		$("#file_url_dialog .codeditor_button").click(function(){
+			var input = $("#file_url_dialog").find("input");
+			var fileURL = $(input).val();
+			var dialogDOM = $("#file_url_dialog");
+			$(dialogDOM).dialog('close');
+			_onGetExternalJSONFile(fileURL);
+		});
 	};
 
 	var addArrowToDialog = function(dialogDOM, position){
@@ -412,11 +475,11 @@ CODEditor.CORE = (function(C,$,undefined){
 	var _isValidFileType = function(file){
 		var fileType = file.type;
 
-		if(typeof fileType != "string"){
+		if(typeof fileType !== "string"){
 			return false;
 		}
 
-		var acceptedTypes = ["text/html","application/javascript","application/json",/text.*/];
+		var acceptedTypes = ["text/html","application/javascript","application/json","text/plain",/text.*/];
 
 		for(var i=0; i<acceptedTypes.length; i++){
 			if(fileType.match(acceptedTypes[i])){
@@ -436,7 +499,7 @@ CODEditor.CORE = (function(C,$,undefined){
 	};
 
 	//Get external file from fileURL
-	var _getExternalFile = function(fileURL,successCallback,failCallback){
+	var _getExternalJSONFile = function(fileURL,successCallback,failCallback){
 		if(typeof fileURL !== "string"){
 			return;
 		}
@@ -454,34 +517,46 @@ CODEditor.CORE = (function(C,$,undefined){
 	};
 
 	var _processFile = function(fileContent,fileType){
-		if(fileType=="text/html"){
+		if(typeof fileContent !== "string"){
+			return alert("Formato de fichero no soportado.");
+		}
+
+		//Look for valid JSON
+		if ((fileType==="application/json")||(fileType==="text/plain")||(fileType.toString()==="/text.*/")){
+			if(_containsValidJSON(fileContent)){
+				return _loadJSON(JSON.parse(fileContent));
+			}
+		}
+
+		var editorContent = undefined;
+
+		if(fileType==="text/html"){
 			//HTML file
 			_changeEditorMode("HTML");
-		} else if (fileType=="application/javascript"){
+		} else if (fileType==="application/javascript"){
 			//JS file.
 			_changeEditorMode("JavaScript");
-		} else  if(fileType.match(/text.*/)){
-			//Text file.
+			return true;
+		} else if ((fileType==="text/plain")||(fileType.toString()==="/text.*/")){
+			//Text files. Load as HTML file.
 			_changeEditorMode("HTML");
-		} else if (fileType=="application/json"){
-			//JSON file. Parse and load example.
-			if(typeof fileContent === "string"){
-				try{
-					fileContent = JSON.parse(fileContent);
-				} catch (e) {
-					//Invalid file
-					return alert("Formato de fichero no soportado.");
-				}
-			}
-			if(_isValidJSON(fileContent)){
-				return _loadJSON(fileContent);
-			}
 		} else {
-			//Unknown file
+			//Unknown file.
+			_changeEditorMode("HTML");
 		}
 
 		_editor.setValue(fileContent,1);
 		_focusEditor();
+	};
+
+	var _containsValidJSON = function(fileContent){
+		try{
+			fileContent = JSON.parse(fileContent);
+			if(_isValidJSON(fileContent)){
+				return true;
+			}
+		} catch (e) {}
+		return false;
 	};
 
 	var _saveFile = function(){
@@ -558,7 +633,7 @@ CODEditor.CORE = (function(C,$,undefined){
 				switch(editorMode){
 					case "HTML":
 						aceMode = "ace/mode/html";
-						initialValue = "<html>\n\n</html>"
+						initialValue = "<html>\n  <head></head>\n  <body>\n    \n  </body>\n</html>"
 						$("#editor_tab p").html("index.html");
 						$("#preview_wrapper.HTML #preview_header").html("<p>Resultado</p>");
 						break;
@@ -696,18 +771,26 @@ CODEditor.CORE = (function(C,$,undefined){
 		if(typeof json.description === "string"){
 			json.description = CODEditor.Utils.purgeTextString(json.description);
 			//Look for code tags.
-			json.description = json.description.replace(/&lt;code&gt;/g, '<span class="code">');
-			json.description = json.description.replace(/&lt;\/code&gt;/g, '</span>');
+			json.description = json.description.replace(/&lt;code&gt;/g, '<pre class="code">');
+			json.description = json.description.replace(/&lt;\/code&gt;/g, '</pre>');
 			$("#exercise_description").show();
-			$("#exercise_description").html(json.description);
+			$("#exercise_description").html("<pre>" + json.description + "</pre>");
 		} else {
 			$("#exercise_description").hide();
 		}
 
 		//Editor mode
 		_changeEditorMode(json.editorMode,false);
+
 		//Block editorMode in settings
 		$("#settings_mode").attr("disabled","disabled");
+
+		if(_isDefaultMode!==true){
+			//Disallow loading
+			$("#openFileInput").attr("disabled","disabled");
+			$("label[for=openFileInput]").attr("disabled","disabled");
+			$("#openurl").attr("disabled","disabled");
+		}
 
 		CODEditor.UI.cleanPreview();
 
