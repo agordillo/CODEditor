@@ -57,7 +57,7 @@ CODEditor.CORE = (function(C,$,undefined){
 			_onGetExternalJSONFile(URLparams["file"],URLparams);
 		} else {
 			//Testing
-			// _loadJSON(CODEditor.Samples.getExample("js_elipse"));
+			// _loadJSON(CODEditor.Samples.getExample("jquery_intro"));
 			_initDefaultMode(URLparams);
 		}
 	};

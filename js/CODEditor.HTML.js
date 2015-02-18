@@ -17,26 +17,28 @@ CODEditor.HTML = (function(C,$,undefined){
 
 		if(typeof currentExercise !== "undefined"){
 			if(typeof currentExercise.parsed_score_function == "function"){
-				var score = CODEditor.Score.getScoreFromScoreFunction(currentExercise.parsed_score_function,doc,{});
-				if(typeof score == "object"){
-					//Adjust UI when exercise. Show a new window with evaluation results.
-					
-					var htmlResultWrapper = $("<div class='html_result_wrapper'></div>");
-					var htmlResultHeader = $("<div class='html_result_header'></div>");
-					$(htmlResultHeader).html("<p>Corrección</p><div id='consoleButtons'><img id='closeHTMLconsole' title='Cerrar consola' src='img/close_console.png'/><img id='minimizeHTMLconsole' title='Minimizar consola' src='img/minimize_console.png'/><img id='maximizeHTMLconsole' title='Maximizar consola' src='img/maximize_console.png'/></div>");
-					var htmlResultContent = $("<div class='html_resultContent'></div>");
-					$(htmlResultWrapper).append(htmlResultHeader);
-					$(htmlResultWrapper).append(htmlResultContent);
-					$("#preview").append(htmlResultWrapper);
+				setTimeout(function(){
+					var score = CODEditor.Score.getScoreFromScoreFunction(currentExercise.parsed_score_function,doc,{});
+					if(typeof score == "object"){
+						//Adjust UI when exercise. Show a new window with evaluation results.
+						
+						var htmlResultWrapper = $("<div class='html_result_wrapper'></div>");
+						var htmlResultHeader = $("<div class='html_result_header'></div>");
+						$(htmlResultHeader).html("<p>Corrección</p><div id='consoleButtons'><img id='closeHTMLconsole' title='Cerrar consola' src='img/close_console.png'/><img id='minimizeHTMLconsole' title='Minimizar consola' src='img/minimize_console.png'/><img id='maximizeHTMLconsole' title='Maximizar consola' src='img/maximize_console.png'/></div>");
+						var htmlResultContent = $("<div class='html_resultContent'></div>");
+						$(htmlResultWrapper).append(htmlResultHeader);
+						$(htmlResultWrapper).append(htmlResultContent);
+						$("#preview").append(htmlResultWrapper);
 
-					_loadEvents();
+						_loadEvents();
 
-					adjustHTMLPreviewUI();
+						adjustHTMLPreviewUI();
 
-					CODEditor.Score.displayScore(score,htmlResultContent);
+						CODEditor.Score.displayScore(score,htmlResultContent);
 
-					CODEditor.CORE.onDoCurrentExercise(score.score,htmlResultContent);
-				}
+						CODEditor.CORE.onDoCurrentExercise(score.score,htmlResultContent);
+					}
+				},500);
 			} else {
 				CODEditor.CORE.onDoCurrentExercise(undefined,htmlResultContent);
 			}	

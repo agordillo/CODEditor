@@ -475,7 +475,6 @@ CODEditor.Samples = (function(C,$,undefined){
 	js_elipse_description += "-> En cualquier otro caso en que la función reciba parámetros erroneos deberá devolver el valor <b>-3</b>.\n";
 	js_elipse_description += "-> Si los parámetros son correctos, la función devolverá el valor del área de la elipse.\n";
 
-	/* Example with 'code' in description. */
 	var js_elipse = {
 		"type": "exercise",
 		"title": "Área de una elipse",
@@ -485,6 +484,152 @@ CODEditor.Samples = (function(C,$,undefined){
 		"score_function": ("var score = " + js_elipse_score.toString()),
 		"score_function_vars": ["elipse"]
 	};
+
+
+	/* Reloj */
+	var js_dom_reloj_content = '<!DOCTYPE html>\n<html>\n<head>\n    <title>Reloj</title>\n    <meta charset="UTF-8">\n    <script type="text/javascript">\n        function mostrar_fecha(){\n            var cl = document.getElementById("fecha");\n            cl.innerHTML = new Date();\n        }\n    </script>\n</head>\n<body>\n    <h2>Reloj</h2>\n    <div id="fecha"></div>\n    <script type="text/javascript">\n        mostrar_fecha(); //muestra fecha al cargar\n                         // actualiza cada segundo\n        setInterval(mostrar_fecha, 1000);\n    </script>\n</body>\n</html>';
+	var js_dom_reloj = {
+		"type": "exercise",
+		"title": "Reloj",
+		"description": "Ejemplo de Reloj con JavaScript\nTrate de conseguir el mismo resultado empleando JQuery.\nPuede importar la librería de un CDN mediante la siguiente etiqueta: <code><script src=\"http://code.jquery.com/jquery-1.11.2.min.js\"></script></code>.",
+		"editorMode":"HTML",
+		"content": js_dom_reloj_content
+	};
+
+	/* JQuery Intro */
+	var jquery_intro_score = function(document){
+		var grade = {};
+		grade.successes = [];
+		grade.errors = [];
+		grade.feedback = [];
+		grade.score = 0;
+
+		// Añada el título "JQuery" a la página web.
+		var title = $(document).find("head").find("title").html();
+		if((typeof title === "string")&&(title.trim().toLowerCase()==="jquery")){
+			grade.successes.push("Cambiaste el título de la página web correctamente.");
+			grade.score += 2;
+		} else {
+			grade.errors.push("No cambiaste correctamente el título de la página web.");
+		}
+
+		if(grade.errors.length > 0){
+			return grade;
+		}
+
+		//Centre la cabecera <header>.
+		var header = $(document).find("header");
+		if($(header).css("text-align")==="center"){
+			grade.successes.push("Centraste el <header> correctamente.");
+			grade.score += 1;
+		} else {
+			grade.errors.push("El <header> no está centrado.");
+		}
+
+		if(grade.errors.length > 0){
+			return grade;
+		}
+
+		//Cambie a 20px el tamaño de fuente de los <p> con clase "title".
+		var ps = $(document).find("p.title");
+		if($(ps).css("font-size")==="20px"){
+			grade.successes.push("Cambiaste el tamaño de los <p> con clase title correctamente.");
+			grade.score += 1;
+		} else {
+			grade.errors.push("Los elementos p con clase title no tienen el tamaño de fuente correcto.");
+		}
+
+		if(grade.errors.length > 0){
+			return grade;
+		}
+
+
+		//Ponga fondo negro y letra blanca a los <div> que estén dentro del elemento con id "news".
+		var divs = $(document).find("#news div");
+		var _background = false;
+		var _color = false;
+
+		if($(divs).css("background-color")==="rgb(0, 0, 0)"){
+			_background = true;
+		} else {
+			_background = false;
+		}
+
+		if($(divs).css("color")==="rgb(255, 255, 255)"){
+			_color = true;
+		} else {
+			_color = false;
+		}
+
+		if(_background&&_color){
+			grade.successes.push("Los <div> dentro del elemento con id news tienen el estilo adecuado.");
+			grade.score += 2;
+		} else {
+			if(!_background){
+				grade.errors.push("Los <div> dentro del elemento con id news no tienen el fondo adecuado.");
+			}
+			if(!_color){
+				grade.errors.push("Los <div> dentro del elemento con id news no tienen el color adecuado.");
+			}
+		}
+
+		if(grade.errors.length > 0){
+			return grade;
+		}
+
+		// Incluya un manejador de eventos a todos los <li> cuyo atributo "alert" sea igual a "yes", de modo que si se pulsa sobre alguno de ellos su contenido se escriba en el <footer> de la página.
+		var triggerElement = $(document).find("[alert='yes']")[0];
+		if(typeof triggerElement == "undefined"){
+			grade.errors.push("No se encontró ningún elemento escuchando al evento.");
+			return grade;
+		}
+
+		var footer = $(document).find("footer");
+		var oldFooterVal = $(footer).html();
+		var triggerElementVal = $(triggerElement).html();
+
+		$(footer).html("");
+		$(triggerElement).trigger("click");
+		if($(footer).html()===triggerElementVal){
+			//Success
+			grade.score += 4;
+			grade.successes.push("El manejador de eventos funciona acorde a lo esperado.");
+		} else {
+			//Fail
+			grade.errors.push("El manejador de eventos no funciona acorde a lo esperado.");
+		}
+
+		$(footer).html(oldFooterVal);
+
+		//Passed threshold: 8
+		if(grade.score < 8){
+			grade.score = 4;
+		}
+
+		if(grade.score===10){
+			grade.feedback.push("¡Enhorabuena, tu solución es perfecta!");
+		}
+
+		return grade;
+	};
+
+	var js_jquery_intro_description = "Empleando JQuery realice los siguiente cambios en la página web:\n"
+	js_jquery_intro_description += "-> Añada el título \"JQuery\" a la página web.\n";
+	js_jquery_intro_description += "-> Centre la cabecera <code><header></code>.\n";
+	js_jquery_intro_description += "-> Cambie a 20px el tamaño de fuente de los <code><p></code> con clase \"title\".\n";
+	js_jquery_intro_description += "-> Ponga fondo negro y letra blanca a los <code><div></code> que estén dentro del elemento con id \"news\".\n";
+	js_jquery_intro_description += "-> Incluya un manejador de eventos a todos los <code><li></code> cuyo atributo \"alert\" sea igual a \"yes\", de modo que si se pulsa sobre alguno de ellos su contenido se escriba en el <code><footer></code> de la página.\n";
+	
+	var jquery_intro_content = '<!DOCTYPE html>\n<html>\n  <head>\n        <meta charset="UTF-8">\n        <script src=\"http://code.jquery.com/jquery-1.11.2.min.js\"></script>\n        <script type="text/javascript">\n            $(document).ready(function(){\n                //Escribe tu solución aquí\n                \n            });\n      </script>\n  </head>\n  <body>\n    <header>Aprendiendo a utilizar los selectores de JQuery</header>\n    <article>\n        <div>\n            <p class="title">Características de JQuery</p>\n            <ul>\n                <li>Rápido</li>\n                <li alert="yes">Ligero</li>\n                <li>Multi-navegador</li>\n            </ul>\n        </div>\n    </article>\n    <article id="news">\n        <div class="title">\n            <a target="_blank" href="http://jquery.com/">JQuery website</a>\n        </div>\n    </article>\n    <footer></footer>\n  </body>\n</html>';
+	var jquery_intro = {
+		"type": "exercise",
+		"title": "JQuery Intro",
+		"description": js_jquery_intro_description,
+		"editorMode":"HTML",
+		"content": jquery_intro_content,
+		"score_function": ("var score = " + jquery_intro_score.toString())
+	};
+
 
 
 	var getExample = function(exampleName){
@@ -500,8 +645,11 @@ CODEditor.Samples = (function(C,$,undefined){
 		examples.push(js_sample);
 		examples.push(js_sample_feedback);
 		examples.push(js_sample_multivar);
+		examples.push(js_elipse);
 		examples.push(html_sample);
 		examples.push(html_css_sample);
+		examples.push(js_dom_reloj);
+		examples.push(jquery_intro);
 		examples.push(mooc_test_sample);
 		examples.push(test_sample);
 		examples.push(js_hybrid);
