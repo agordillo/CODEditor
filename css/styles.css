@@ -119,14 +119,13 @@ html, body {
 }
 
 #exercise_title_wrapper {
-	padding: 20px;
-	padding-top: 15px;
+	padding: 15px 20px;
 }
 
 #exercise_title{
 	font-size: 1.6rem;
 	margin: 0px;
-	margin-bottom: 16px;
+	margin-bottom: 1px;
 }
 
 #test_header {
@@ -207,7 +206,7 @@ html, body {
 
 #exercise_description pre.code {
 	background: #CCC;
-	padding: 5px 4px;
+	padding: 1px 4px;
 	font-size: 1rem;
 	line-height: inherit;
 	border-radius: 2px;
@@ -215,7 +214,7 @@ html, body {
 	border: 1px solid rgba(131, 131, 131, 0.51);
 	font-family: Monaco,Menlo,'Ubuntu Mono',Consolas,monospace;
 	display: inline-block;
-	margin: 3px 0px;
+	margin: 0px;
 }
 
 #editor, #preview {

@@ -332,6 +332,160 @@ CODEditor.Samples = (function(C,$,undefined){
 	};
 
 
+	/* Elipse */
+	var js_elipse_score = function(result,variablesHash){
+		var grade = {};
+		grade.successes = [];
+		grade.errors = [];
+		grade.feedback = [];
+		grade.score = 0;
+
+		var elipse = variablesHash["elipse"];
+
+		if(typeof elipse !== "function"){
+			grade.errors.push("El valor devuelto en la variable 'elipse' no es una función.");
+			return grade;
+		}
+		grade.score += 1;
+
+		//Testear la función.
+
+		var _feedbackPI = false;
+
+		//Case: a,b numbers
+		try {
+			var testA = elipse(0,0);
+			var testB = elipse(1,1);
+			var testC = elipse(2,5);
+			if((testA===0)&&(testB===Math.PI)&&(testC===10*Math.PI)){
+				grade.score += 2;
+				grade.successes.push("La función 'elipse' funciona correctamente cuando 'a' y 'b' son números.");
+			} else {
+				grade.errors.push("La función 'elipse' no calcula correctamente el valor esperado cuando 'a' y 'b' son números.");
+				if(Math.abs(testB-Math.PI) < 0.1){
+					grade.score += 1;
+					grade.feedback.push("Algunos valores calculados se acercan bastante al esperado sin llegar a ser exactos. Recuerda que el valor de PI puede ser obtenido empleando el módulo Math de JavaScript de la siguiente forma \"Math.PI\".");
+					_feedbackPI = true;
+				}
+			}
+		} catch (e1){
+			grade.errors.push("La función 'elipse' presenta errores de ejecución cuando 'a' y 'b' son números.");
+		}
+
+		if(grade.errors.length > 0){
+			return grade;
+		}
+
+		//Case: a, array
+		try {
+			var testD = elipse([0,0]);
+			var testE = elipse([1,1]);
+			var testF = elipse([2,5]);
+			if((testD===0)&&(testE===Math.PI)&&(testF===10*Math.PI)){
+				grade.score += 2;
+				grade.successes.push("La función 'elipse' funciona correctamente cuando 'a' es un array.");
+			} else {
+				grade.errors.push("La función 'elipse' no calcula correctamente el valor esperado cuando 'a' es un array.");
+				if(Math.abs(testE-Math.PI) < 0.1){
+					grade.score += 1;
+					if(!_feedbackPI){
+						grade.feedback.push("Algunos valores calculados se acercan bastante al esperado sin llegar a ser exactos. Recuerda que el valor de PI puede ser obtenido empleando el módulo Math de JavaScript de la siguiente forma \"Math.PI\".");
+						_feedbackPI= true;
+					}
+				}
+			}
+		} catch (e2){
+			grade.errors.push("La función 'elipse' presenta errores de ejecución cuando 'a' es un array.");
+		}
+
+		if(grade.errors.length > 0){
+			return grade;
+		}
+
+
+		//Si la función recibe como parámetro un objeto que no sea un array devolverá -1.
+		try {
+			if((elipse({})===-1)&&(elipse(new Date())===-1)){
+				grade.score += 2;
+				grade.successes.push("La función 'elipse' funciona correctamente cuando 'a' es un objeto diferente de un array.");
+			} else {
+				grade.errors.push("La función 'elipse' no funciona correctamente cuando 'a' es un objeto diferente de un array.");
+			}
+		} catch (e2){
+			grade.errors.push("La función 'elipse' presenta errores de ejecución cuando 'a' es un objeto diferente de un array.");
+		}
+
+		//Si la función recibe como parámetro un array que no contenga los valores adecuados devolverá -2.
+		try {
+			if((elipse([])===-2)&&(elipse([5,"test"])===-2)&&(elipse([undefined,5])===-2)){
+				grade.score += 1;
+				grade.successes.push("La función 'elipse' funciona correctamente cuando 'a' es un array inválido.");
+			} else {
+				grade.errors.push("La función 'elipse' no funciona correctamente cuando 'a' es un array inválido.");
+			}
+
+			if(elipse([-1,-1])===-2){
+				grade.score += 1;
+			} else {
+				grade.feedback.push("Un array que contenga números negativos también se considera un array inválido.");
+			}
+
+		} catch (e2){
+			grade.errors.push("La función 'elipse' presenta errores de ejecución cuando 'a' es un array inválido.");
+		}
+
+		// En cualquier otro caso en que la función reciba parámetros erroneos deberá devolver el valor -3.
+		try {
+			if((elipse()===-3)&&(elipse(5)===-3)&&(elipse(5,null)===-3)&&(elipse(undefined,5)===-3)&&(elipse("perro",10)===-3)){
+				grade.score += 1;
+				grade.successes.push("La función 'elipse' funciona correctamente cuando recibe parámetros inválidos.");
+			} else {
+				grade.errors.push("La función 'elipse' no funciona correctamente cuando recibe parámetros inválidos.");
+			}
+
+			if(elipse(-1,-1)===-3){
+				grade.score += 1;
+			} else {
+				grade.feedback.push("Los valores a y b deberían ser siempre positivos. De lo contrario se deberían considerarse parámetros inválidos.");
+			}
+
+		} catch (e2){
+			grade.errors.push("La función 'elipse' presenta errores de ejecución cuando recibe parámetros inválidos.");
+		}
+
+		//Scale grade
+		grade.score = Math.min(10,Math.max(0,grade.score));
+
+		//Passed threshold: 8
+		if(grade.score < 8){
+			grade.score = 4;
+		}
+
+		if(grade.score===10){
+			grade.feedback.push("¡Enhorabuena, tu solución es perfecta!");
+		}
+
+		return grade;
+	};
+
+	var js_elipse_description = "Devuelva en la variable <b>'elipse'</b> una función que calcule el área de una elipse de acuerdo a la fórmula <code>Área = &#928;·a·b</code>, siendo a y b el radio de los semiejes de la elipse. "
+	js_elipse_description += "La función podrá ser invocada de dos formas diferentes:\n  a) mediante dos parámetros numéricos '<b>a</b>' y '<b>b</b>'.\n  b) mediante un solo parámetro de tipo array que contenga los valores de a y b.\n";
+	js_elipse_description += "-> Si la función recibe como parámetro un objeto que no sea un array devolverá <b>-1</b>.\n";
+	js_elipse_description += "-> Si la función recibe como parámetro un array que no contenga los valores adecuados devolverá <b>-2</b>.\n";
+	js_elipse_description += "-> En cualquier otro caso en que la función reciba parámetros erroneos deberá devolver el valor <b>-3</b>.\n";
+	js_elipse_description += "-> Si los parámetros son correctos, la función devolverá el valor del área de la elipse.\n";
+
+	/* Example with 'code' in description. */
+	var js_elipse = {
+		"type": "exercise",
+		"title": "Área de una elipse",
+		"description":js_elipse_description,
+		"editorMode":"JavaScript",
+		"content": "/*\n * " +  "Devuelva en la variable 'elipse' una función que calcule el área de una elipse de acuerdo a la fórmula 'Área = Π·a·b'" + "\n */\n\n" + "var elipse = function(a,b){\n\n};\n",
+		"score_function": ("var score = " + js_elipse_score.toString()),
+		"score_function_vars": ["elipse"]
+	};
+
 
 	var getExample = function(exampleName){
 		var example = undefined;
