@@ -320,6 +320,10 @@ ul.menu li.mitemmode {
 	cursor: pointer;
 }
 
+ul.menu li.mitemmode.logged {
+	top: 20px;
+}
+
 ul.menu li#fullscreen_button {
 	display: none;
 }
@@ -721,6 +725,14 @@ div.notificationDialog {
 div.notificationDialog p {
 	padding: 10px 0px;
 	font-size: 1.2rem;
+}
+
+p#login {
+	display: none;
+	position: absolute;
+ 	left: 6px;
+ 	top: -10px;
+ 	color: #006709;
 }
 
 /* Themes */

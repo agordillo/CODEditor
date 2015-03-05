@@ -121,13 +121,13 @@ CODEditor.Samples = (function(C,$,undefined){
 		}
 
 		//Scale grade
-		grade.score = Math.min(10,Math.max(0,Math.pow(grade.score,2)/10) + 0.1);
-
+		if(grade.score>0){
+			grade.score = Math.min(10,Math.max(0,Math.pow(grade.score,2)/10) + 0.1);
+		}		
 
 		if(grade.score===10){
 			grade.feedback.push("¡Enhorabuena, tu solución es perfecta!");
 		}
-
 
 		return grade;
 	};
