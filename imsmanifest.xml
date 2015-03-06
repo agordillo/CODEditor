@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest identifier="CODEditor_v2" version="1.3" xmlns="http://www.imsglobal.org/xsd/imscp_v1p1" xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_v1p3" xmlns:adlseq="http://www.adlnet.org/xsd/adlseq_v1p3" xmlns:adlnav="http://www.adlnet.org/xsd/adlnav_v1p3" xmlns:imsss="http://www.imsglobal.org/xsd/imsss" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imscp_v1p1 imscp_v1p1.xsd http://www.adlnet.org/xsd/adlcp_v1p3 adlcp_v1p3.xsd http://www.adlnet.org/xsd/adlseq_v1p3 adlseq_v1p3.xsd http://www.adlnet.org/xsd/adlnav_v1p3 adlnav_v1p3.xsd http://www.imsglobal.org/xsd/imsss imsss_v1p0.xsd">
+  <metadata>
+    <schema>ADL SCORM</schema>
+    <schemaversion>2004 4th Edition</schemaversion>
+    <lom xmlns="http://ltsc.ieee.org/xsd/LOM" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ltsc.ieee.org/xsd/LOM lom.xsd">
+      <general>
+        <title>
+          <string language="es">CODEditor</string>
+        </title>
+        <language>es</language>
+        <description>
+          <string language="es">Ejercicio creado con CODEditor v2.</string>
+        </description>
+        <keyword>
+          <string language="es">HTML</string>
+        </keyword>
+        <keyword>
+          <string language="es">CSS</string>
+        </keyword>
+        <keyword>
+          <string language="es">JavaScript</string>
+        </keyword>
+        <structure>
+          <source>LOMv1.0</source>
+          <value>hierarchical</value>
+        </structure>
+        <aggregationLevel>
+          <source>LOMv1.0</source>
+          <value>2</value>
+        </aggregationLevel>
+      </general>
+      <technical>
+        <format>text/html</format>
+        <requirement>
+          <orComposite>
+            <type>
+              <source>LOMv1.0</source>
+              <value>browser</value>
+            </type>
+            <name>
+              <source>LOMv1.0</source>
+              <value>any</value>
+            </name>
+          </orComposite>
+        </requirement>
+        <otherPlatformRequirements>
+          <string language="en">HTML5-compliant web browser</string>
+          <string language="en">CODEditor v2 (http://github.com/agordillo/CodeEditorApp)</string>
+        </otherPlatformRequirements>
+      </technical>
+      <educational>
+        <interactivityType>
+          <source>LOMv1.0</source>
+          <value>mixed</value>
+        </interactivityType>
+        <learningResourceType>
+          <source>LOMv1.0</source>
+          <value>lecture</value>
+        </learningResourceType>
+        <interactivityLevel>
+          <source>LOMv1.0</source>
+          <value>very high</value>
+        </interactivityLevel>
+        <intendedEndUserRole>
+          <source>LOMv1.0</source>
+          <value>learner</value>
+        </intendedEndUserRole>
+        <context>
+          <source>LOMv1.0</source>
+          <value>school</value>
+        </context>
+        <language>es</language>
+      </educational>
+      <rights>
+        <cost>
+          <source>LOMv1.0</source>
+          <value>no</value>
+        </cost>
+        <copyrightAndOtherRestrictions>
+          <source>LOMv1.0</source>
+          <value>no</value>
+        </copyrightAndOtherRestrictions>
+      </rights>
+    </lom>
+  </metadata>
+  <organizations default="defaultOrganization">
+    <organization identifier="defaultOrganization" structure="hierarchical">
+      <title>CODEditor</title>
+      <item identifier="CODEditor_v2" identifierref="CODEditor_v2_resource">
+        <title>CODEditor v2</title>
+      </item>
+    </organization>
+  </organizations>
+  <resources>
+    <resource identifier="CODEditor_v2_resource" type="webcontent" href="index.html" adlcp:scormType="sco">
+      <file href="index.html"/>
+    </resource>
+  </resources>
+</manifest>
