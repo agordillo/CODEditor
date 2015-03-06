@@ -21,10 +21,16 @@ CODEditor.CORE = (function(C,$,undefined){
 	var _currentUser;
 
 	//Enable debugging
-	var _debug = true;
+	var _debug = false;
 
 
 	var init = function(options){
+		var URLparams = C.Utils.readURLparams();
+
+		if(URLparams["debug"] === "true"){
+			_debug = true;
+		}
+
 		C.Utils.init();
 		C.FullScreen.init();
 		C.Score.init();
@@ -41,13 +47,11 @@ CODEditor.CORE = (function(C,$,undefined){
 		C.JS.init();
 		C.HTML.init();
 
-		var URLparams = C.Utils.readURLparams();
-
 		if(typeof URLparams["file"] === "string"){
 			_onGetExternalJSONFile(URLparams["file"],URLparams);
 		} else {
-			if(_debug){
-				_initExerciseMode(C.Samples.getExample("mooc_test_sample"));
+			if((_debug)&&(typeof URLparams["example"] === "string")){
+				_initExerciseMode(C.Samples.getExample(URLparams["example"]));
 			} else {
 				_initDefaultMode(URLparams);
 			}
@@ -211,6 +215,12 @@ CODEditor.CORE = (function(C,$,undefined){
 				if(_currentExercise.editorMode === "HTML"){
 					C.HTML.adjustHTMLPreviewUI();
 				}
+			}
+		};
+
+		window.onbeforeunload = function(){
+			if(C.SCORM.isConnected()){
+				C.SCORM.onExit();
 			}
 		};
 

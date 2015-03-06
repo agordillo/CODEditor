@@ -23,7 +23,7 @@ CODEditor.SCORM = (function(C,$,undefined){
 		connected = scorm.initialize();
 		scorm.debug("Connected: " + connected,4);
 		
-		if((!connected)||(connected==="false")){
+		if(!isConnected()){
 			return;
 		}
 
@@ -139,6 +139,13 @@ CODEditor.SCORM = (function(C,$,undefined){
 		} else {
 			return undefined;
 		}		
+	};
+
+	var isConnected = function(){
+		if((!connected)||(connected==="false")){
+			return false;
+		}
+		return true;
 	};
 
 
@@ -1378,7 +1385,7 @@ CODEditor.SCORM = (function(C,$,undefined){
 	            API.connection = true;
 	            return true;
 	        }
-	        debug("I was unable to locate an API for communication", 2);
+	        debug("I was unable to locate an API for communication", 1);
 	        if (settings.use_standalone) {
 	            // Create Local API in SCORM 2004
 	            debug("If you included Local_API_1484_11 I'll mimic the LMS.  If not, all SCORM calls will fail.", 4);
@@ -1484,9 +1491,11 @@ CODEditor.SCORM = (function(C,$,undefined){
 
 	return {
 		init 						: init,
+		isConnected 				: isConnected,
 		getAPIInstance				: getAPIInstance,
 		getLMSAPIInstance			: getLMSAPIInstance,
-		onProgressObjectiveUpdated	: onProgressObjectiveUpdated
+		onProgressObjectiveUpdated	: onProgressObjectiveUpdated,
+		onExit						: onExit
 	};
 
 })(CODEditor,jQuery);
