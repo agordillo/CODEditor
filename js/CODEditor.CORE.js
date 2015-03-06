@@ -49,6 +49,13 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		if(typeof URLparams["file"] === "string"){
 			_onGetExternalJSONFile(URLparams["file"],URLparams);
+		} else if((typeof options == "object")&&(typeof options.file == "object")) {
+			if(_isValidJSON(options.file)){
+				_initExerciseMode(options.file);
+			} else {
+				C.Utils.showDialog("El recurso cargado no es válido.");
+				_initDefaultMode(URLparams);
+			}
 		} else {
 			if((_debug)&&(typeof URLparams["example"] === "string")){
 				_initExerciseMode(C.Samples.getExample(URLparams["example"]));
@@ -599,11 +606,11 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var exportToSCORM = function(){
 		var zip = new JSZip();
-		zip.file("index.html", document.documentElement.innerHTML);
 
 		var packageFileTree = {};
 		var filesSources = [];
 
+		filesSources.push("index.html");
 		// filesSources.push("lms_index.html");
 
 		$("link[href]").each(function(index,value){
@@ -687,6 +694,34 @@ CODEditor.CORE = (function(C,$,undefined){
 	var _onZipFileInSCORM = function(zip){
 		fileSourcesCounter++;
 		if(fileSourcesCounter>=fileSourcesLength){
+			_onFinishExportSCORMStep1(zip);
+		}
+	};
+
+	var _onFinishExportSCORMStep1 = function(zip){
+		var currentFile = _getCurrentFile();
+
+		if(typeof currentFile != "undefined"){
+			//CODEditor.File.js
+			zip.file("CODEditor.File.js", "var CODEditor = CODEditor || {};\nCODEditor.File = " + JSON.stringify(currentFile));
+			
+			//Modify index.html
+			JSZipUtils.getBinaryContent("index.html", function (err, data) {
+				if(err) {
+					throw err;
+				}
+				
+				//ArrayBuffer to String
+				var indexHTMLContent = String.fromCharCode.apply(null, new Uint8Array(data));
+				var position = indexHTMLContent.indexOf("</head>");
+				var fileScript = '<script src="CODEditor.File.js" type="text/javascript" charset="utf-8"></script>';
+				indexHTMLContent = (indexHTMLContent.substr(0, position) + "    " + fileScript + "\n" + indexHTMLContent.substr(position));
+				zip.file("index.html", indexHTMLContent);
+
+				_onFinishExportSCORM(zip);
+			});
+
+		} else {
 			_onFinishExportSCORM(zip);
 		}
 	};
@@ -696,14 +731,19 @@ CODEditor.CORE = (function(C,$,undefined){
 		saveAs(content, (_getCurrentSCORMTitle() + ".zip"));
 	};
 
-	var _getCurrentSCORMTitle = function(){
+	var _getCurrentFile = function(){
 		if(typeof _currentTest != "undefined"){
-			return _currentTest.title;
+			return _currentTest;
 		} else if(typeof _currentExercise != "undefined"){
-			return _currentExercise.title;
-		} else {
-			return "scorm";
+			return _currentExercise;
 		}
+	};
+
+	var _getCurrentSCORMTitle = function(){
+		if(typeof _getCurrentFile() != "undefined"){
+			return _getCurrentFile().title;
+		}
+		return "scorm";
 	};
 
 	var _changeViewMode = function(viewMode){
