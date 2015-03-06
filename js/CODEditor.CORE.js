@@ -593,6 +593,119 @@ CODEditor.CORE = (function(C,$,undefined){
 		saveAs(blob, filename);
 	};
 
+
+	var fileSourcesCounter;
+	var fileSourcesLength;
+
+	var exportToSCORM = function(){
+		var zip = new JSZip();
+		zip.file("index.html", document.documentElement.innerHTML);
+
+		var packageFileTree = {};
+		var filesSources = [];
+
+		// filesSources.push("lms_index.html");
+
+		$("link[href]").each(function(index,value){
+			filesSources.push($(value).attr("href"));
+		});
+
+		$("script[src]").each(function(index,value){
+			filesSources.push($(value).attr("src"));
+		});
+
+		$("img[src]").each(function(index,value){
+			filesSources.push($(value).attr("src"));
+		});
+
+		//Delete duplicated values
+		var uniqFileSources = [];
+		for(var i=0; i<filesSources.length; i++){
+			if(uniqFileSources.indexOf(filesSources[i])===-1){
+				uniqFileSources.push(filesSources[i]);
+			}
+		}
+		filesSources = uniqFileSources;
+
+		fileSourcesCounter = 0;
+		fileSourcesLength = filesSources.length;
+
+		for(var i=0; i<filesSources.length; i++){
+			var splitValue = filesSources[i].split("/");
+			var splitLength = splitValue.length;
+			var currentFolder = packageFileTree;
+			for(var j=0; j<splitLength; j++){
+				if(j!=(splitLength-1)){
+					//Folder
+					if(typeof currentFolder[splitValue[j]] == "undefined"){
+						currentFolder[splitValue[j]] = {};
+					}
+					currentFolder = currentFolder[splitValue[j]];
+				} else {
+					currentFolder[splitValue[j]] = splitValue[j];
+				}
+			}
+		};
+
+		// console.log(packageFileTree);
+
+		_zipFolder(zip,undefined,undefined,packageFileTree,"");
+	};
+
+	var _zipFolder = function(zipRoot,zipParent,folderName,folderContent,path){
+		if(typeof zipParent !== "undefined"){
+			window["folder_" + folderName] = zipParent.folder(folderName);
+			var folder = window["folder_" + folderName];
+		} else {
+			var folder = zipRoot;
+		}
+		for(var key in folderContent){
+			var file = folderContent[key];
+			if(path !== ""){
+				var fileFullPath = path+"/"+key;
+			} else {
+				var fileFullPath = key;
+			}
+			if(typeof file === "object"){
+				_zipFolder(zipRoot,folder,key,file,fileFullPath);
+			} else {
+				_zipFile(zipRoot,folder,key,fileFullPath);
+			}
+		}
+	};
+
+	var _zipFile = function(zipRoot,zipParent,fileName,fileFullPath){
+		JSZipUtils.getBinaryContent(fileFullPath, function (err, data) {
+			if(err) {
+				throw err;
+			}
+			zipParent.file(fileName, data, {binary:true});
+			_onZipFileInSCORM(zipRoot);
+		});
+	};
+
+	var _onZipFileInSCORM = function(zip){
+		fileSourcesCounter++;
+		if(fileSourcesCounter>=fileSourcesLength){
+			_onFinishExportSCORM(zip);
+		}
+	};
+
+	var _onFinishExportSCORM = function(zip){
+		var content = zip.generate({type:"blob"});
+		saveAs(content, (_getCurrentSCORMTitle() + ".zip"));
+	};
+
+	var _getCurrentSCORMTitle = function(){
+		if(typeof _currentTest != "undefined"){
+			return _currentTest.title;
+		} else if(typeof _currentExercise != "undefined"){
+			return _currentExercise.title;
+		} else {
+			return "scorm";
+		}
+	};
+
 	var _changeViewMode = function(viewMode){
 		if((_viewModes.indexOf(viewMode)!=-1)&&(viewMode!=_currentViewMode)){
 			var wrappersDOM = $("#editor_wrapper, #preview_wrapper");
@@ -1184,6 +1297,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		getCurrentExercise 		: getCurrentExercise,
 		getCurrentTest			: getCurrentTest,
 		loadTestExercise		: loadTestExercise,
+		exportToSCORM			: exportToSCORM,
 		onDoCurrentExercise		: onDoCurrentExercise,
 		getUser					: getUser,
 		setUser					: setUser,
