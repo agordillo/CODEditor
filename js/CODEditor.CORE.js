@@ -612,10 +612,9 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		filesSources.push("index.html");
 		// filesSources.push("lms_index.html");
+		
 		filesSources.push("imsmanifest.xml");
-
 		var scormConstantFiles = ["adlcp_v1p3.xsd","adlnav_v1p3.xsd","adlseq_v1p3.xsd","imscp_v1p1.xsd","imsss_v1p0.xsd","lom.xsd",	"common/anyElement.xsd", "common/dataTypes.xsd", "common/elementNames.xsd", "common/elementTypes.xsd", "common/rootElement.xsd", "common/vocabTypes.xsd", "common/vocabValues.xsd", "extend/custom.xsd", "extend/strict.xsd", "unique/loose.xsd", "unique/strict.xsd", "vocab/adlmd_vocabv1p0.xsd", "vocab/custom.xsd", "vocab/loose.xsd", "vocab/strict.xsd"];
-
 		for(var s=0; s<scormConstantFiles.length; s++){
 			filesSources.push(scormConstantFiles[s]);
 		}
@@ -631,6 +630,12 @@ CODEditor.CORE = (function(C,$,undefined){
 		$("img[src]").each(function(index,value){
 			filesSources.push($(value).attr("src"));
 		});
+
+		//Extra images
+		var extraImages = ["img/error_icon.png","img/success_icon.png","img/fullscreen_off.png","img/maximize_console.png","img/minimize_console.png"];
+		for(var ii=0; ii<extraImages.length; ii++){
+			filesSources.push(extraImages[ii]);
+		}
 
 		//Delete duplicated values
 		var uniqFileSources = [];
