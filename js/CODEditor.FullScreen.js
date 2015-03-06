@@ -42,7 +42,7 @@ CODEditor.FullScreen = (function(C,$,undefined){
 			//Give some time...
 			setTimeout(function(){
 				_updateFsButtons();
-				CODEditor.UI.adjustView();
+				C.UI.adjustView();
 			}, 400);
 		});
 	};

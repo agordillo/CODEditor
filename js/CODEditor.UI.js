@@ -30,7 +30,7 @@ CODEditor.UI = (function(C,$,undefined){
 		// var glutterWidth = $("div.ace_layer.ace_gutter-layer.ace_folding-enabled").width();
 
 		//Adjust widhts in hybrid mode
-		if(CODEditor.CORE.getCurrentViewMode()==="HYBRID"){
+		if(C.CORE.getCurrentViewMode()==="HYBRID"){
 			var totalWidth = $("#content").outerWidth();
 			var editorWrapperWidth = Math.floor(totalWidth/2);
 			$("#editor_wrapper").width(editorWrapperWidth);
@@ -43,7 +43,7 @@ CODEditor.UI = (function(C,$,undefined){
 			$("#test_header").width($("#content").outerWidth() - $("#test_header").cssNumber("padding-right") - $("#test_header").cssNumber("padding-left"));
 		}
 
-		var editor = CODEditor.CORE.getEditor();
+		var editor = C.CORE.getEditor();
 		if(typeof editor !== "undefined"){
 			editor.resize();
 		};
@@ -54,7 +54,7 @@ CODEditor.UI = (function(C,$,undefined){
 		fontsize = (fontsize.trim()=="" ? "12px" : fontsize);
 		$("#settings_fontsize option[value='"+fontsize+"']").attr("selected","selected");
 
-		$("#settings_mode option[value='"+CODEditor.CORE.getCurrentEditorMode()+"']").attr("selected","selected");
+		$("#settings_mode option[value='"+C.CORE.getCurrentEditorMode()+"']").attr("selected","selected");
 	};
 
 	var cleanPreview = function(){
@@ -62,15 +62,15 @@ CODEditor.UI = (function(C,$,undefined){
 	};
 
 	var updateUIAfterNewExerciseOnTest = function(){
-		var currentTest = CODEditor.CORE.getCurrentTest();
+		var currentTest = C.CORE.getCurrentTest();
 
 		var testMenuWrapper = ("#test_menu_wrapper");
 		$(testMenuWrapper).find("p").html(currentTest.currentExerciseIndex.toString() + "/" + currentTest.exercisesQuantity.toString());
 	};
 
 	var updateTestMenuDialog = function(){
-		var currentTest = CODEditor.CORE.getCurrentTest();
-		var currentExercise = CODEditor.CORE.getCurrentExercise();
+		var currentTest = C.CORE.getCurrentTest();
+		var currentExercise = C.CORE.getCurrentExercise();
 
 		var menuDOM = $("#test_exercises_dialog");
 		$(menuDOM).html("");
@@ -96,7 +96,7 @@ CODEditor.UI = (function(C,$,undefined){
 		$("#test_exercises_dialog ul li").click(function(){
 			var exerciseIndex = parseInt($(this).attr("exerciseindex"));
 			if((typeof exerciseIndex === "number")&&(!isNaN(exerciseIndex))){
-				CODEditor.CORE.loadTestExercise(exerciseIndex);
+				C.CORE.loadTestExercise(exerciseIndex);
 				$("#test_exercises_dialog").dialog('close');
 			}
 		});

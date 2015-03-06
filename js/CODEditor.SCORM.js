@@ -19,7 +19,7 @@ CODEditor.SCORM = (function(C,$,undefined){
 
 
 	var init = function(){
-		scorm = new SCORM_API({debug: CODEditor.CORE.isDebugging(), windowDebug: false, exit_type: ""});
+		scorm = new SCORM_API({debug: C.CORE.isDebugging(), windowDebug: false, exit_type: ""});
 		connected = scorm.initialize();
 		scorm.debug("Connected: " + connected,4);
 		
@@ -31,10 +31,10 @@ CODEditor.SCORM = (function(C,$,undefined){
 		var learnerName = scorm.getvalue('cmi.learner_name');
 		var learnerId = scorm.getvalue('cmi.learner_id');
 		user = {name: learnerName, id: learnerId};
-		CODEditor.CORE.setUser(user);
+		C.CORE.setUser(user);
 
 		//Init progress tracking
-		CODEditor.ProgressTracking.init();
+		C.ProgressTracking.init();
 
 		//Initial progress value
 		_updateProgressMeasure(0);
@@ -45,6 +45,10 @@ CODEditor.SCORM = (function(C,$,undefined){
 			scorm.setvalue('cmi.score.min',(0).toString());
 			scorm.setvalue('cmi.score.max',(100).toString());
 			_updateScore(0);
+		}
+
+		if(C.CORE.getCurrentExercise() != "undefined"){
+			C.ProgressTracking.onLoadExercise(C.CORE.getCurrentExercise());
 		}
 	};
 

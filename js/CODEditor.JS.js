@@ -7,7 +7,7 @@ CODEditor.JS = (function(C,$,undefined){
 
 		//Check if an excercise is currently tried
 		var variablesArray = undefined;
-		var currentExercise = CODEditor.CORE.getCurrentExercise();
+		var currentExercise = C.CORE.getCurrentExercise();
 		if(typeof currentExercise !== "undefined"){
 			variablesArray = currentExercise.score_function_vars;
 		}
@@ -62,16 +62,16 @@ CODEditor.JS = (function(C,$,undefined){
 		if(!hasErrors){
 			if(typeof currentExercise !== "undefined"){
 				if(typeof currentExercise.parsed_score_function == "function"){
-					var score = CODEditor.Score.getScoreFromScoreFunction(currentExercise.parsed_score_function,evaluation.response,evaluation.variablesHash);
-					CODEditor.Score.displayScore(score,wrapper);
-					CODEditor.CORE.onDoCurrentExercise(score.score,wrapper);
+					var score = C.Score.getScoreFromScoreFunction(currentExercise.parsed_score_function,evaluation.response,evaluation.variablesHash);
+					C.Score.displayScore(score,wrapper);
+					C.CORE.onDoCurrentExercise(score.score,wrapper);
 				} else {
-					CODEditor.CORE.onDoCurrentExercise(undefined,wrapper);
+					C.CORE.onDoCurrentExercise(undefined,wrapper);
 				}
 			}
 		} else {
-			if(!CODEditor.Utils.isCodeEmpty(jscode)){
-				CODEditor.Score.displayErrors(["Se produjo un error de ejecución."],wrapper);
+			if(!C.Utils.isCodeEmpty(jscode)){
+				C.Score.displayErrors(["Se produjo un error de ejecución."],wrapper);
 			}
 		}
 
@@ -85,7 +85,7 @@ CODEditor.JS = (function(C,$,undefined){
 		evaluation.variablesHash = {};
 
 		//1. Check if jscode is a not empty string
-		if(CODEditor.Utils.isCodeEmpty(jscode)){
+		if(C.Utils.isCodeEmpty(jscode)){
 			evaluation.errors.push("No ha enviado ningún código para ser ejecutado.");
 			return evaluation;
 		}

@@ -58,7 +58,7 @@ CODEditor.Score = (function(C,$,undefined){
 				
 				$(successesHeader).append("Aciertos");
 				for(var s=0; s<score.successes.length; s++){
-					$(successesContent).append("<img class='success_icon' src='img/success_icon.png'/>" + CODEditor.Utils.purgeTextString(score.successes[s]) + "\n");
+					$(successesContent).append("<img class='success_icon' src='img/success_icon.png'/>" + C.Utils.purgeTextString(score.successes[s]) + "\n");
 				}
 
 				$(successesContentWrapper).append(successesContent);
@@ -77,7 +77,7 @@ CODEditor.Score = (function(C,$,undefined){
 				
 				$(errorsHeader).append("Errores");
 				for(var e=0; e<score.errors.length; e++){
-					$(errorsContent).append("<img class='error_icon' src='img/error_icon.png'/>" + CODEditor.Utils.purgeTextString(score.errors[e]) + "\n");
+					$(errorsContent).append("<img class='error_icon' src='img/error_icon.png'/>" + C.Utils.purgeTextString(score.errors[e]) + "\n");
 				}
 
 				$(errorsContentWrapper).append(errorsContent);
@@ -96,7 +96,7 @@ CODEditor.Score = (function(C,$,undefined){
 				
 				$(feedbackHeader).append("Feedback");
 				for(var f=0; f<score.feedback.length; f++){
-					$(feedbackContent).append(CODEditor.Utils.purgeTextString(score.feedback[f]) + "\n\n");
+					$(feedbackContent).append(C.Utils.purgeTextString(score.feedback[f]) + "\n\n");
 				}
 
 				$(feedbackContentWrapper).append(feedbackContent);

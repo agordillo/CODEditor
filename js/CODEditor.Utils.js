@@ -18,7 +18,7 @@ CODEditor.Utils = (function(C,$,undefined){
 		}
 
 		//Remove text in comments
-		switch(CODEditor.CORE.getCurrentEditorMode()){
+		switch(C.CORE.getCurrentEditorMode()){
 			case "HTML":
 				break;
 			case "JavaScript":

@@ -21,33 +21,33 @@ CODEditor.CORE = (function(C,$,undefined){
 	var _currentUser;
 
 	//Enable debugging
-	var _debug = false;
+	var _debug = true;
 
 
 	var init = function(options){
-		CODEditor.Utils.init();
-		CODEditor.FullScreen.init();
-		CODEditor.Score.init();
+		C.Utils.init();
+		C.FullScreen.init();
+		C.Score.init();
 
 		//Default view mode (CODE)
 		_changeViewMode(_viewModes[0]);
 
-		CODEditor.UI.init();
+		C.UI.init();
 		_initEditor();
-		CODEditor.UI.updateSettingsPanel();
+		C.UI.updateSettingsPanel();
 
 		_loadEvents();
 
-		CODEditor.JS.init();
-		CODEditor.HTML.init();
+		C.JS.init();
+		C.HTML.init();
 
-		var URLparams = CODEditor.Utils.readURLparams();
+		var URLparams = C.Utils.readURLparams();
 
 		if(typeof URLparams["file"] === "string"){
 			_onGetExternalJSONFile(URLparams["file"],URLparams);
 		} else {
 			if(_debug){
-				_initExerciseMode(CODEditor.Samples.getExample("js_sample_multivar"));
+				_initExerciseMode(C.Samples.getExample("mooc_test_sample"));
 			} else {
 				_initDefaultMode(URLparams);
 			}
@@ -57,7 +57,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _onGetExternalJSONFile = function(fileURL,initParams){
 		if((typeof fileURL !== "string")||(fileURL.trim() === "")){
-			return CODEditor.Utils.showDialog("La URL del fichero no es válida.");
+			return C.Utils.showDialog("La URL del fichero no es válida.");
 		}
 
 		//Allow to include default ViSH URLs for JSON files uploaded to http://vishub.org.
@@ -69,24 +69,24 @@ CODEditor.CORE = (function(C,$,undefined){
 		_getExternalJSONFile(fileURL,function(json){
 			//On success
 			if(_isValidJSON(json)){
-				if(CODEditor.Utils.isHistorySupported()){
-					var URLparams = CODEditor.Utils.readURLparams();
+				if(C.Utils.isHistorySupported()){
+					var URLparams = C.Utils.readURLparams();
 					if(typeof URLparams["file"] === "undefined"){
 						URLparams["file"] = fileURL;
 					}
-					var newURL = CODEditor.Utils.buildURLwithParams(URLparams);
+					var newURL = C.Utils.buildURLwithParams(URLparams);
 					window.history.replaceState("","",newURL);
 				}
 				_initExerciseMode(json);
 			} else {
-				CODEditor.Utils.showDialog("El recurso cargado no es válido.");
+				C.Utils.showDialog("El recurso cargado no es válido.");
 				if(typeof initParams !== "undefined"){
 					_initDefaultMode(initParams);
 				}
 			}
 		}, function(jqXHR,textStatus,errorThrown){
 			//On failure
-			CODEditor.Utils.showDialog("Error loading external script from " + fileURL);
+			C.Utils.showDialog("Error loading external script from " + fileURL);
 			if(typeof initParams !== "undefined"){
 				_initDefaultMode(initParams);
 			}
@@ -104,7 +104,7 @@ CODEditor.CORE = (function(C,$,undefined){
 			_changeEditorMode(initParams["emode"]);
 		}
 
-		CODEditor.SCORM.init();
+		C.SCORM.init();
 	};
 
 	var _initExerciseMode = function(json){
@@ -112,11 +112,11 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		_loadJSON(json);
 
-		CODEditor.SCORM.init();
+		C.SCORM.init();
 	};
 
 	var _populateExamples = function(){
-		var allExamples = CODEditor.Samples.getExamples();
+		var allExamples = C.Samples.getExamples();
 		var selector = $("#examples_panel #examples_selection");
 
 		for(var i=0; i<allExamples.length; i++){
@@ -206,10 +206,10 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _loadEvents = function(){
 		window.onresize = function(event){
-			CODEditor.UI.adjustView();
+			C.UI.adjustView();
 			if(typeof _currentExercise !== "undefined"){
 				if(_currentExercise.editorMode === "HTML"){
-					CODEditor.HTML.adjustHTMLPreviewUI();
+					C.HTML.adjustHTMLPreviewUI();
 				}
 			}
 		};
@@ -235,7 +235,7 @@ CODEditor.CORE = (function(C,$,undefined){
 				$(this).removeClass("active");
 				$("#examples_panel").hide();
 			} else {
-				$("#examples_panel #examples_mode option[value='"+CODEditor.CORE.getCurrentEditorMode()+"']").attr("selected","selected");
+				$("#examples_panel #examples_mode option[value='"+C.CORE.getCurrentEditorMode()+"']").attr("selected","selected");
 				_loadExamples();
 				$(this).addClass("active");
 				$("#examples_panel").show();
@@ -292,10 +292,10 @@ CODEditor.CORE = (function(C,$,undefined){
 				var r = confirm("Si recargas el ejercicio perderás todos tus cambios. ¿Estás seguro de que deseas hacerlo?");
 				if (r === true) {
 					_loadJSON(_currentExercise);
-					CODEditor.UI.cleanPreview();
+					C.UI.cleanPreview();
 				}
 			} else {
-				CODEditor.Utils.showDialog("No hay ningún ejercicio que reiniciar.");
+				C.Utils.showDialog("No hay ningún ejercicio que reiniciar.");
 			}
 		});
 
@@ -431,7 +431,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		} catch (e) {}
 
 		if(!isFileReaderSupported){
-			return CODEditor.Utils.showDialog("Lo siento, tu navegador no puede leer ficheros.");
+			return C.Utils.showDialog("Lo siento, tu navegador no puede leer ficheros.");
 		}
 
 		var fileInput = document.getElementById('openFileInput');
@@ -453,13 +453,13 @@ CODEditor.CORE = (function(C,$,undefined){
 
 			reader.onerror = function(e){
 				_resetFileHandler(fileInput);
-				CODEditor.Utils.showDialog("Se produjo un error leyendo el fichero.");
+				C.Utils.showDialog("Se produjo un error leyendo el fichero.");
 			}
 
 			reader.readAsText(file);
 		} else {
 			_resetFileHandler(fileInput);
-			CODEditor.Utils.showDialog("Formato de fichero no soportado.");
+			C.Utils.showDialog("Formato de fichero no soportado.");
 		}
 	};
 
@@ -515,7 +515,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _processFile = function(fileContent,fileType){
 		if(typeof fileContent !== "string"){
-			return CODEditor.Utils.showDialog("Formato de fichero no soportado.");
+			return C.Utils.showDialog("Formato de fichero no soportado.");
 		}
 
 		//Look for valid JSON
@@ -563,7 +563,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		} catch (e) {}
 
 		if(!isFileSaverSupported){
-			CODEditor.Utils.showDialog("Lo siento, tu navegador no puede descargar ficheros.");
+			C.Utils.showDialog("Lo siento, tu navegador no puede descargar ficheros.");
 		}
 
 		var filename = "file.txt";
@@ -599,7 +599,7 @@ CODEditor.CORE = (function(C,$,undefined){
 			if(typeof _editor != "undefined"){
 				_editor.resize();
 			}
-			CODEditor.UI.adjustView();
+			C.UI.adjustView();
 		}
 	};
 
@@ -653,7 +653,7 @@ CODEditor.CORE = (function(C,$,undefined){
 				}
 			}
 
-			CODEditor.UI.updateSettingsPanel();
+			C.UI.updateSettingsPanel();
 		}
 	};
 
@@ -693,7 +693,7 @@ CODEditor.CORE = (function(C,$,undefined){
 			return;
 		}
 
-		CODEditor.UI.cleanPreview();
+		C.UI.cleanPreview();
 
 		var code = _editor.getValue();
 
@@ -703,9 +703,9 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		switch(_currentEditorMode){
 			case "HTML":
-				return CODEditor.HTML.runHTMLcode(code);
+				return C.HTML.runHTMLcode(code);
 			case "JavaScript":
-				return CODEditor.JS.runJavaScriptcode(code);
+				return C.JS.runJavaScriptcode(code);
 			default:
 				return;
 		}
@@ -717,7 +717,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		if(errors.length > 0){
 			errors.unshift("El elemento a cargar no es válido.\n\nErrores:");
 			var errorMessage = errors.join("\n");
-			return CODEditor.Utils.showDialog(errorMessage);
+			return C.Utils.showDialog(errorMessage);
 		}
 
 		switch(json.type){
@@ -726,7 +726,7 @@ CODEditor.CORE = (function(C,$,undefined){
 			case "test":
 				return _loadTest(json);
 			default:
-				return CODEditor.Utils.showDialog("El elemento a cargar no es válido.");
+				return C.Utils.showDialog("El elemento a cargar no es válido.");
 		}
 	};
 
@@ -748,7 +748,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		_loadNextTestExercise();
 
 		//Populate MenuWrapper
-		CODEditor.UI.updateTestMenuDialog();
+		C.UI.updateTestMenuDialog();
 	};
 
 	var _loadExercise = function(json){
@@ -766,7 +766,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		//Load description
 		if(typeof json.description === "string"){
-			json.description = CODEditor.Utils.purgeTextString(json.description);
+			json.description = C.Utils.purgeTextString(json.description);
 			//Look for code tags.
 			json.description = json.description.replace(/&lt;code&gt;/g, '<pre class="code">');
 			json.description = json.description.replace(/&lt;\/code&gt;/g, '</pre>');
@@ -795,17 +795,19 @@ CODEditor.CORE = (function(C,$,undefined){
 			$("ul.menu li[group*='exercise']").css("display","inline-block");
 		}
 
-		CODEditor.UI.cleanPreview();
+		C.UI.cleanPreview();
 
 		if(typeof json.content == "string"){
 			_editor.setValue(json.content,1);
 		}
 		
-		CODEditor.UI.adjustView();
+		C.UI.adjustView();
 
 		if(typeof _currentTest != "undefined"){
-			CODEditor.UI.updateUIAfterNewExerciseOnTest();
+			C.UI.updateUIAfterNewExerciseOnTest();
 		}
+
+		C.ProgressTracking.onLoadExercise(json);
 	};
 
 	var _isValidJSON = function(json){
@@ -923,7 +925,7 @@ CODEditor.CORE = (function(C,$,undefined){
 			} else {
 				//Check if score_function is well formed
 				//The score_function is retrieved in the scoreFunctionEvaluation.response var.
-				var scoreFunctionEvaluation = CODEditor.JS.validateScoreFunction(json.score_function);
+				var scoreFunctionEvaluation = C.JS.validateScoreFunction(json.score_function);
 				if(scoreFunctionEvaluation.errors.length > 0){
 					for(var i=0; i<scoreFunctionEvaluation.errors.length; i++){
 						errors.push(scoreFunctionEvaluation.errors[i]);
@@ -985,7 +987,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 			if(typeof options.id === "number"){
 				json.id = options.id;
-			} else {
+			} else if(typeof json.id != "number"){
 				json.id = 1;
 			}
 
@@ -1028,19 +1030,19 @@ CODEditor.CORE = (function(C,$,undefined){
 			$("#openurl").removeAttr("disabled");
 		}
 
-		CODEditor.UI.cleanPreview();
+		C.UI.cleanPreview();
 
 		//Reset editor
 		_editorModeToSet = _currentEditorMode;
 		_currentEditorMode = undefined;
 		_changeEditorMode(_editorModeToSet,true);
 		
-		CODEditor.UI.adjustView();
+		C.UI.adjustView();
 
-		if(CODEditor.Utils.isHistorySupported()){
-			var URLparams = CODEditor.Utils.readURLparams();
+		if(C.Utils.isHistorySupported()){
+			var URLparams = C.Utils.readURLparams();
 			delete URLparams.file;
-			var newURL = CODEditor.Utils.buildURLwithParams(URLparams);
+			var newURL = C.Utils.buildURLwithParams(URLparams);
 			window.history.replaceState("","",newURL);
 		}
 	};
@@ -1072,7 +1074,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		_currentTest.currentExerciseIndex = exerciseIndex;
 		var excercise = _currentTest.parsed_exercises[_currentTest.currentExerciseIndex-1];
 		_loadJSON(excercise);
-		CODEditor.UI.updateTestMenuDialog();
+		C.UI.updateTestMenuDialog();
 	};
 
 	var _isCurrentTestCompleted = function(){
@@ -1090,7 +1092,7 @@ CODEditor.CORE = (function(C,$,undefined){
 	};
 
 	var onDoCurrentExercise = function(score,screenDOM){
-		CODEditor.ProgressTracking.onDoCurrentExercise(score);
+		C.ProgressTracking.onDoCurrentExercise(score);
 
 		if(typeof _currentTest != "undefined"){
 			if(typeof _currentExercise != "undefined"){
@@ -1137,7 +1139,7 @@ CODEditor.CORE = (function(C,$,undefined){
 					}
 				}
 
-				CODEditor.UI.updateTestMenuDialog();
+				C.UI.updateTestMenuDialog();
 			}
 		}
 	};

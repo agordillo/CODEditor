@@ -271,6 +271,9 @@ CODEditor.Samples = (function(C,$,undefined){
 		"type": "exercise",
 		"title": "Date",
 		"editorMode":"HTML",
+		"metadata": {
+			"TLT": "PT30S"
+		},
 		"content": '<!DOCTYPE html><html>\n<head>\n<title>Script</title>\n<meta charset="UTF-8">\n</head>\n\n<body>\n<h3>Fecha y hora</h3>\n\n<script type="text/javascript">\ndocument.write("Fecha: " + (new Date()));\n</script>\n</body>\n</html>'
 	};
 
@@ -279,6 +282,9 @@ CODEditor.Samples = (function(C,$,undefined){
 		"type": "exercise",
 		"title": "Date 2",
 		"editorMode":"HTML",
+		"metadata": {
+			"TLT": "PT30S"
+		},
 		"content": '<!DOCTYPE html><html>\n<head>\n  <title>Ejemplo</title>\n  <meta charset="UTF-8">\n\n  <style type="text/css">     \nbody {color: blue;}   \n</style>\n</head>\n\n<body>\n  <h3>Fecha y hora</h3>\n\n  <script type="text/javascript">\n    document.write(new Date());\n  </script>\n</body>\n</html>'
 	};
 
@@ -493,7 +499,10 @@ CODEditor.Samples = (function(C,$,undefined){
 		"title": "Reloj",
 		"description": "Ejemplo de Reloj con JavaScript\nTrate de conseguir el mismo resultado empleando JQuery.\nPuede importar la librería de un CDN mediante la siguiente etiqueta: <code><script src=\"http://code.jquery.com/jquery-1.11.2.min.js\"></script></code>.",
 		"editorMode":"HTML",
-		"content": js_dom_reloj_content
+		"content": js_dom_reloj_content,
+		"metadata": {
+			"TLT": "PT15S"
+		}
 	};
 
 	/* JQuery Intro */

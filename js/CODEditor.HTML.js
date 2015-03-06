@@ -13,12 +13,12 @@ CODEditor.HTML = (function(C,$,undefined){
 		doc.close();
 
 		//Check if an excercise is currently tried
-		var currentExercise = CODEditor.CORE.getCurrentExercise();
+		var currentExercise = C.CORE.getCurrentExercise();
 
 		if(typeof currentExercise !== "undefined"){
 			if(typeof currentExercise.parsed_score_function == "function"){
 				setTimeout(function(){
-					var score = CODEditor.Score.getScoreFromScoreFunction(currentExercise.parsed_score_function,doc,{});
+					var score = C.Score.getScoreFromScoreFunction(currentExercise.parsed_score_function,doc,{});
 					if(typeof score == "object"){
 						//Adjust UI when exercise. Show a new window with evaluation results.
 						
@@ -34,13 +34,13 @@ CODEditor.HTML = (function(C,$,undefined){
 
 						adjustHTMLPreviewUI();
 
-						CODEditor.Score.displayScore(score,htmlResultContent);
+						C.Score.displayScore(score,htmlResultContent);
 
-						CODEditor.CORE.onDoCurrentExercise(score.score,htmlResultContent);
+						C.CORE.onDoCurrentExercise(score.score,htmlResultContent);
 					}
 				},500);
 			} else {
-				CODEditor.CORE.onDoCurrentExercise(undefined,htmlResultContent);
+				C.CORE.onDoCurrentExercise();
 			}	
 		}
 	};
