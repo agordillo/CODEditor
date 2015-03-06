@@ -47,7 +47,7 @@ CODEditor.SCORM = (function(C,$,undefined){
 			_updateScore(0);
 		}
 
-		if(C.CORE.getCurrentExercise() != "undefined"){
+		if(typeof C.CORE.getCurrentExercise() !== "undefined"){
 			C.ProgressTracking.onLoadExercise(C.CORE.getCurrentExercise());
 		}
 	};
