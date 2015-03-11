@@ -1,6 +1,12 @@
 CODEditor.UI = (function(C,$,undefined){
 
 	var init = function(options){
+		if(CODEditor.CORE.isEditorMode()){
+			$("ul.menu li.viewer:not(.editor)").css("display","none");
+			$("#open").addClass("last");
+		} else {
+			$("ul.menu li.editor:not(.viewer)").css("display","none");
+		}
 		adjustView();
 	};
 

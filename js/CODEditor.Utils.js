@@ -1,7 +1,16 @@
 CODEditor.Utils = (function(C,$,undefined){
 
+	var _fileSaverSupported = false;
+
 	var init = function(options){
 		_defineExtraFunctions();
+
+		//Feature and support detection
+
+		//File Saver
+		try {
+			_fileSaverSupported = !!new Blob;
+		} catch (e) {}
 	};
 
 	var _defineExtraFunctions = function(){
@@ -65,10 +74,6 @@ CODEditor.Utils = (function(C,$,undefined){
 		});
 	};
 
-	var isHistorySupported = function(){
-		return ((typeof history === "object")&&(typeof history.pushState === "function"));
-	};
-
 	var readURLparams = function(){
 		var params = {};
 		try {
@@ -111,15 +116,26 @@ CODEditor.Utils = (function(C,$,undefined){
 		return url;
 	};
 
+
+	/* Features and support */
+
+	var isHistorySupported = function(){
+		return ((typeof history === "object")&&(typeof history.pushState === "function"));
+	};
+
+	var isFileSaverSupported = function(){
+		return _fileSaverSupported;
+	}
+
 	return {
 		init 					: init,
 		isCodeEmpty				: isCodeEmpty,
 		purgeTextString			: purgeTextString,
 		showDialog				: showDialog,
 		isHistorySupported		: isHistorySupported,
+		isFileSaverSupported	: isFileSaverSupported,
 		readURLparams			: readURLparams,
 		buildURLwithParams		: buildURLwithParams
-
 	};
 
 }) (CODEditor,jQuery);

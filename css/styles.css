@@ -34,15 +34,15 @@ html, body {
 	float: left;
 }
 
-#editor_wrapper.CODE {
+#editor_wrapper.CODE, #editor_wrapper.SCORE {
 	width: 100% !important;
 }
 
-#preview_wrapper.CODE {
+#preview_wrapper.CODE, #preview_wrapper.SCORE {
 	width: 0% !important;
 }
 
-#preview_wrapper.CODE #preview_header {
+#preview_wrapper.CODE #preview_header, #preview_wrapper.SCORE #preview_header {
 	display: none;
 }
 
@@ -756,4 +756,32 @@ body[theme='Twilight'] #editor_tab {
 
 body[theme='Twilight'] #editor_tab p {
 	color: white;
+}
+
+
+/* Editor */
+
+#exerciseTitleInput {
+	padding: 5px;
+	margin: -5px;
+	border: 0px;
+	width: 100%;
+	font-size: 1.6rem;
+	background: #4C4C4C;
+	color: white;
+}
+
+#exerciseDescriptionTextArea {
+	border: 0px;
+	width: 100%;
+	font-size: 1.1rem;
+	background: #4C4C4C;
+	color: white;
+	white-space: pre-wrap;
+ 	word-wrap: break-word;
+ 	font-family: monospace;
+ 	padding: 5px;
+ 	margin: -5px;
+ 	min-height: 73px;
+ 	resize: none;
 }

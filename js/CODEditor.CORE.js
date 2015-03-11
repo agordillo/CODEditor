@@ -1,12 +1,23 @@
 CODEditor.CORE = (function(C,$,undefined){
 
+	//Initial options
+	var _options;
+	var _isEditor = false; //If CODEditor is in viewer mode, or editor mode.
+
+
 	var _editor; //ACE editor instance
 
-	var _viewModes = ["CODE","RESULT","HYBRID"];
+	var _viewModes = ["CODE","RESULT","HYBRID","SCORE"];
 	var _currentViewMode;
+	var _isScore = false;
 
 	var _editorModes = ["HTML","JavaScript"];
 	var _currentEditorMode;
+
+	var defaultValues = {};
+	defaultValues["HTML"] = "<html>\n  <head></head>\n  <body>\n    \n  </body>\n</html>";
+	defaultValues["JavaScript"] = "";
+	defaultValues["SCORE"] = 'var score = function(result,variablesHash){\n  var grade = {};\n  grade.successes = [];\n  grade.errors = [];\n  grade.feedback = [];\n\n  grade.score = 10;\n  grade.successes.push("Correcto.");\n\n  return grade;\n};';
 
 	var _editorThemes = ["Chrome","Twilight"];
 	var _currentEditorTheme;
@@ -25,6 +36,14 @@ CODEditor.CORE = (function(C,$,undefined){
 
 
 	var init = function(options){
+		if(typeof options !== "object") {
+			options = {};
+		}
+
+		if(typeof options.editor == "boolean") {
+			_isEditor = options.editor;
+		}
+
 		var URLparams = C.Utils.readURLparams();
 
 		if(URLparams["debug"] === "true"){
@@ -39,7 +58,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		_changeViewMode(_viewModes[0]);
 
 		C.UI.init();
-		_initEditor();
+		_initACEEditor();
 		C.UI.updateSettingsPanel();
 
 		_loadEvents();
@@ -49,7 +68,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		if(typeof URLparams["file"] === "string"){
 			_onGetExternalJSONFile(URLparams["file"],URLparams);
-		} else if((typeof options == "object")&&(typeof options.file == "object")) {
+		} else if(typeof options.file == "object") {
 			if(_isValidJSON(options.file)){
 				_initExerciseMode(options.file);
 			} else {
@@ -64,7 +83,6 @@ CODEditor.CORE = (function(C,$,undefined){
 			}
 		}
 	};
-
 
 	var _onGetExternalJSONFile = function(fileURL,initParams){
 		if((typeof fileURL !== "string")||(fileURL.trim() === "")){
@@ -108,14 +126,32 @@ CODEditor.CORE = (function(C,$,undefined){
 	var _initDefaultMode = function(initParams){
 		_isDefaultMode = true;
 
-		$("ul.menu li[group*='examples']").css("display","inline-block");
-		_populateExamples();
+		if(isViewerMode()){
+			$("ul.menu li[group*='examples']").css("display","inline-block");
+			_populateExamples();
 
-		if(typeof initParams["emode"] === "string"){
-			_changeEditorMode(initParams["emode"]);
+			if(typeof initParams["emode"] === "string"){
+				_changeEditorMode(initParams["emode"]);
+			}
+
+			C.SCORM.init();
+		} else {
+			var exerciseDOM = $("#exercise_wrapper")
+			$(exerciseDOM).addClass("open");
+
+			//Title
+			var exerciseTitleDOM = $("#exercise_title");
+			var exerciseTitleInput = $('<input id="exerciseTitleInput" placeholder="Título" type="text"/>');
+			$(exerciseTitleDOM).append(exerciseTitleInput);
+
+			//Description
+			$("#exercise_description").show();
+			var exerciseDescriptionTextArea = $('<textarea id="exerciseDescriptionTextArea" placeholder="Descripción"></textarea>');
+			$("#exercise_description").append(exerciseDescriptionTextArea);
+
+			C.UI.adjustView();
 		}
 
-		C.SCORM.init();
 	};
 
 	var _initExerciseMode = function(json){
@@ -123,7 +159,9 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		_loadJSON(json);
 
-		C.SCORM.init();
+		if(isViewerMode()){
+			C.SCORM.init();
+		}
 	};
 
 	var _populateExamples = function(){
@@ -191,7 +229,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		return _currentExercise;
 	};
 
-	var _initEditor = function(options){
+	var _initACEEditor = function(options){
 		_editor = ace.edit("editor");
 
 		//Specify Default values
@@ -302,6 +340,21 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		$("#save").click(function(){
 			_saveFile();
+		});
+
+		$("#save_file_editor").click(function(){
+			_saveFileEditor();
+		});
+
+		$("#save_editor").click(function(){
+			var errors = _saveCurrentJSON({raise_errors: true});
+			if(errors.length === 0){
+				C.Utils.showDialog("El elemento no tiene errores.");
+			}
+		});
+
+		$("#save_scorm").click(function(){
+			exportToSCORM();
 		});
 
 		$("#refresh").click(function(){
@@ -574,12 +627,7 @@ CODEditor.CORE = (function(C,$,undefined){
 	};
 
 	var _saveFile = function(){
-		var isFileSaverSupported = false;
-		try {
-			isFileSaverSupported = !!new Blob;
-		} catch (e) {}
-
-		if(!isFileSaverSupported){
+		if(!CODEditor.Utils.isFileSaverSupported()){
 			C.Utils.showDialog("Lo siento, tu navegador no puede descargar ficheros.");
 		}
 
@@ -600,11 +648,61 @@ CODEditor.CORE = (function(C,$,undefined){
 		saveAs(blob, filename);
 	};
 
+	var _saveFileEditor = function(){
+		if(!CODEditor.Utils.isFileSaverSupported()){
+			C.Utils.showDialog("Lo siento, tu navegador no puede descargar ficheros.");
+		}
+
+		_saveCurrentJSON({raise_errors: true});
+
+		if(typeof _currentExercise === "object"){
+			var filename = "file.txt";
+			var dataToDownload = JSON.stringify(_currentExercise);
+			var blob = new Blob([dataToDownload], {type: "text/plain;charset=utf-8"});
+			saveAs(blob, filename);
+		}
+	};
+
+	var _saveCurrentJSON = function(options){
+		if(typeof options != "object"){
+			options = {};
+		}
+		if(typeof _currentExercise != "object"){
+			_currentExercise = {};
+		}
+
+		_currentExercise.type = "exercise";
+		_currentExercise.title = $("#exerciseTitleInput").val();
+		_currentExercise.description = $("#exerciseDescriptionTextArea").val();
+
+		if(_isScore){
+			_currentExercise.score_function = _editor.getValue();
+		} else {
+			_currentExercise.content = _editor.getValue();
+			_currentExercise.editorMode = _currentEditorMode;
+		}
+
+		var errors = _validateJSON(_currentExercise,{updateCurrent: true});
+		delete _currentExercise.id;
+
+		if((options)&&(options.raise_errors===true)){
+			if(errors.length > 0){
+				errors.unshift("El elemento salvado contiene errores:");
+				var errorMessage = errors.join("\n");
+				C.Utils.showDialog(errorMessage);
+			}
+		}
+		
+		return errors;
+	};
+
 
 	var fileSourcesCounter;
 	var fileSourcesLength;
 
 	var exportToSCORM = function(){
+		_saveCurrentJSON({raise_errors: true});
+
 		var zip = new JSZip();
 
 		var packageFileTree = {};
@@ -665,8 +763,6 @@ CODEditor.CORE = (function(C,$,undefined){
 				}
 			}
 		};
-
-		// console.log(packageFileTree);
 
 		_zipFolder(zip,undefined,undefined,packageFileTree,"");
 	};
@@ -760,6 +856,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _changeViewMode = function(viewMode){
 		if((_viewModes.indexOf(viewMode)!=-1)&&(viewMode!=_currentViewMode)){
+			var oldViewMode = _currentViewMode;
 			var wrappersDOM = $("#editor_wrapper, #preview_wrapper");
 			for(var i in _viewModes){
 				if(viewMode === _viewModes[i]){
@@ -771,6 +868,9 @@ CODEditor.CORE = (function(C,$,undefined){
 					$("ul.menu > li[group='view'][viewMode='"+_viewModes[i]+"']").removeClass("active");
 				}
 			};
+			if(isEditorMode()){
+				_onChangeViewMode(oldViewMode,viewMode);
+			}
 			if(typeof _editor != "undefined"){
 				_editor.resize();
 			}
@@ -778,8 +878,12 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 	};
 
-	var _changeEditorMode = function(editorMode,isNew){
-		if((_editorModes.indexOf(editorMode)!=-1)&&(editorMode!=_currentEditorMode)){
+	var _changeEditorMode = function(editorMode,options){
+		if(typeof options != "object"){
+			options = {is_new: true}
+		}
+
+		if((_editorModes.indexOf(editorMode)!=-1)&&((options.force===true)||(editorMode!=_currentEditorMode))){
 
 			var wrappersDOM = $("#editor_wrapper, #preview_wrapper");
 			$(wrappersDOM).addClass(_currentEditorMode);
@@ -798,20 +902,22 @@ CODEditor.CORE = (function(C,$,undefined){
 			};
 
 			if(typeof _editor != "undefined"){
-				isNew = !(isNew===false);
+
 				var aceMode;
-				var initialValue = "";
 
 				switch(editorMode){
 					case "HTML":
 						aceMode = "ace/mode/html";
-						initialValue = "<html>\n  <head></head>\n  <body>\n    \n  </body>\n</html>"
 						$("#editor_tab p").html("index.html");
 						$("#preview_wrapper.HTML #preview_header").html("<p>Resultado</p>");
 						break;
 					case "JavaScript":
 						aceMode = "ace/mode/javascript";
-						$("#editor_tab p").html("script.js");
+						if(_isScore){
+							$("#editor_tab p").html("score.js");
+						} else {
+							$("#editor_tab p").html("script.js");
+						}
 						$("#preview_wrapper.JavaScript #preview_header").html("<p>Consola</p><div id='consoleButtons'><img id='closeJSconsole' title='Cerrar consola' src='img/close_console.png'/></div>");
 						$("#closeJSconsole").click(function(){
 							_changeViewMode("CODE");
@@ -822,8 +928,10 @@ CODEditor.CORE = (function(C,$,undefined){
 				}
 				if(typeof aceMode == "string"){
 					_editor.getSession().setMode(aceMode);
-					if(isNew){
-						_editor.setValue(initialValue,1);
+					if(options.is_new){
+						_editor.setValue(defaultValues[editorMode],1);
+					} else if(typeof options.initial_text == "string"){
+						_editor.setValue(options.initial_text,1);
 					}
 				}
 			}
@@ -870,9 +978,20 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		C.UI.cleanPreview();
 
-		var code = _editor.getValue();
+		var code;
+		if(isViewerMode()){
+			code = _editor.getValue();
+		} else {
+			_saveCurrentJSON();
+			if(_currentExercise){
+				code = _currentExercise.content;
+			} else {
+				code = "";
+			}
+		}
+		
 
-		if(_currentViewMode === "CODE"){
+		if((_currentViewMode === "CODE")||(_currentViewMode === "SCORE")){
 			_changeViewMode("HYBRID");
 		}
 
@@ -908,7 +1027,6 @@ CODEditor.CORE = (function(C,$,undefined){
 	var _loadTest = function(json){
 		var exerciseDOM = $("#exercise_wrapper");
 		$(exerciseDOM).addClass("open");
-
 
 		//Load test header
 		$("#test_header").css("display","inline-block");
@@ -952,7 +1070,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 
 		//Editor mode
-		_changeEditorMode(json.editorMode,false);
+		_changeEditorMode(json.editorMode,{is_new: false});
 
 		//Block editorMode in settings
 		$("#settings_mode").attr("disabled","disabled");
@@ -993,11 +1111,13 @@ CODEditor.CORE = (function(C,$,undefined){
 		var errors = [];
 
 		if(typeof json !== "object"){
-			return errors.push("Invalid json. Is not an object.");
+			errors.push("Invalid json. Is not an object.");
+			return errors;
 		}
 
 		if((typeof json.type !== "string")||(["exercise","test"].indexOf(json.type)===-1)){
-			return errors.push("Invalid 'type' value.");
+			errors.push("Invalid 'type' value.");
+			return errors;
 		}
 
 		switch(json.type){
@@ -1006,7 +1126,8 @@ CODEditor.CORE = (function(C,$,undefined){
 			case "test":
 				return _validateTest(json,options);
 			default:
-				return errors.push("Invalid 'type' value.");
+				errors.push("Invalid 'type' value.");
+				return errors;
 		}
 	};
 
@@ -1014,7 +1135,8 @@ CODEditor.CORE = (function(C,$,undefined){
 		var errors = [];
 
 		if(typeof json !== "object"){
-			return errors.push("Invalid json. Is not an object.");
+			errors.push("Invalid json. Is not an object.");
+			return errors;
 		}
 		if(json.type !== "test"){
 			errors.push("Type is not 'test'.");
@@ -1075,7 +1197,8 @@ CODEditor.CORE = (function(C,$,undefined){
 		var errors = [];
 
 		if(typeof json !== "object"){
-			return errors.push("Invalid json. Is not an object.");
+			errors.push("Invalid json. Is not an object.");
+			return errors;
 		}
 		if(json.type !== "exercise"){
 			errors.push("Type is not 'exercise'.");
@@ -1210,7 +1333,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		//Reset editor
 		_editorModeToSet = _currentEditorMode;
 		_currentEditorMode = undefined;
-		_changeEditorMode(_editorModeToSet,true);
+		_changeEditorMode(_editorModeToSet,{is_new: true});
 		
 		C.UI.adjustView();
 
@@ -1340,8 +1463,39 @@ CODEditor.CORE = (function(C,$,undefined){
 		return _debug;
 	};
 
+	var isEditorMode = function(){
+		return _isEditor;
+	};
+
+	var isViewerMode = function(){
+		return !_isEditor;
+	};
+
+	/* Editor features */
+	var _onChangeViewMode = function(oldViewMode,newViewMode){
+		if((oldViewMode==="CODE")||(oldViewMode==="SCORE")){
+			_saveCurrentJSON();
+		}
+
+		if(typeof _currentExercise != "undefined"){
+			if(newViewMode==="CODE"){
+				_isScore = false;
+				_changeEditorMode(_currentExercise.editorMode,{force: true, is_new: false, initial_text: _currentExercise.content});
+			} else if(newViewMode==="SCORE"){
+				_isScore = true;
+				var initialText = _currentExercise.score_function;
+				if((typeof initialText != "string")||(initialText=="")){
+					initialText = defaultValues["SCORE"];
+				}
+				_changeEditorMode("JavaScript",{force: true, is_new: false, initial_text: initialText});
+			}
+		}
+	};
+
 	return {
 		init 					: init,
+		isEditorMode			: isEditorMode,
+		isViewerMode			: isViewerMode,
 		getCurrentViewMode		: getCurrentViewMode,
 		getCurrentEditorMode 	: getCurrentEditorMode,
 		getCurrentEditorTheme	: getCurrentEditorTheme,
