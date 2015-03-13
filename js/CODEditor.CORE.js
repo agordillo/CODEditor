@@ -13,11 +13,14 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _editorModes = ["HTML","JavaScript"];
 	var _currentEditorMode;
+	var _currentPreviewMode;
 
 	var defaultValues = {};
 	defaultValues["HTML"] = "<html>\n  <head></head>\n  <body>\n    \n  </body>\n</html>";
 	defaultValues["JavaScript"] = "";
-	defaultValues["SCORE"] = 'var score = function(result,variablesHash){\n  var grade = {};\n  grade.successes = [];\n  grade.errors = [];\n  grade.feedback = [];\n\n  grade.score = 10;\n  grade.successes.push("Correcto.");\n\n  return grade;\n};';
+	defaultValues["SCORE"] = {};
+	defaultValues["SCORE"]["HTML"] = '/*\nvar score = function(document){\n  var grade = {};\n  grade.successes = [];\n  grade.errors = [];\n  grade.feedback = [];\n\n  grade.score = 10;\n  grade.successes.push("Correcto.");\n\n  return grade;\n};\n*/';
+	defaultValues["SCORE"]["JavaScript"] = '/*\nvar score = function(result,variablesHash){\n  var grade = {};\n  grade.successes = [];\n  grade.errors = [];\n  grade.feedback = [];\n\n  grade.score = 10;\n  grade.successes.push("Correcto.");\n\n  return grade;\n};\n*/';
 
 	var _editorThemes = ["Chrome","Twilight"];
 	var _currentEditorTheme;
@@ -98,13 +101,15 @@ CODEditor.CORE = (function(C,$,undefined){
 		_getExternalJSONFile(fileURL,function(json){
 			//On success
 			if(_isValidJSON(json)){
-				if(C.Utils.isHistorySupported()){
-					var URLparams = C.Utils.readURLparams();
-					if(typeof URLparams["file"] === "undefined"){
-						URLparams["file"] = fileURL;
+				if(isViewerMode()){
+					if(C.Utils.isHistorySupported()){
+						var URLparams = C.Utils.readURLparams();
+						if(typeof URLparams["file"] === "undefined"){
+							URLparams["file"] = fileURL;
+						}
+						var newURL = C.Utils.buildURLwithParams(URLparams);
+						window.history.replaceState("","",newURL);
 					}
-					var newURL = C.Utils.buildURLwithParams(URLparams);
-					window.history.replaceState("","",newURL);
 				}
 				_initExerciseMode(json);
 			} else {
@@ -239,6 +244,8 @@ CODEditor.CORE = (function(C,$,undefined){
 		document.getElementById('editor').style.fontSize='14px';
 		_editor.setShowPrintMargin(false);
 
+		_editor.getSession().setTabSize(2);
+
 		_focusEditor();
 	};
 
@@ -349,7 +356,8 @@ CODEditor.CORE = (function(C,$,undefined){
 		$("#save_editor").click(function(){
 			var errors = _saveCurrentJSON({raise_errors: true});
 			if(errors.length === 0){
-				C.Utils.showDialog("El elemento no tiene errores.");
+				_saveFileLS();
+				C.Utils.showDialog("Salvado correctamente");
 			}
 		});
 
@@ -492,15 +500,7 @@ CODEditor.CORE = (function(C,$,undefined){
 	};
 
 	var _openFile = function(){
-		//FileReader API support (doc at https://developer.mozilla.org/en-US/docs/Web/API/FileReader)
-		var isFileReaderSupported = false;
-		try {
-			if(window.File && window.FileReader && window.FileList && window.Blob){
-				isFileReaderSupported = true;
-			}
-		} catch (e) {}
-
-		if(!isFileReaderSupported){
+		if(!C.Utils.isFileReaderSupported()){
 			return C.Utils.showDialog("Lo siento, tu navegador no puede leer ficheros.");
 		}
 
@@ -663,6 +663,24 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 	};
 
+	var _saveFileLS = function(){
+		if(typeof _currentExercise === "object"){
+			localStorage.setItem("saved_file",JSON.stringify(_currentExercise));
+		}
+	};
+
+	var _loadFileLS = function(){
+		var json;
+		try {
+			json = JSON.parse(localStorage.getItem("saved_file"));
+		} catch (e){}
+		if(_isValidJSON(json)){
+			_loadJSON(json);
+		} else {
+			C.Utils.showDialog("Recurso inválido");
+		}
+	};
+
 	var _saveCurrentJSON = function(options){
 		if(typeof options != "object"){
 			options = {};
@@ -676,7 +694,10 @@ CODEditor.CORE = (function(C,$,undefined){
 		_currentExercise.description = $("#exerciseDescriptionTextArea").val();
 
 		if(_isScore){
-			_currentExercise.score_function = _editor.getValue();
+			var scoreFunctionValue = _editor.getValue();
+			if(_isValidScoreFunctionValue(scoreFunctionValue)){
+				_currentExercise.score_function = scoreFunctionValue;
+			}
 		} else {
 			_currentExercise.content = _editor.getValue();
 			_currentExercise.editorMode = _currentEditorMode;
@@ -883,10 +904,12 @@ CODEditor.CORE = (function(C,$,undefined){
 			options = {is_new: true}
 		}
 
-		if((_editorModes.indexOf(editorMode)!=-1)&&((options.force===true)||(editorMode!=_currentEditorMode))){
+		var previewMode = editorMode;
+		if(options.preview_mode){
+			previewMode = options.preview_mode;
+		}
 
-			var wrappersDOM = $("#editor_wrapper, #preview_wrapper");
-			$(wrappersDOM).addClass(_currentEditorMode);
+		if((_editorModes.indexOf(editorMode)!=-1)&&((typeof options.initial_text == "string")||(editorMode!=_currentEditorMode)||(previewMode!=_currentPreviewMode))){
 
 			$("#preview_wrapper #preview_header").html("");
 			$("#preview_wrapper #preview").html("");
@@ -894,10 +917,17 @@ CODEditor.CORE = (function(C,$,undefined){
 			for(var i in _editorModes){
 				if(editorMode === _editorModes[i]){
 					_currentEditorMode = editorMode;
-					$(wrappersDOM).addClass(editorMode);
+					$("#editor_wrapper").addClass(editorMode);
 					$("#editorModeMenu").html(editorMode);
 				} else {
-					$(wrappersDOM).removeClass(_editorModes[i]);
+					$("#editor_wrapper").removeClass(_editorModes[i]);
+				}
+
+				if(previewMode === _editorModes[i]){
+					_currentPreviewMode = previewMode;
+					$("#preview_wrapper").addClass(previewMode);
+				} else {
+					$("#preview_wrapper").removeClass(_editorModes[i]);
 				}
 			};
 
@@ -918,6 +948,16 @@ CODEditor.CORE = (function(C,$,undefined){
 						} else {
 							$("#editor_tab p").html("script.js");
 						}
+						break;
+					default:
+						return;
+				}
+
+				switch(previewMode){
+					case "HTML":
+						$("#preview_wrapper.HTML #preview_header").html("<p>Resultado</p>");
+						break;
+					case "JavaScript":
 						$("#preview_wrapper.JavaScript #preview_header").html("<p>Consola</p><div id='consoleButtons'><img id='closeJSconsole' title='Cerrar consola' src='img/close_console.png'/></div>");
 						$("#closeJSconsole").click(function(){
 							_changeViewMode("CODE");
@@ -926,12 +966,13 @@ CODEditor.CORE = (function(C,$,undefined){
 					default:
 						return;
 				}
+
 				if(typeof aceMode == "string"){
 					_editor.getSession().setMode(aceMode);
-					if(options.is_new){
-						_editor.setValue(defaultValues[editorMode],1);
-					} else if(typeof options.initial_text == "string"){
+					if(typeof options.initial_text == "string"){
 						_editor.setValue(options.initial_text,1);
+					} else if(options.is_new){
+						_editor.setValue(defaultValues[editorMode],1);
 					}
 				}
 			}
@@ -978,15 +1019,18 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		C.UI.cleanPreview();
 
+		var editorMode;
 		var code;
 		if(isViewerMode()){
 			code = _editor.getValue();
+			editorMode = _currentEditorMode;
 		} else {
 			_saveCurrentJSON();
 			if(_currentExercise){
 				code = _currentExercise.content;
+				editorMode = _currentExercise.editorMode;
 			} else {
-				code = "";
+				return;
 			}
 		}
 		
@@ -995,7 +1039,7 @@ CODEditor.CORE = (function(C,$,undefined){
 			_changeViewMode("HYBRID");
 		}
 
-		switch(_currentEditorMode){
+		switch(editorMode){
 			case "HTML":
 				return C.HTML.runHTMLcode(code);
 			case "JavaScript":
@@ -1016,9 +1060,17 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		switch(json.type){
 			case "exercise":
-				return _loadExercise(json);
+				if(isViewerMode()){
+					return _loadExercise(json);
+				} else {
+					return _loadExerciseEditor(json);
+				}
 			case "test":
-				return _loadTest(json);
+				if(isViewerMode()){
+					return _loadTest(json);
+				} else {
+					return _loadTestEditor(json);
+				}
 			default:
 				return C.Utils.showDialog("El elemento a cargar no es válido.");
 		}
@@ -1101,6 +1153,32 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 
 		C.ProgressTracking.onLoadExercise(json);
+	};
+
+	var _loadExerciseEditor = function(json){
+		_currentExercise = json;
+
+		var exerciseDOM = $("#exercise_wrapper");
+		$(exerciseDOM).addClass("open");
+
+		//Title
+		if(json.title){
+			$("#exerciseTitleInput").val(json.title);
+		}
+		 
+		//Description
+		if(json.description){
+			$("#exerciseDescriptionTextArea").val(json.description);
+		}
+
+		var editorMode = (typeof json.editorMode == "string") ? json.editorMode : "JavaScript";
+		var content = (typeof json.content == "string") ? json.content : "";
+		_changeEditorMode(editorMode,{initial_text: content});
+	};
+
+	var _loadTestEditor = function(json){
+		var exerciseDOM = $("#exercise_wrapper");
+		$(exerciseDOM).addClass("open");
 	};
 
 	var _isValidJSON = function(json){
@@ -1333,7 +1411,8 @@ CODEditor.CORE = (function(C,$,undefined){
 		//Reset editor
 		_editorModeToSet = _currentEditorMode;
 		_currentEditorMode = undefined;
-		_changeEditorMode(_editorModeToSet,{is_new: true});
+		_currentPreviewMode = undefined;
+		_changeEditorMode(_editorModeToSet);
 		
 		C.UI.adjustView();
 
@@ -1480,16 +1559,35 @@ CODEditor.CORE = (function(C,$,undefined){
 		if(typeof _currentExercise != "undefined"){
 			if(newViewMode==="CODE"){
 				_isScore = false;
-				_changeEditorMode(_currentExercise.editorMode,{force: true, is_new: false, initial_text: _currentExercise.content});
+				//Unlock editorMode in settings
+				$("#settings_mode").removeAttr("disabled");
+				_changeEditorMode(_currentExercise.editorMode,{initial_text: _currentExercise.content});
 			} else if(newViewMode==="SCORE"){
 				_isScore = true;
 				var initialText = _currentExercise.score_function;
 				if((typeof initialText != "string")||(initialText=="")){
-					initialText = defaultValues["SCORE"];
+					initialText = defaultValues["SCORE"][_currentExercise.editorMode];
 				}
-				_changeEditorMode("JavaScript",{force: true, is_new: false, initial_text: initialText});
+				//Block editorMode in settings
+				$("#settings_mode").attr("disabled","disabled");
+				_changeEditorMode("JavaScript",{preview_mode: _currentExercise.editorMode, initial_text: initialText});
 			}
 		}
+	};
+
+	var _isValidScoreFunctionValue = function(scoreFunctionText){
+		if(typeof scoreFunctionText != "string"){
+			return false;
+		}
+		if(scoreFunctionText.trim()===""){
+			return false;
+		}
+		for(var key in defaultValues["SCORE"]){
+			if(scoreFunctionText === defaultValues["SCORE"][key]){
+				return false;
+			}
+		}
+		return true;
 	};
 
 	return {
@@ -1503,6 +1601,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		getCurrentExercise 		: getCurrentExercise,
 		getCurrentTest			: getCurrentTest,
 		loadTestExercise		: loadTestExercise,
+		_loadFileLS				: _loadFileLS,
 		exportToSCORM			: exportToSCORM,
 		onDoCurrentExercise		: onDoCurrentExercise,
 		getUser					: getUser,

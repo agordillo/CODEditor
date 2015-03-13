@@ -1,16 +1,16 @@
 CODEditor.Utils = (function(C,$,undefined){
 
 	var _fileSaverSupported = false;
+	var _isFileReaderSupported = false;
+	var _localStorageSupported = false;
 
 	var init = function(options){
 		_defineExtraFunctions();
 
 		//Feature and support detection
-
-		//File Saver
-		try {
-			_fileSaverSupported = !!new Blob;
-		} catch (e) {}
+		_checkFileSaverSupport();
+		_checkFileReaderSupport();
+		_checkLocalStorageSupport();
 	};
 
 	var _defineExtraFunctions = function(){
@@ -98,7 +98,7 @@ CODEditor.Utils = (function(C,$,undefined){
 	};
 
 	var buildURLwithParams = function(URLparams){
-		var url = "index.html";
+		var url = (C.CORE.isViewerMode() ? "index.html" : "edit.html");
 		var index = 0;
 
 		if(typeof URLparams === "object"){
@@ -125,7 +125,51 @@ CODEditor.Utils = (function(C,$,undefined){
 
 	var isFileSaverSupported = function(){
 		return _fileSaverSupported;
-	}
+	};
+
+	var isFileReaderSupported = function(){
+		return _isFileReaderSupported;
+	};
+
+	var isLocalStorageSupported = function(){
+		return _localStorageSupported;
+	};
+
+	var _checkFileSaverSupport = function(){
+		try {
+			_fileSaverSupported = !!new Blob;
+		} catch (e) {}
+	};
+
+	var _checkFileReaderSupport = function(){
+		//FileReader API support (doc at https://developer.mozilla.org/en-US/docs/Web/API/FileReader)
+		_isFileReaderSupported = false;
+		try {
+			if(window.File && window.FileReader && window.FileList && window.Blob){
+				_isFileReaderSupported = true;
+			}
+		} catch (e) {}
+	};
+
+	var _checkLocalStorageSupport = function(){
+		if((typeof(Storage)!=="undefined")){
+			//Check if there is no security restrictions
+			try {
+				localStorage.setItem("myKey","myKeyValue");
+				localStorage.getItem("myKey");
+				localStorage.removeItem("myKey");
+				_localStorageSupported = true;
+				return;
+			} catch(e){}
+		}
+		_localStorageSupported = false;
+	};
+
+	var clearLocalStorage = function(){
+		if(isLocalStorageSupported()){
+			localStorage.clear();
+		}
+	};
 
 	return {
 		init 					: init,
@@ -134,6 +178,9 @@ CODEditor.Utils = (function(C,$,undefined){
 		showDialog				: showDialog,
 		isHistorySupported		: isHistorySupported,
 		isFileSaverSupported	: isFileSaverSupported,
+		isFileReaderSupported 	: isFileReaderSupported,
+		isLocalStorageSupported	: isLocalStorageSupported,
+		clearLocalStorage		: clearLocalStorage,
 		readURLparams			: readURLparams,
 		buildURLwithParams		: buildURLwithParams
 	};
