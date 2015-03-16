@@ -54,12 +54,18 @@ CODEditor.Utils = (function(C,$,undefined){
 		return text.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&lt;b&gt;/g, '<b>').replace(/&lt;\/b&gt;/g, '</b>');
 	};
 
-	var showDialog = function(message){
+	var showDialog = function(message,options){
+		if(typeof options != "object"){
+			options = {};
+		}
 		message = (typeof message === "string") ? message : "undefined";
-		$('<div></div>').html("<p>" + message + "</p>").dialog({
+		options = (typeof options === "object") ? options : {};
+		var divContent = (options.error === true) ? ("<pre>" + message + "</pre>") : ("<p>" + message + "</p>");
+		var dialogTitle = (typeof options.title === "string") ? options.title : "Notificación";
+		$('<div></div>').html(divContent).dialog({
 			autoOpen: true,
 			dialogClass:'notificationDialog',
-			title: "Notificación",
+			title: dialogTitle,
 			closeOnEscape: true,
 			resizable: false,
 			draggable: false,
@@ -72,6 +78,12 @@ CODEditor.Utils = (function(C,$,undefined){
 				});
 			}
 		});
+	};
+
+	var showDialogWithErrors = function(message,errors){
+		errors.unshift(message + ":\n");
+		var errorMessage = errors.join("\n-> ");
+		C.Utils.showDialog(errorMessage,{error:true});
 	};
 
 	var readURLparams = function(){
@@ -187,6 +199,7 @@ CODEditor.Utils = (function(C,$,undefined){
 		isCodeEmpty				: isCodeEmpty,
 		purgeTextString			: purgeTextString,
 		showDialog				: showDialog,
+		showDialogWithErrors	: showDialogWithErrors,
 		isHistorySupported		: isHistorySupported,
 		isFileSaverSupported	: isFileSaverSupported,
 		isFileReaderSupported 	: isFileReaderSupported,

@@ -113,6 +113,7 @@ CODEditor.CORE = (function(C,$,undefined){
 						window.history.replaceState("","",newURL);
 					}
 				}
+				_currentLSKey = undefined;
 				_initExerciseMode(json);
 			} else {
 				C.Utils.showDialog("El recurso cargado no es válido.");
@@ -302,6 +303,11 @@ CODEditor.CORE = (function(C,$,undefined){
 					C.HTML.adjustHTMLPreviewUI();
 				}
 			}
+			if(isEditorMode()){
+				if($(".preview_iframe").dialog("isOpen")){
+					_resizePreviewDialog($(".preview_iframe"));
+				}
+			}
 		};
 
 		window.onbeforeunload = function(){
@@ -393,11 +399,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		});
 
 		$("#save_editor").click(function(){
-			var errors = _saveCurrentJSON({raise_errors: true});
-			if(errors.length === 0){
-				_saveFileLS();
-				C.Utils.showDialog("Salvado correctamente");
-			}
+			_saveFileLS();
 		});
 
 		$("#save_scorm").click(function(){
@@ -538,6 +540,27 @@ CODEditor.CORE = (function(C,$,undefined){
 			_deleteFileLS(lsKey);
 		});
 
+		$("#preview_button").click(function(){
+			var errors = _saveCurrentJSON({raise_errors: true});
+			if(errors.length === 0){
+				//Open preview dialog
+				$('<iframe class="preview_iframe" src="index.html"></iframe>').dialog({
+					autoOpen: true,
+					dialogClass:'previewDialog',
+					title: "Vista Previa",
+					width: "90%",
+					height: 500,
+					closeOnEscape: true,
+					resizable: false,
+					draggable: false,
+					modal: true,
+					open: function(event, ui) {
+						_resizePreviewDialog($(this));
+					}
+				});
+			}
+		});
+
 		$("#exit").click(function(){
 			if(typeof _currentExercise !== "undefined"){
 				var r = confirm("Si abandonas el ejercicio perderás todos tus cambios. ¿Estás seguro de que deseas hacerlo?");
@@ -546,6 +569,13 @@ CODEditor.CORE = (function(C,$,undefined){
 				}
 			}
 		});
+	};
+
+	var _resizePreviewDialog = function(iframe){
+		var theDialog = $(iframe).parent();
+		var dialogHeight = $(theDialog).height();
+		var headerHeight = $(theDialog).find(".ui-dialog-titlebar").outerHeight();
+		$(iframe).height(dialogHeight-headerHeight);
 	};
 
 	var addArrowToDialog = function(dialogDOM, position){
@@ -658,10 +688,15 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 
 		//Look for valid JSON
-		if ((fileType==="application/json")||(fileType==="text/plain")||(fileType.toString()==="/text.*/")){
+		if((fileType==="application/json")||(fileType==="text/plain")||(fileType.toString()==="/text.*/")){
 			if(_containsValidJSON(fileContent)){
+				_currentLSKey = undefined;
 				return _loadJSON(JSON.parse(fileContent));
 			}
+		}
+
+		if(isEditorMode()){
+			return C.Utils.showDialog("Formato de fichero no soportado.");;
 		}
 
 		var editorContent = undefined;
@@ -719,20 +754,31 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _saveFileEditor = function(){
 		if(!CODEditor.Utils.isFileSaverSupported()){
-			C.Utils.showDialog("Lo siento, tu navegador no puede descargar ficheros.");
+			return C.Utils.showDialog("Lo siento, tu navegador no puede descargar ficheros.");
 		}
 
-		_saveCurrentJSON({raise_errors: true});
+		var errors = _saveCurrentJSON({raise_errors: true});
+		
+		if(errors.length > 0){
+			return;
+		}
 
 		if(typeof _currentExercise === "object"){
 			var filename = "file.txt";
 			var dataToDownload = JSON.stringify(_currentExercise);
 			var blob = new Blob([dataToDownload], {type: "text/plain;charset=utf-8"});
 			saveAs(blob, filename);
+
+			C.Utils.showDialog("Salvado correctamente");
 		}
 	};
 
 	var _saveFileLS = function(){
+		var errors = _saveCurrentJSON({raise_errors: true});
+		if(errors.length > 0){
+			return;
+		}
+
 		if(typeof _currentExercise === "object"){
 			var record = {};
 			record.saved_at = new Date();
@@ -747,6 +793,8 @@ CODEditor.CORE = (function(C,$,undefined){
 
 			_currentLSKey = key;
 			localStorage.setItem(key,JSON.stringify(record));
+
+			C.Utils.showDialog("Salvado correctamente");
 		}
 	};
 
@@ -795,9 +843,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		if((options)&&(options.raise_errors===true)){
 			if(errors.length > 0){
-				errors.unshift("El elemento salvado contiene errores:");
-				var errorMessage = errors.join("\n");
-				C.Utils.showDialog(errorMessage);
+				C.Utils.showDialogWithErrors("El elemento a salvar contiene errores", errors);
 			}
 		}
 		
@@ -809,7 +855,11 @@ CODEditor.CORE = (function(C,$,undefined){
 	var fileSourcesLength;
 
 	var exportToSCORM = function(){
-		_saveCurrentJSON({raise_errors: true});
+		var errors = _saveCurrentJSON({raise_errors: true});
+
+		if(errors.length > 0){
+			return;
+		}
 
 		var zip = new JSZip();
 
@@ -944,7 +994,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _onFinishExportSCORM = function(zip){
 		var content = zip.generate({type:"blob"});
-		saveAs(content, (_getCurrentSCORMTitle() + ".zip"));
+		saveAs(content, (_getCurrentFileTitle() + ".zip"));
 	};
 
 	var _getCurrentFile = function(){
@@ -955,11 +1005,11 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 	};
 
-	var _getCurrentSCORMTitle = function(){
-		if(typeof _getCurrentFile() != "undefined"){
+	var _getCurrentFileTitle = function(){
+		if((typeof _getCurrentFile() != "undefined")&&(typeof _getCurrentFile().title == "string")&&(_getCurrentFile().title.trim()!="")){
 			return _getCurrentFile().title;
 		}
-		return "scorm";
+		return "Sin título";
 	};
 
 	var _changeViewMode = function(viewMode){
@@ -1140,9 +1190,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		var errors = _validateJSON(json,{updateCurrent: true});
 
 		if(errors.length > 0){
-			errors.unshift("El elemento a cargar no es válido.\n\nErrores:");
-			var errorMessage = errors.join("\n");
-			return C.Utils.showDialog(errorMessage);
+			return C.Utils.showDialogWithErrors("El elemento a cargar tiene errores", errors);
 		}
 
 		switch(json.type){
@@ -1677,6 +1725,10 @@ CODEditor.CORE = (function(C,$,undefined){
 		return true;
 	};
 
+	var getPreview = function(){
+		return _getCurrentFile();
+	};
+
 	return {
 		init 					: init,
 		isEditorMode			: isEditorMode,
@@ -1692,6 +1744,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		onDoCurrentExercise		: onDoCurrentExercise,
 		getUser					: getUser,
 		setUser					: setUser,
+		getPreview				: getPreview,
 		isDebugging				: isDebugging
 	};
 

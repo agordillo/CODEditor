@@ -43,6 +43,8 @@
 			<li id="refresh" class="mitem first viewer" group="exercise"><img src="img/glyphicons-82-refresh.png" title="Recargar ejemplo"/></li>
 			<li id="exit" class="mitem last withoutRightBorder viewer" group="exercise onlydefault"><img src="img/glyphicons-389-exit.png" title="Quitar ejercicio"/></li>
 
+			<li id="preview_button" class="mitem first editor" group="preview"><img src="img/glyphicons-52-eye-open.png" title="Previsualizar"/></li>
+
 			<li id="save_editor" class="mitem first editor" group="editor"><img src="img/glyphicons-444-floppy-disk.png" title="Salvar recurso"/></li>
 			<li id="save_file_editor" class="mitem editor" group="editor"><img src="img/glyphicons-416-disk-open.png" title="Salvar"/></li>
 			<li id="save_scorm" class="mitem last withoutRightBorder editor" group="editor"><img src="img/glyphicons-364-cloud-download.png" title="Exportar a SCORM"/></li>
@@ -60,7 +62,7 @@
 			<li viewMode="CODE" class="mitem first withoutLeftBorder viewer editor" group="view"><img src="img/glyphicons-151-edit.png" title="Vista Edición"/></li>
 			<li viewMode="SCORE" class="mitem editor" group="view"><img src="img/glyphicons-153-check.png" title="Escribir solución"/></li>
 			<li viewMode="HYBRID" class="mitem viewer editor" group="view"><img src="img/glyphicons-489-multiple-displays.png" title="Vista Híbrida"/></li>
-			<li viewMode="RESULT" class="mitem last viewer editor" group="view"><img src="img/glyphicons-52-eye-open.png" title="Vista Resultado"/></li>
+			<li viewMode="RESULT" class="mitem last viewer editor" group="view"><img src="img/glyphicons-87-display.png" title="Vista Resultado"/></li>
 			
 			<li id="run" class="mitem unique viewer editor"><img src="img/glyphicons-221-play-button.png" title="Run Code"/></li>
 			<li id="settings" class="mitem unique viewer editor"><img src="img/glyphicons-137-cogwheel.png" title="Settings"/></li>
@@ -205,9 +207,22 @@
 <script type="text/javascript">
 	$(document).ready(function(){
 		try {
-			if (typeof window.parent.CODEditor.Viewer === "boolean"){
-				CODEditor.Viewer = window.parent.CODEditor.Viewer;
-			}
+			if(window != window.parent){
+				//Iframe case
+
+				if (typeof window.parent.CODEditor.Viewer === "boolean"){
+					CODEditor.Viewer = window.parent.CODEditor.Viewer;
+				}
+				if (typeof window.parent.CODEditor.File === "object"){
+					CODEditor.File= window.parent.CODEditor.File;
+				}
+
+				if (typeof window.parent.CODEditor.CORE.getPreview === "function"){
+					//Preview mode
+					CODEditor.File = window.parent.CODEditor.CORE.getPreview();
+					CODEditor.Viewer = true;
+				}
+			} 
 		} catch (e){}
 
 		// //Activate Viewer

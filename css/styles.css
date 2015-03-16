@@ -313,6 +313,10 @@ ul.menu li.withoutRightBorder {
 	border-right: none !important;
 }
 
+#preview_button {
+	padding-top: 3px;
+}
+
 ul.menu li.mitemmode {
 	position: absolute;
 	left: 5px;
@@ -728,6 +732,14 @@ div.notificationDialog {
 	text-align: center;
 }
 
+div.notificationDialog pre {
+	padding: 10px 10px;
+	font-size: 1.2rem;
+	text-align: left;
+	font-family: "Open Sans","Hevetica Neue","Helvetica", sans-serif;
+	margin: 0px;
+}
+
 div.notificationDialog p {
 	padding: 10px 0px;
 	font-size: 1.2rem;
@@ -743,6 +755,17 @@ p#login {
  	left: 6px;
  	top: -10px;
  	color: #006709;
+}
+
+div.previewDialog {
+	height: 90% !important;
+}
+
+iframe.preview_iframe {
+	width: 100% !important;
+	border: 0px !important;
+	margin: 0px !important;
+	padding: 0px !important;
 }
 
 /* Themes */
@@ -788,10 +811,18 @@ body[theme='Twilight'] #editor_tab p {
 	background: #4C4C4C;
 	color: white;
 	white-space: pre-wrap;
- 	word-wrap: break-word;
- 	font-family: monospace;
- 	padding: 5px;
- 	margin: -5px;
- 	min-height: 73px;
- 	resize: none;
+	word-wrap: break-word;
+	font-family: monospace;
+	padding: 5px;
+	margin: -5px;
+	min-height: 73px;
+	resize: none;
+}
+
+/* Media Queries */
+
+@media (max-width: 700px) {
+	#editorModeMenu, #login {
+		display: none !important;
+	}
 }
