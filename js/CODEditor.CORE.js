@@ -2,7 +2,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	//Initial options
 	var _options;
-	var _isEditor = false; //If CODEditor is in viewer mode, or editor mode.
+	var _isViewer = false; //If CODEditor is in viewer mode, or editor mode.
 
 
 	var _editor; //ACE editor instance
@@ -43,8 +43,8 @@ CODEditor.CORE = (function(C,$,undefined){
 			options = {};
 		}
 
-		if(typeof options.editor == "boolean") {
-			_isEditor = options.editor;
+		if(typeof options.viewer == "boolean") {
+			_isViewer = options.viewer;
 		}
 
 		var URLparams = C.Utils.readURLparams();
@@ -832,7 +832,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		if(typeof currentFile != "undefined"){
 			//CODEditor.File.js
-			zip.file("CODEditor.File.js", "var CODEditor = CODEditor || {};\nCODEditor.File = " + JSON.stringify(currentFile));
+			zip.file("CODEditor.Viewer.js", "var CODEditor = CODEditor || {};\nCODEditor.Viewer = true;\nCODEditor.File = " + JSON.stringify(currentFile));
 			
 			//Modify index.html
 			JSZipUtils.getBinaryContent("index.html", function (err, data) {
@@ -843,7 +843,7 @@ CODEditor.CORE = (function(C,$,undefined){
 				//ArrayBuffer to String
 				var indexHTMLContent = String.fromCharCode.apply(null, new Uint8Array(data));
 				var position = indexHTMLContent.indexOf("</head>");
-				var fileScript = '<script src="CODEditor.File.js" type="text/javascript" charset="utf-8"></script>';
+				var fileScript = '<script src="CODEditor.Viewer.js" type="text/javascript" charset="utf-8"></script>';
 				indexHTMLContent = (indexHTMLContent.substr(0, position) + "    " + fileScript + "\n" + indexHTMLContent.substr(position));
 				zip.file("index.html", indexHTMLContent);
 
@@ -1543,11 +1543,11 @@ CODEditor.CORE = (function(C,$,undefined){
 	};
 
 	var isEditorMode = function(){
-		return _isEditor;
+		return !_isViewer;
 	};
 
 	var isViewerMode = function(){
-		return !_isEditor;
+		return _isViewer;
 	};
 
 	/* Editor features */

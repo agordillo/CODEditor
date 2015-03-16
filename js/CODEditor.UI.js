@@ -5,8 +5,10 @@ CODEditor.UI = (function(C,$,undefined){
 			$("ul.menu li.viewer:not(.editor)").css("display","none");
 			$("#open").removeClass("first");
 			$("#openurl").addClass("last");
+			$("title").html("CODEditor");
 		} else {
 			$("ul.menu li.editor:not(.viewer)").css("display","none");
+			$("title").html("CODEditor: Viewer");
 		}
 		adjustView();
 	};

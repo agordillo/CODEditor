@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>HTML and JS Editor</title>
+	<title>CODEditor</title>
 	<meta charset="UTF-8">
 	<link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css"/>
 	<link rel="stylesheet" type="text/css" href="css/jquery-ui.structure.min.css"/>
@@ -36,29 +36,35 @@
 	<div id="header">
 		<p id="login" class="" title="login"></p>
 		<ul class="menu">
-			<li id="editorModeMenu" class="mitem mitemmode" title="Cambiar Lenguaje"></li>
+			<li id="editorModeMenu" class="mitem mitemmode viewer editor" title="Cambiar Lenguaje"></li>
 
-			<li id="examples" class="mitem first last withoutRightBorder" group="examples"><img src="img/glyphicons-156-show-big-thumbnails.png" title="Cargar ejemplos"/></li>
+			<li id="examples" class="mitem first last withoutRightBorder viewer" group="examples"><img src="img/glyphicons-156-show-big-thumbnails.png" title="Cargar ejemplos"/></li>
 
-			<li id="refresh" class="mitem first" group="exercise"><img src="img/glyphicons-82-refresh.png" title="Recargar ejemplo"/></li>
-			<li id="exit" class="mitem last withoutRightBorder" group="exercise onlydefault"><img src="img/glyphicons-389-exit.png" title="Quitar ejercicio"/></li>
+			<li id="refresh" class="mitem first viewer" group="exercise"><img src="img/glyphicons-82-refresh.png" title="Recargar ejemplo"/></li>
+			<li id="exit" class="mitem last withoutRightBorder viewer" group="exercise onlydefault"><img src="img/glyphicons-389-exit.png" title="Quitar ejercicio"/></li>
 
-			<li id="openurl" class="mitem first" group="files"><img src="img/glyphicons-365-cloud-upload.png" title="Cargar fichero por URL"/></li>
-			<li id="open" class="mitem" group="files">
+			<li id="save_editor" class="mitem first editor" group="editor"><img src="img/glyphicons-444-floppy-disk.png" title="Salvar recurso"/></li>
+			<li id="save_file_editor" class="mitem editor" group="editor"><img src="img/glyphicons-416-disk-open.png" title="Salvar"/></li>
+			<li id="save_scorm" class="mitem last withoutRightBorder editor" group="editor"><img src="img/glyphicons-364-cloud-download.png" title="Exportar a SCORM"/></li>
+
+			<li id="open_editor" class="mitem first editor" group="files"><img src="img/glyphicons-447-floppy-save.png" title="Cargar recurso"/></li>
+			<li id="open" class="mitem first viewer editor" group="files">
 				<label for="openFileInput">
 					<img src="img/glyphicons-415-disk-save.png" title="Cargar fichero"/>
 				</label>
 				<input id="openFileInput" type="file" style="display:none" />
 			</li>
-			<li id="save" class="mitem last" group="files"><img src="img/glyphicons-416-disk-open.png" title="Exportar a fichero"/></li>
+			<li id="openurl" class="mitem viewer editor" group="files"><img src="img/glyphicons-365-cloud-upload.png" title="Cargar fichero por URL"/></li>
+			<li id="save" class="mitem last viewer" group="files"><img src="img/glyphicons-416-disk-open.png" title="Exportar a fichero"/></li>
 
-			<li viewMode="CODE" class="mitem first withoutLeftBorder" group="view"><img src="img/glyphicons-151-edit.png" title="Vista Edición"/></li>
-			<li viewMode="HYBRID" class="mitem" group="view"><img src="img/glyphicons-489-multiple-displays.png" title="Vista Híbrida"/></li>
-			<li viewMode="RESULT" class="mitem last" group="view"><img src="img/glyphicons-52-eye-open.png" title="Vista Resultado"/></li>
+			<li viewMode="CODE" class="mitem first withoutLeftBorder viewer editor" group="view"><img src="img/glyphicons-151-edit.png" title="Vista Edición"/></li>
+			<li viewMode="SCORE" class="mitem editor" group="view"><img src="img/glyphicons-153-check.png" title="Escribir solución"/></li>
+			<li viewMode="HYBRID" class="mitem viewer editor" group="view"><img src="img/glyphicons-489-multiple-displays.png" title="Vista Híbrida"/></li>
+			<li viewMode="RESULT" class="mitem last viewer editor" group="view"><img src="img/glyphicons-52-eye-open.png" title="Vista Resultado"/></li>
 			
-			<li id="run" class="mitem unique"><img src="img/glyphicons-221-play-button.png" title="Run Code"/></li>
-			<li id="settings" class="mitem unique"><img src="img/glyphicons-137-cogwheel.png" title="Settings"/></li>
-			<li id="fullscreen_button" class="mitem unique"><img id="fullscreen_img" title="Pantalla completa"/></li>
+			<li id="run" class="mitem unique viewer editor"><img src="img/glyphicons-221-play-button.png" title="Run Code"/></li>
+			<li id="settings" class="mitem unique viewer editor"><img src="img/glyphicons-137-cogwheel.png" title="Settings"/></li>
+			<li id="fullscreen_button" class="mitem unique viewer editor"><img id="fullscreen_img" title="Pantalla completa"/></li>
 		</ul>
 	</div>
 
@@ -183,7 +189,16 @@
 </body>
 <script type="text/javascript">
 	$(document).ready(function(){
-		CODEditor.CORE.init({editor: false, file: CODEditor.File});
+		try {
+			if (typeof window.parent.CODEditor.Viewer === "boolean"){
+				CODEditor.Viewer = window.parent.CODEditor.Viewer;
+			}
+		} catch (e){}
+
+		// //Activate Viewer
+		// CODEditor.Viewer = true;
+
+		CODEditor.CORE.init({viewer: CODEditor.Viewer, file: CODEditor.File});
 	});
 </script>
 </html>
