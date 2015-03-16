@@ -539,6 +539,12 @@ pre.failed, pre.errors {
 	border: 2px solid black;
 }
 
+.codeditor_button.disabled {
+	cursor: default;
+	background: gray;
+	opacity: 0.5;
+}
+
 div.file_url_dialog input {
 	width: 300px;
 }
@@ -725,6 +731,10 @@ div.notificationDialog {
 div.notificationDialog p {
 	padding: 10px 0px;
 	font-size: 1.2rem;
+}
+
+div.notificationDialog span.ui-dialog-title {
+	padding-left: 5%;
 }
 
 p#login {

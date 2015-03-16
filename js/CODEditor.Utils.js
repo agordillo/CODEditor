@@ -171,6 +171,17 @@ CODEditor.Utils = (function(C,$,undefined){
 		}
 	};
 
+	var getReadableDate = function(date){
+		var readableDate = "";
+		if(typeof date == "string"){
+			date = new Date(date);
+		}
+		if((date instanceof Date)&&(!isNaN(date.getDate()))){
+			readableDate = date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear();
+		}
+		return readableDate;
+	};
+
 	return {
 		init 					: init,
 		isCodeEmpty				: isCodeEmpty,
@@ -182,7 +193,8 @@ CODEditor.Utils = (function(C,$,undefined){
 		isLocalStorageSupported	: isLocalStorageSupported,
 		clearLocalStorage		: clearLocalStorage,
 		readURLparams			: readURLparams,
-		buildURLwithParams		: buildURLwithParams
+		buildURLwithParams		: buildURLwithParams,
+		getReadableDate			: getReadableDate
 	};
 
 }) (CODEditor,jQuery);

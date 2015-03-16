@@ -30,6 +30,8 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _isDefaultMode = false;
 
+	var _currentLSKey;
+
 	var _examples = {};
 
 	var _currentUser;
@@ -210,6 +212,38 @@ CODEditor.CORE = (function(C,$,undefined){
 		$($("#examples_panel #examples_selection option[group*='" + editorMode + "']")[0]).attr("selected","selected");
 	};
 
+	var _loadFSFiles = function(){
+		$("#lsfiles_select").html("");
+
+		if(CODEditor.Utils.isLocalStorageSupported()){
+			var lsKeysLength = localStorage.length;
+			for (var i = 0; i < lsKeysLength; i++){
+				try {
+					var key = localStorage.key(i);
+					var record = JSON.parse(localStorage.getItem(key));
+					var resource = record.resource;
+					var recordTitle = "Sin título" + " (Salvado el " + CODEditor.Utils.getReadableDate(record.saved_at) +  ")";
+					if((typeof resource.title == "string")&&(resource.title.trim()!=="")){
+						recordTitle = resource.title;
+					}
+					if(_isValidJSON(resource)){
+						var option = $('<option value="'+ key +'">'+ recordTitle + '</option>');
+						if(_currentLSKey===key){
+							$(option).attr("selected","selected");
+						}
+						$("#lsfiles_select").prepend(option);
+					}
+				} catch (e){}
+			}
+		}
+
+		if($("#lsfiles_select").children().length===0){
+			$("#lsfiles_panel .codeditor_button[action]").addClass("disabled");
+		} else {
+			$("#lsfiles_panel .codeditor_button[action]").removeClass("disabled");
+		}
+	};
+
 	var getCurrentViewMode = function(){
 		return _currentViewMode;
 	};
@@ -316,6 +350,11 @@ CODEditor.CORE = (function(C,$,undefined){
 		$("#closeExamplesButton").click(function(){
 			$("#examples").removeClass("active");
 			$("#examples_panel").hide();
+		});
+
+		$("#closeLSfilesButton").click(function(){
+			$("#open_lsfile").removeClass("active");
+			$("#lsfiles_panel").hide();
 		});
 
 		$("#settings_fontsize").change(function(event) {
@@ -467,6 +506,36 @@ CODEditor.CORE = (function(C,$,undefined){
 			var dialogDOM = $("#file_url_dialog");
 			$(dialogDOM).dialog('close');
 			_onGetExternalJSONFile(fileURL);
+		});
+
+		$("#open_lsfile").click(function(){
+			if($(this).hasClass("active")){
+				$(this).removeClass("active");
+				$("#lsfiles_panel").hide();
+			} else {
+				_loadFSFiles();
+				$(this).addClass("active");
+				$("#lsfiles_panel").show();
+			}
+		});
+
+		$("#lsfiles_panel .codeditor_button[action='open']").click(function(){
+			if($(this).hasClass("disabled")){
+				return;
+			}
+
+			var lsKey = $("#lsfiles_select").val();
+			_loadFileLS(lsKey);
+			$("#closeLSfilesButton").trigger("click");
+		});
+
+		$("#lsfiles_panel .codeditor_button[action='delete']").click(function(){
+			if($(this).hasClass("disabled")){
+				return;
+			}
+
+			var lsKey = $("#lsfiles_select").val();
+			_deleteFileLS(lsKey);
 		});
 
 		$("#exit").click(function(){
@@ -665,20 +734,38 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _saveFileLS = function(){
 		if(typeof _currentExercise === "object"){
-			localStorage.setItem("saved_file",JSON.stringify(_currentExercise));
+			var record = {};
+			record.saved_at = new Date();
+			record.resource = _currentExercise;
+
+			var key;
+			if(typeof _currentLSKey === "string"){
+				key = _currentLSKey;
+			} else {
+				key = (new Date().getTime()).toString();
+			}
+
+			_currentLSKey = key;
+			localStorage.setItem(key,JSON.stringify(record));
 		}
 	};
 
-	var _loadFileLS = function(){
+	var _loadFileLS = function(key){
 		var json;
 		try {
-			json = JSON.parse(localStorage.getItem("saved_file"));
+			json = JSON.parse(localStorage.getItem(key)).resource;
 		} catch (e){}
 		if(_isValidJSON(json)){
+			_currentLSKey = key;
 			_loadJSON(json);
 		} else {
 			C.Utils.showDialog("Recurso inválido");
 		}
+	};
+
+	var _deleteFileLS = function(key){
+		localStorage.removeItem(key);
+		_loadFSFiles();
 	};
 
 	var _saveCurrentJSON = function(options){
@@ -1601,7 +1688,6 @@ CODEditor.CORE = (function(C,$,undefined){
 		getCurrentExercise 		: getCurrentExercise,
 		getCurrentTest			: getCurrentTest,
 		loadTestExercise		: loadTestExercise,
-		_loadFileLS				: _loadFileLS,
 		exportToSCORM			: exportToSCORM,
 		onDoCurrentExercise		: onDoCurrentExercise,
 		getUser					: getUser,
