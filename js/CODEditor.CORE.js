@@ -71,6 +71,10 @@ CODEditor.CORE = (function(C,$,undefined){
 		C.JS.init();
 		C.HTML.init();
 
+		if(isEditorMode()){
+			_initEditor();
+		}
+
 		if(typeof URLparams["file"] === "string"){
 			_onGetExternalJSONFile(URLparams["file"],URLparams);
 		} else if(typeof options.file == "object") {
@@ -143,24 +147,48 @@ CODEditor.CORE = (function(C,$,undefined){
 			}
 
 			C.SCORM.init();
-		} else {
-			var exerciseDOM = $("#exercise_wrapper")
-			$(exerciseDOM).addClass("open");
-
-			//Title
-			var exerciseTitleDOM = $("#exercise_title");
-			var exerciseTitleInput = $('<input id="exerciseTitleInput" placeholder="Título" type="text"/>');
-			$(exerciseTitleDOM).append(exerciseTitleInput);
-
-			//Description
-			$("#exercise_description").show();
-			var exerciseDescriptionTextArea = $('<textarea id="exerciseDescriptionTextArea" placeholder="Descripción"></textarea>');
-			$("#exercise_description").append(exerciseDescriptionTextArea);
-
-			C.UI.adjustView();
 		}
-
 	};
+
+	var _initEditor = function(){
+		var exerciseDOM = $("#exercise_wrapper");
+		$(exerciseDOM).addClass("open");
+
+		//Title
+		var exerciseTitleDOM = $("#exercise_title");
+		var exerciseTitleInput = $('<input id="exerciseTitleInput" placeholder="Título" type="text"/>');
+		$(exerciseTitleDOM).append(exerciseTitleInput);
+
+		//Description
+		$("#exercise_description").show();
+		var exerciseDescriptionTextArea = $('<textarea id="exerciseDescriptionTextArea" placeholder="Descripción"></textarea>');
+		$("#exercise_description").append(exerciseDescriptionTextArea);
+
+		//Test
+		var testWrapper = $("#test_menu_wrapper");
+
+		//Test: Title
+		var testTitleInput = $('<input id="testTitleInput" placeholder="Título" type="text"/>');
+		$(testTitleInput).insertBefore("#test_title");
+		$("#test_title").remove();
+
+		$("#testTitleInput").keydown(function(){
+			$(this).css("width",_getWidthOfTestTitleInput()+"px");
+		});
+
+		C.UI.adjustView();
+	};
+
+	var _getWidthOfTestTitleInput = function(){
+		var input = $("#testTitleInput")[0];
+		var tmp = document.createElement("span");
+		tmp.className = "span-tmp-element";
+		tmp.innerHTML = input.value.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+		document.body.appendChild(tmp);
+		var theWidth = tmp.getBoundingClientRect().width;
+		document.body.removeChild(tmp);
+		return theWidth;
+    }
 
 	var _initExerciseMode = function(json){
 		_isDefaultMode = false;
@@ -558,6 +586,18 @@ CODEditor.CORE = (function(C,$,undefined){
 						_resizePreviewDialog($(this));
 					}
 				});
+			}
+		});
+
+		$("#test_settings").click(function(){
+			if(typeof _currentTest == "undefined"){
+				//Create Test
+				var r = confirm("¿Estás seguro de que quieres convertir este ejercicio en un Test?");
+				if (r === true) {
+					_onCreateTest();
+				}
+			} else {
+				_openEditorTestPanel();
 			}
 		});
 
@@ -1306,6 +1346,10 @@ CODEditor.CORE = (function(C,$,undefined){
 			$("#exerciseDescriptionTextArea").val(json.description);
 		}
 
+		if(typeof _currentTest != "undefined"){
+			C.UI.updateUIAfterNewExerciseOnTest();
+		}
+
 		var editorMode = (typeof json.editorMode == "string") ? json.editorMode : "JavaScript";
 		var content = (typeof json.content == "string") ? json.content : "";
 		_changeEditorMode(editorMode,{initial_text: content});
@@ -1314,6 +1358,42 @@ CODEditor.CORE = (function(C,$,undefined){
 	var _loadTestEditor = function(json){
 		var exerciseDOM = $("#exercise_wrapper");
 		$(exerciseDOM).addClass("open");
+		
+		//Load test header
+		$("#test_header").css("display","inline-block");
+		
+		$("#test_menu_wrapper").css("display","inline-block");
+		$("#test_menu_wrapper").addClass("test_menu_wrapper_editor");
+
+		//Load title
+		if(json.title){
+			$("#testTitleInput").val(json.title);
+		}
+
+		//Menu
+		$("#test_settings").find("img").attr("title","Configuración del Test");
+
+		_loadNextTestExercise();
+
+		//Populate MenuWrapper
+		//TODO
+		C.UI.updateTestMenuDialog();
+	};
+
+	var _onCreateTest = function(){
+		var errors = _saveCurrentJSON({raise_errors: true});
+		if(errors.length === 0){
+			_currentTest = {};
+			_currentTest.type = "test";
+			_currentTest.title = "";
+			_currentTest.exercises = JSON.stringify([_currentExercise]);
+			_loadJSON(_currentTest);
+			_openEditorTestPanel();
+		}
+	};
+
+	var _openEditorTestPanel = function(){
+		$("#test_menu_wrapper").trigger("click");
 	};
 
 	var _isValidJSON = function(json){

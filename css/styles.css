@@ -146,17 +146,17 @@ html, body {
 }
 
 #test_menu_wrapper {
-	positon: relative;
+	position: relative;
 	display: "inline-block";
-	border-radius: 15px;
-	border: 1px solid #4C4C4C;
 	text-align: center;
-	cursor: pointer;
-	opacity: 0.7;
 	float: left;
 	margin-left: 15px;
 	margin-top: -3px;
 	padding-right: 10px;
+	border-radius: 15px;
+	border: 1px solid #4C4C4C;
+	opacity: 0.7;
+	cursor: pointer;
 }
 
 #test_menu_wrapper:hover {
@@ -817,6 +817,27 @@ body[theme='Twilight'] #editor_tab p {
 	margin: -5px;
 	min-height: 73px;
 	resize: none;
+}
+
+#testTitleInput {
+	padding: 5px;
+	margin: -5px;
+	border: 0px;
+	width: auto;
+	min-width: 200px;
+	max-width: 600px;
+	font-size: 1.2rem;
+	background: #ebebeb;
+	color: #969696;
+	float: left;
+}
+
+.span-tmp-element {
+	visibility: hidden;
+	white-space: pre;
+	border: 0;
+    padding: 5px;
+    font-size: 1.2rem;
 }
 
 /* Media Queries */
