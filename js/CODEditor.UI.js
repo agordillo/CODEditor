@@ -84,11 +84,42 @@ CODEditor.UI = (function(C,$,undefined){
 		var menuDOM = $("#test_exercises_dialog");
 		$(menuDOM).html("");
 
+		if(C.CORE.isEditorMode()){
+			//Add "New Exercise" button
+			var newExerciseButton = $('<div id="newExerciseButton" class="codeditor_button"><img src="img/glyphicons-433-plus.png"/> Crear nuevo ejercicio</div>');
+			$(menuDOM).prepend(newExerciseButton);
+
+			$("#newExerciseButton").click(function(){
+				C.CORE.createExercise();
+			});
+		}
+
 		var exercisesList = $("<ul></ul>");
-		for(var i=0; i<currentTest.parsed_exercises.length; i++){
+		var exercisesLength = currentTest.parsed_exercises.length;
+		for(var i=0; i<exercisesLength; i++){
 			var exercise = currentTest.parsed_exercises[i];
 			var exerciseIndex = (i+1);
-			var li = $("<li exerciseIndex='" + exerciseIndex.toString() + "'><div class='exerciseProgressIcon'></div><span class='exerciseIndex'>" + exerciseIndex.toString() + ".</span> " + exercise.title + "</li>");
+			var li = $("<li exerciseIndex='" + exerciseIndex.toString() + "'></li>");
+			var exerciseEntryViewerWrapper = $("<div class='exerciseEntryViewerWrapper'></div>");
+			var exerciseProgressIconWrapper = $("<div class='exerciseProgressIcon'></div>");
+			var exerciseIndexAndTitleWrapper = $("<div class='index_and_title_wrapper'></div>");
+			var exerciseIndexSpan = $("<span class='exerciseIndex'>" + exerciseIndex.toString() + ". </span>");
+			var exerciseTitleSpan = $("<span class='exerciseTitle'>" + exercise.title + "</span>");
+			$(exerciseEntryViewerWrapper).append(exerciseProgressIconWrapper);
+			$(exerciseIndexAndTitleWrapper).append(exerciseIndexSpan);
+			$(exerciseIndexAndTitleWrapper).append(exerciseTitleSpan);
+			$(exerciseEntryViewerWrapper).append(exerciseIndexAndTitleWrapper);
+			$(li).append(exerciseEntryViewerWrapper);
+
+			if(C.CORE.isEditorMode()){
+				var exerciseEntryEditorWrapper = $("<div class='exerciseEntryEditorWrapper'></div>");
+				if(exercisesLength > 1){
+					var removeExerciseButton = $('<img src="img/glyphicons-17-bin.png" action="delete" title="Borrar ejercicio"/>');
+					$(exerciseEntryEditorWrapper).append(removeExerciseButton);
+				}
+				$(li).append(exerciseEntryEditorWrapper);
+			}
+			
 			if(exercise.progress.passed === true){
 				$(li).addClass("passed");
 				$(li).find(".exerciseProgressIcon").append("<img src='img/success_icon.png'/>");
@@ -102,13 +133,30 @@ CODEditor.UI = (function(C,$,undefined){
 		$(menuDOM).append(exercisesList);
 
 		//Reload events
-		$("#test_exercises_dialog ul li").click(function(){
-			var exerciseIndex = parseInt($(this).attr("exerciseindex"));
+		$("#test_exercises_dialog ul li").find(".exerciseEntryViewerWrapper").click(function(){
+			var exerciseIndex = parseInt($(this).parents("li").attr("exerciseindex"));
 			if((typeof exerciseIndex === "number")&&(!isNaN(exerciseIndex))){
 				C.CORE.loadTestExercise(exerciseIndex);
 				$("#test_exercises_dialog").dialog('close');
 			}
 		});
+
+		if(C.CORE.isEditorMode()){
+			$("#test_exercises_dialog ul li").find(".exerciseEntryEditorWrapper img[action]").click(function(){
+				var exerciseIndex = parseInt($(this).parents("li").attr("exerciseindex"));
+				switch($(this).attr("action")){
+					case "delete":
+						var r = confirm("¿Estás seguro de que deseas borrar este ejercicio?");
+						if (r === true) {
+							C.CORE.deleteExercise(exerciseIndex);
+						}
+						break;
+					default:
+						break;
+				}
+			});
+		}
+		
 	};
 
 

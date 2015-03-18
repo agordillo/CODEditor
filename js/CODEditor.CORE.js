@@ -156,7 +156,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		//Title
 		var exerciseTitleDOM = $("#exercise_title");
-		var exerciseTitleInput = $('<input id="exerciseTitleInput" placeholder="Título" type="text"/>');
+		var exerciseTitleInput = $('<input id="exerciseTitleInput" placeholder="Título del ejercicio" type="text"/>');
 		$(exerciseTitleDOM).append(exerciseTitleInput);
 
 		//Description
@@ -168,7 +168,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		var testWrapper = $("#test_menu_wrapper");
 
 		//Test: Title
-		var testTitleInput = $('<input id="testTitleInput" placeholder="Título" type="text"/>');
+		var testTitleInput = $('<input id="testTitleInput" placeholder="Título del test" type="text"/>');
 		$(testTitleInput).insertBefore("#test_title");
 		$("#test_title").remove();
 
@@ -459,7 +459,23 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		$("#test_menu_wrapper").click(function(){
 			var dialogDOM = $("#test_exercises_dialog");
-			$(dialogDOM).attr("Title",_currentTest.title);
+			var dialogTitle;
+
+			if(isEditorMode()){
+				var errors = _saveCurrentJSON({raise_errors: true});
+				if(errors.length > 0){
+					return;
+				}
+				dialogTitle = $("#testTitleInput").val();
+				if(dialogTitle.trim()===""){
+					dialogTitle = "Sin título";
+				}
+				C.UI.updateTestMenuDialog();
+			} else {
+				dialogTitle = _currentTest.title;
+			}
+
+			$(dialogDOM).attr("Title",dialogTitle);
 
 			var dialogWidth = 400;
 			var dialogHeight = "auto";
@@ -1122,8 +1138,12 @@ CODEditor.CORE = (function(C,$,undefined){
 						aceMode = "ace/mode/javascript";
 						if(_isScore){
 							$("#editor_tab p").html("score.js");
+							$("ul.menu li[viewmode='CODE']").removeClass("active");
+							$("ul.menu li[viewmode='SCORE']").addClass("active");
 						} else {
 							$("#editor_tab p").html("script.js");
+							$("ul.menu li[viewmode='CODE']").addClass("active");
+							$("ul.menu li[viewmode='SCORE']").removeClass("active");
 						}
 						break;
 					default:
@@ -1352,6 +1372,8 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		var editorMode = (typeof json.editorMode == "string") ? json.editorMode : "JavaScript";
 		var content = (typeof json.content == "string") ? json.content : "";
+		_isScore = false;
+		_changeViewMode("CODE");
 		_changeEditorMode(editorMode,{initial_text: content});
 	};
 
@@ -1376,7 +1398,6 @@ CODEditor.CORE = (function(C,$,undefined){
 		_loadNextTestExercise();
 
 		//Populate MenuWrapper
-		//TODO
 		C.UI.updateTestMenuDialog();
 	};
 
@@ -1388,7 +1409,9 @@ CODEditor.CORE = (function(C,$,undefined){
 			_currentTest.title = "";
 			_currentTest.exercises = JSON.stringify([_currentExercise]);
 			_loadJSON(_currentTest);
-			_openEditorTestPanel();
+			C.UI.adjustView();
+			// _openEditorTestPanel();
+			$("#testTitleInput").focus();
 		}
 	};
 
@@ -1654,6 +1677,14 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 	};
 
+	var _getLastExercise = function(){
+		if(_currentTest.parsed_exercises.length > 0){
+			return _currentTest.parsed_exercises[_currentTest.parsed_exercises.length-1];
+		} else {
+			return undefined;
+		}
+	};
+
 	var _loadNextTestExercise = function(){
 		if(_hasNextExercise()){
 			var exercise = _getNextExercise();
@@ -1765,7 +1796,9 @@ CODEditor.CORE = (function(C,$,undefined){
 		return _isViewer;
 	};
 
+
 	/* Editor features */
+
 	var _onChangeViewMode = function(oldViewMode,newViewMode){
 		if((oldViewMode==="CODE")||(oldViewMode==="SCORE")){
 			_saveCurrentJSON();
@@ -1809,6 +1842,35 @@ CODEditor.CORE = (function(C,$,undefined){
 		return _getCurrentFile();
 	};
 
+	var createExercise = function(){
+		var exercise = {};
+		exercise.type = "exercise";
+		exercise.title = "";
+		exercise.description = "";
+		exercise.editorMode = "JavaScript";
+		exercise.content = "";
+		var exercises = JSON.parse(_currentTest.exercises);
+		exercises.push(exercise);
+		_currentTest.exercises = JSON.stringify(exercises);
+
+		if(_isValidJSON(_currentTest)){
+			if($("#test_exercises_dialog").dialog("isOpen")){
+				$("#test_exercises_dialog").dialog("close");
+			}
+
+			_loadJSON(_currentTest);
+			_loadJSON(_getLastExercise());
+		} else {
+
+		}
+		
+		//TODO
+	};
+
+	var deleteExercise = function(exerciseIndex){
+		console.log("deleteExercise: " + exerciseIndex);
+	};
+
 	return {
 		init 					: init,
 		isEditorMode			: isEditorMode,
@@ -1825,6 +1887,8 @@ CODEditor.CORE = (function(C,$,undefined){
 		getUser					: getUser,
 		setUser					: setUser,
 		getPreview				: getPreview,
+		createExercise			: createExercise,
+		deleteExercise			: deleteExercise,
 		isDebugging				: isDebugging
 	};
 
