@@ -897,12 +897,18 @@ CODEditor.CORE = (function(C,$,undefined){
 		var errors = _validateJSON(_currentExercise,{updateCurrent: true});
 		delete _currentExercise.id;
 
-		if((options)&&(options.raise_errors===true)){
-			if(errors.length > 0){
-				C.Utils.showDialogWithErrors("El elemento a salvar contiene errores", errors);
+		if((typeof _currentTest != "undefined")&&(errors.length === 0)){
+			//Update test
+			_updateCurrentTestWithCurrentExercise();
+			errors = _validateJSON(_currentTest,{updateCurrent: true});
+		}
+
+		if(errors.length > 0){
+			if(options.raise_errors===true){
+				C.Utils.showDialogWithErrors("El elemento a salvar tiene errores", errors);
 			}
 		}
-		
+
 		return errors;
 	};
 
@@ -1359,11 +1365,15 @@ CODEditor.CORE = (function(C,$,undefined){
 		//Title
 		if(json.title){
 			$("#exerciseTitleInput").val(json.title);
+		} else {
+			$("#exerciseTitleInput").val("");
 		}
 		 
 		//Description
 		if(json.description){
 			$("#exerciseDescriptionTextArea").val(json.description);
+		} else {
+			$("#exerciseDescriptionTextArea").val("");
 		}
 
 		if(typeof _currentTest != "undefined"){
@@ -1494,10 +1504,12 @@ CODEditor.CORE = (function(C,$,undefined){
 		if((errors.length===0)&&(updateCurrentTest)){
 			_currentTest = json;
 			_currentTest.exercisesQuantity = exercises.length;
-			_currentTest.currentExerciseIndex = 0;
+			if(typeof _currentTest.currentExerciseIndex == "undefined"){
+				_currentTest.currentExerciseIndex = 0;
+			}
 			_currentTest.parsed_exercises = exercises;
 			for(var j=0; j<_currentTest.parsed_exercises.length; j++){
-				_validateExercise(_currentTest.parsed_exercises[j],{updateCurrent: false, id: (j+1)})
+				_validateExercise(_currentTest.parsed_exercises[j],{updateCurrent: false, id: (j+1)});
 				_currentTest.parsed_exercises[j].progress = {
 					score: 0,
 					passed: false
@@ -1677,20 +1689,16 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 	};
 
-	var _getLastExercise = function(){
-		if(_currentTest.parsed_exercises.length > 0){
-			return _currentTest.parsed_exercises[_currentTest.parsed_exercises.length-1];
-		} else {
-			return undefined;
-		}
-	};
-
 	var _loadNextTestExercise = function(){
 		if(_hasNextExercise()){
 			var exercise = _getNextExercise();
 			_currentTest.currentExerciseIndex += 1;
 			_loadJSON(exercise);
 		}
+	};
+
+	var _loadLastTestExercise = function(){
+		loadTestExercise(_currentTest.parsed_exercises.length);
 	};
 
 	var loadTestExercise = function(exerciseIndex){
@@ -1857,14 +1865,15 @@ CODEditor.CORE = (function(C,$,undefined){
 			if($("#test_exercises_dialog").dialog("isOpen")){
 				$("#test_exercises_dialog").dialog("close");
 			}
-
 			_loadJSON(_currentTest);
-			_loadJSON(_getLastExercise());
-		} else {
-
+			_loadLastTestExercise();
 		}
-		
-		//TODO
+	};
+
+	var _updateCurrentTestWithCurrentExercise = function(){
+		var exercises = JSON.parse(_currentTest.exercises);
+		exercises[_currentTest.currentExerciseIndex-1] = _currentExercise;
+		_currentTest.exercises = JSON.stringify(exercises);
 	};
 
 	var deleteExercise = function(exerciseIndex){
