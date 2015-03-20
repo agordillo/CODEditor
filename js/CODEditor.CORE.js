@@ -270,8 +270,10 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		if($("#lsfiles_select").children().length===0){
 			$("#lsfiles_panel .codeditor_button[action]").addClass("disabled");
+			$("#lsfiles_select").attr("disabled","disabled");
 		} else {
 			$("#lsfiles_panel .codeditor_button[action]").removeClass("disabled");
+			$("#lsfiles_select").removeAttr("disabled");
 		}
 	};
 
@@ -361,6 +363,7 @@ CODEditor.CORE = (function(C,$,undefined){
 				$(this).removeClass("active");
 				$("#settings_panel").hide();
 			} else {
+				C.Utils.closePanels();
 				$(this).addClass("active");
 				$("#settings_panel").show();
 			}
@@ -371,6 +374,7 @@ CODEditor.CORE = (function(C,$,undefined){
 				$(this).removeClass("active");
 				$("#examples_panel").hide();
 			} else {
+				C.Utils.closePanels();
 				$("#examples_panel #examples_mode option[value='"+C.CORE.getCurrentEditorMode()+"']").attr("selected","selected");
 				_loadExamples();
 				$(this).addClass("active");
@@ -380,21 +384,6 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		$("#editorModeMenu").click(function(){
 			$("#settings").trigger("click");
-		});
-
-		$("#closeSettingsButton").click(function(){
-			$("#settings").removeClass("active");
-			$("#settings_panel").hide();
-		});
-
-		$("#closeExamplesButton").click(function(){
-			$("#examples").removeClass("active");
-			$("#examples_panel").hide();
-		});
-
-		$("#closeLSfilesButton").click(function(){
-			$("#open_lsfile").removeClass("active");
-			$("#lsfiles_panel").hide();
 		});
 
 		$("#settings_fontsize").change(function(event) {
@@ -565,6 +554,7 @@ CODEditor.CORE = (function(C,$,undefined){
 				$(this).removeClass("active");
 				$("#lsfiles_panel").hide();
 			} else {
+				C.Utils.closePanels();
 				_loadFSFiles();
 				$(this).addClass("active");
 				$("#lsfiles_panel").show();
@@ -577,8 +567,8 @@ CODEditor.CORE = (function(C,$,undefined){
 			}
 
 			var lsKey = $("#lsfiles_select").val();
+			C.Utils.closePanels();
 			_loadFileLS(lsKey);
-			$("#closeLSfilesButton").trigger("click");
 		});
 
 		$("#lsfiles_panel .codeditor_button[action='delete']").click(function(){
@@ -586,8 +576,11 @@ CODEditor.CORE = (function(C,$,undefined){
 				return;
 			}
 
-			var lsKey = $("#lsfiles_select").val();
-			_deleteFileLS(lsKey);
+			var r = confirm("¿Estás seguro de que quieres borrar este recurso?");
+			if (r === true) {
+				var lsKey = $("#lsfiles_select").val();
+				_deleteFileLS(lsKey);
+			}
 		});
 
 		$("#preview_button").click(function(){
@@ -621,6 +614,36 @@ CODEditor.CORE = (function(C,$,undefined){
 			} else {
 				_openEditorTestPanel();
 			}
+		});
+
+		$("#editor_tab p").click(function(){
+			if(_currentViewMode==="SCORE"){
+				if($(this).hasClass("active")){
+					$(this).removeClass("active");
+					$("#score_function_panel").hide();
+				} else {
+					C.Utils.closePanels();
+					_loadScorePanel();
+					$(this).addClass("active");
+					$("#score_function_panel").show();
+				}
+			}
+		});
+
+		$("#score_function_panel .codeditor_button[action='add_score_var']").click(function(){
+			if($(this).hasClass("disabled")){
+				return;
+			}
+			_addScoreVar($("#score_var_name_input").val());
+			_loadScorePanel();
+		});
+
+		$("#score_function_panel .codeditor_button[action='delete']").click(function(){
+			if($(this).hasClass("disabled")){
+				return;
+			}
+			_removeScoreVar($("#score_vars_select").val());
+			_loadScorePanel();
 		});
 
 		$("#exit").click(function(){
@@ -1396,6 +1419,8 @@ CODEditor.CORE = (function(C,$,undefined){
 		_isScore = false;
 		_changeViewMode("CODE");
 		_changeEditorMode(editorMode,{initial_text: content});
+
+		C.UI.adjustView();
 	};
 
 	var _loadTestEditor = function(json){
@@ -1421,6 +1446,8 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		//Populate MenuWrapper
 		C.UI.updateTestMenuDialog();
+
+		C.UI.adjustView();
 	};
 
 	var _onCreateTest = function(){
@@ -1431,8 +1458,6 @@ CODEditor.CORE = (function(C,$,undefined){
 			_currentTest.title = "";
 			_currentTest.exercises = JSON.stringify([_currentExercise]);
 			_loadJSON(_currentTest);
-			C.UI.adjustView();
-			// _openEditorTestPanel();
 			$("#testTitleInput").focus();
 		}
 	};
@@ -1826,7 +1851,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		if(typeof _currentExercise != "undefined"){
 			if(newViewMode==="CODE"){
-				_isScore = false;
+				 _isScore = false;
 				//Unlock editorMode in settings
 				$("#settings_mode").removeAttr("disabled");
 				_changeEditorMode(_currentExercise.editorMode,{initial_text: _currentExercise.content});
@@ -1856,6 +1881,29 @@ CODEditor.CORE = (function(C,$,undefined){
 			}
 		}
 		return true;
+	};
+
+	var _loadScorePanel = function(){
+		//Populate vars
+		var nVars = 0;
+		$("#score_vars_select").html("");
+		if((typeof _currentExercise != "undefined")&&(_currentExercise.score_function_vars instanceof Array)){
+			nVars = _currentExercise.score_function_vars.length;
+			for(var i=0; i<nVars; i++){
+				var varName = _currentExercise.score_function_vars[i];
+				var option = $('<option value="'+ varName +'">'+ varName + '</option>');
+				$("#score_vars_select").prepend(option);
+			}
+		}
+		if(nVars<1){
+			$("#score_function_panel .codeditor_button[action='delete']").addClass("disabled");
+			$("#score_vars_select").attr("disabled","disabled");
+		} else {
+			$("#score_function_panel .codeditor_button[action='delete']").removeClass("disabled");
+			$("#score_vars_select").removeAttr("disabled");
+		}
+
+		$("#score_var_name_input").val("");
 	};
 
 	var getPreview = function(){
@@ -1924,6 +1972,28 @@ CODEditor.CORE = (function(C,$,undefined){
 						_currentExerciseIndex -= 1;
 					}
 				}
+			}
+		}
+	};
+
+	var _addScoreVar = function(varName){
+		if((typeof varName!="string")||(varName.trim()==="")){
+			return;
+		}
+		if(!(_currentExercise.score_function_vars instanceof Array)){
+			_currentExercise.score_function_vars = [];
+		}
+		if(_currentExercise.score_function_vars.indexOf(varName)===-1){
+			_currentExercise.score_function_vars.push(varName);
+		}
+		_validateJSON(_currentExercise,{updateCurrent: true});
+	};
+
+	var _removeScoreVar = function(varName){
+		if(_currentExercise.score_function_vars instanceof Array){
+			if(_currentExercise.score_function_vars.indexOf(varName)!=-1){
+				_currentExercise.score_function_vars.splice(_currentExercise.score_function_vars.indexOf(varName),1);
+				_validateJSON(_currentExercise,{updateCurrent: true});
 			}
 		}
 	};

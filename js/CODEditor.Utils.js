@@ -92,6 +92,13 @@ CODEditor.Utils = (function(C,$,undefined){
 		C.Utils.showDialog(errorMessage,{error:true});
 	};
 
+	var closePanels = function(){
+		//Close all panels
+		$(".cpanel").hide();
+		//Make icons inactive
+		$(".cpanelicon").removeClass("active");
+	};
+
 	var readURLparams = function(){
 		var params = {};
 		try {
@@ -207,6 +214,7 @@ CODEditor.Utils = (function(C,$,undefined){
 		purgeTextString			: purgeTextString,
 		showDialog				: showDialog,
 		showDialogWithErrors	: showDialogWithErrors,
+		closePanels				: closePanels,
 		isHistorySupported		: isHistorySupported,
 		isFileSaverSupported	: isFileSaverSupported,
 		isFileReaderSupported 	: isFileReaderSupported,

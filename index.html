@@ -38,7 +38,7 @@
 		<ul class="menu">
 			<li id="editorModeMenu" class="mitem mitemmode viewer editor" title="Cambiar Lenguaje"></li>
 
-			<li id="examples" class="mitem first last withoutRightBorder viewer" group="examples"><img src="img/glyphicons-156-show-big-thumbnails.png" title="Cargar ejemplos"/></li>
+			<li id="examples" class="mitem first last withoutRightBorder viewer cpanelicon" group="examples"><img src="img/glyphicons-156-show-big-thumbnails.png" title="Cargar ejemplos"/></li>
 
 			<li id="refresh" class="mitem first viewer" group="exercise"><img src="img/glyphicons-82-refresh.png" title="Recargar ejemplo"/></li>
 			<li id="exit" class="mitem last withoutRightBorder viewer" group="exercise onlydefault"><img src="img/glyphicons-389-exit.png" title="Quitar ejercicio"/></li>
@@ -51,7 +51,7 @@
 			<li id="save_file_editor" class="mitem editor" group="editor"><img src="img/glyphicons-416-disk-open.png" title="Salvar"/></li>
 			<li id="save_scorm" class="mitem last withoutRightBorder editor" group="editor"><img src="img/glyphicons-364-cloud-download.png" title="Exportar a SCORM"/></li>
 
-			<li id="open_lsfile" class="mitem first editor" group="files"><img src="img/glyphicons-447-floppy-save.png" title="Cargar recurso"/></li>
+			<li id="open_lsfile" class="mitem first editor cpanelicon" group="files"><img src="img/glyphicons-447-floppy-save.png" title="Cargar recurso"/></li>
 			<li id="open" class="mitem first viewer editor" group="files">
 				<label for="openFileInput">
 					<img src="img/glyphicons-415-disk-save.png" title="Cargar fichero"/>
@@ -67,7 +67,7 @@
 			<li viewMode="RESULT" class="mitem last viewer editor" group="view"><img src="img/glyphicons-87-display.png" title="Vista Resultado"/></li>
 			
 			<li id="run" class="mitem unique viewer editor"><img src="img/glyphicons-221-play-button.png" title="Run Code"/></li>
-			<li id="settings" class="mitem unique viewer editor"><img src="img/glyphicons-137-cogwheel.png" title="Settings"/></li>
+			<li id="settings" class="mitem unique viewer editor cpanelicon"><img src="img/glyphicons-137-cogwheel.png" title="Settings"/></li>
 			<li id="fullscreen_button" class="mitem unique viewer editor"><img id="fullscreen_img" title="Pantalla completa"/></li>
 		</ul>
 	</div>
@@ -86,7 +86,7 @@
 		<div id="editor_wrapper">
 			<div id="editor_header">
 				<div id="editor_tab_wrapper">
-					<div id="editor_tab"><p><p></div>
+					<div id="editor_tab"><p class="cpanelicon"></p></div>
 				</div>
 			</div>
 			<div id="editor"></div>
@@ -100,7 +100,7 @@
 	<div id="footer"></div>
 
 	<div id="settings_panel" class="cpanel" >
-		<img id="closeSettingsButton" class="close_panel_button" src="img/glyphicons-198-remove.png"/>
+		<img class="close_panel_button" src="img/glyphicons-198-remove.png" onclick="CODEditor.Utils.closePanels();"/>
 		<div class="title">Opciones</div>
 		<table>
 			<tr>
@@ -142,7 +142,7 @@
 	</div>
 
 	<div id="examples_panel" class="cpanel">
-		<img id="closeExamplesButton" class="close_panel_button" src="img/glyphicons-198-remove.png"/>
+		<img class="close_panel_button" src="img/glyphicons-198-remove.png" onclick="CODEditor.Utils.closePanels();"/>
 		<div class="title">Ejemplos</div>
 
 		<table>
@@ -176,7 +176,7 @@
 	</div>
 
 	<div id="lsfiles_panel" class="cpanel">
-		<img id="closeLSfilesButton" class="close_panel_button" src="img/glyphicons-198-remove.png"/>
+		<img class="close_panel_button" src="img/glyphicons-198-remove.png" onclick="CODEditor.Utils.closePanels();"/>
 		<div class="title">Recursos guardados</div>
 
 		<br/>
@@ -188,6 +188,23 @@
 			<div class="codeditor_button" action="open">Abrir</div>
 			<div class="codeditor_button" action="delete">Borrar</div>
 		</div>
+	</div>
+
+	<div id="score_function_panel" class="cpanel">
+		<img class="close_panel_button" src="img/glyphicons-198-remove.png" onclick="CODEditor.Utils.closePanels();"/>
+		<div class="title">Score function</div>
+
+		<p class="panel_section_title">Variables del ejercicio</p>
+		<div>
+			<div class="codeditor_button" action="add_score_var">Añadir variable</div>
+			<input id="score_var_name_input" type="text">
+		</div>
+		<div>
+			<select id="score_vars_select" size="1">
+			</select>
+			<div class="codeditor_button" action="delete">Borrar</div>
+		</div>
+		
 	</div>
 
 	<div id="test_exercises_dialog"></div>
