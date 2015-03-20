@@ -72,9 +72,7 @@ CODEditor.UI = (function(C,$,undefined){
 
 	var updateUIAfterNewExerciseOnTest = function(){
 		var currentTest = C.CORE.getCurrentTest();
-
-		var testMenuWrapper = ("#test_menu_wrapper");
-		$(testMenuWrapper).find("p").html(currentTest.currentExerciseIndex.toString() + "/" + currentTest.exercisesQuantity.toString());
+		$("#test_menu_wrapper p").html(currentTest.currentExerciseIndex.toString() + "/" + currentTest.exercisesQuantity.toString());
 	};
 
 	var updateTestMenuDialog = function(){
@@ -123,8 +121,8 @@ CODEditor.UI = (function(C,$,undefined){
 			if(exercise.progress.passed === true){
 				$(li).addClass("passed");
 				$(li).find(".exerciseProgressIcon").append("<img src='img/success_icon.png'/>");
-			// } else if(exercise===currentExercise){
 			} else if(exerciseIndex===currentTest.currentExerciseIndex){
+				// if(exercise===currentExercise)
 				$(li).addClass("current");
 				$(li).find(".exerciseProgressIcon").append("<span>></span>");
 			}
@@ -149,6 +147,7 @@ CODEditor.UI = (function(C,$,undefined){
 						var r = confirm("¿Estás seguro de que deseas borrar este ejercicio?");
 						if (r === true) {
 							C.CORE.deleteExercise(exerciseIndex);
+							updateUIAfterNewExerciseOnTest();
 						}
 						break;
 					default:

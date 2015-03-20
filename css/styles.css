@@ -675,6 +675,7 @@ img.success_icon, img.error_icon {
 .testMenuWrapper ul li {
 	padding: 12px 0px 12px 0px;
 	cursor: pointer;
+	position: relative;
 }
 
 .testMenuWrapper ul li .exerciseEntryViewerWrapper:hover {

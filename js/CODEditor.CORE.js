@@ -1877,7 +1877,22 @@ CODEditor.CORE = (function(C,$,undefined){
 	};
 
 	var deleteExercise = function(exerciseIndex){
-		console.log("deleteExercise: " + exerciseIndex);
+		var exercises = JSON.parse(_currentTest.exercises);
+		exercises.splice(exerciseIndex-1,1);
+		_currentTest.exercises = JSON.stringify(exercises);
+		var errors= _validateJSON(_currentTest,{updateCurrent: true});
+
+		if(errors.length === 0){
+			if(exerciseIndex===_currentTest.currentExerciseIndex){
+				//Delete current
+				loadTestExercise(1);
+			} else {
+				if(exerciseIndex < _currentTest.currentExerciseIndex){
+					_currentTest.currentExerciseIndex -= 1;
+				}
+				C.UI.updateTestMenuDialog();
+			}
+		}
 	};
 
 	return {
