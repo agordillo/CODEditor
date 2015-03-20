@@ -41,6 +41,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 
 	var init = function(options){
+
 		if(typeof options !== "object") {
 			options = {};
 		}
@@ -1880,7 +1881,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		var exercises = JSON.parse(_currentTest.exercises);
 		exercises.splice(exerciseIndex-1,1);
 		_currentTest.exercises = JSON.stringify(exercises);
-		var errors= _validateJSON(_currentTest,{updateCurrent: true});
+		var errors = _validateJSON(_currentTest,{updateCurrent: true});
 
 		if(errors.length === 0){
 			if(exerciseIndex===_currentTest.currentExerciseIndex){
@@ -1891,6 +1892,27 @@ CODEditor.CORE = (function(C,$,undefined){
 					_currentTest.currentExerciseIndex -= 1;
 				}
 				C.UI.updateTestMenuDialog();
+			}
+		}
+	};
+
+	var moveExercise = function(oldExerciseIndex,newExerciseIndex){
+		if(oldExerciseIndex!=newExerciseIndex){
+			var exercises = JSON.parse(_currentTest.exercises);
+			CODEditor.Utils.moveElementInArray(exercises,oldExerciseIndex-1,newExerciseIndex-1);
+			_currentTest.exercises = JSON.stringify(exercises);
+			var errors = _validateJSON(_currentTest,{updateCurrent: true});
+			if(errors.length === 0){
+				//Update _currentTest.currentExerciseIndex
+				if(_currentTest.currentExerciseIndex===oldExerciseIndex){
+					_currentTest.currentExerciseIndex = newExerciseIndex;
+				} else {
+					if((_currentTest.currentExerciseIndex<oldExerciseIndex)&&(_currentTest.currentExerciseIndex >= newExerciseIndex)){
+						_currentTest.currentExerciseIndex += 1;
+					} else if((_currentTest.currentExerciseIndex>oldExerciseIndex)&&(_currentTest.currentExerciseIndex <= newExerciseIndex)){
+						_currentTest.currentExerciseIndex -= 1;
+					}
+				}
 			}
 		}
 	};
@@ -1913,6 +1935,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		getPreview				: getPreview,
 		createExercise			: createExercise,
 		deleteExercise			: deleteExercise,
+		moveExercise			: moveExercise,
 		isDebugging				: isDebugging
 	};
 

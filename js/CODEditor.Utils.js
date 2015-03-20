@@ -21,6 +21,12 @@ CODEditor.Utils = (function(C,$,undefined){
 		};
 	};
 
+	var moveElementInArray = function(array, fromIndex, toIndex) {
+		var element = array[fromIndex];
+		array.splice(fromIndex, 1);
+		array.splice(toIndex, 0, element);
+	};
+
 	var isCodeEmpty = function(code){
 		if((typeof code != "string")||(code.trim()==="")){
 			return true;
@@ -196,6 +202,7 @@ CODEditor.Utils = (function(C,$,undefined){
 
 	return {
 		init 					: init,
+		moveElementInArray		: moveElementInArray,
 		isCodeEmpty				: isCodeEmpty,
 		purgeTextString			: purgeTextString,
 		showDialog				: showDialog,

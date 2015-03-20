@@ -154,6 +154,29 @@ CODEditor.UI = (function(C,$,undefined){
 						break;
 				}
 			});
+
+			//Sortable
+			$("#test_exercises_dialog ul").sortable({
+				stop: function( event, ui ) {
+					var oldExerciseIndex = parseInt($(ui.item).attr("exerciseindex"));
+					
+					var prevElement = $(ui.item).prev();
+					var newExerciseIndex;
+					if($(prevElement).length===0){
+						newExerciseIndex = 1;
+					} else {
+						var prevExerciseIndex = parseInt($(prevElement).attr("exerciseindex"));
+						if(oldExerciseIndex > prevExerciseIndex){
+							newExerciseIndex = prevExerciseIndex + 1;
+						} else if (oldExerciseIndex < prevExerciseIndex){
+							newExerciseIndex = prevExerciseIndex;
+						}
+					}
+
+					C.CORE.moveExercise(oldExerciseIndex,newExerciseIndex);
+					C.UI.updateTestMenuDialog();
+				}
+			});
 		}
 		
 	};
