@@ -27,6 +27,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _currentTest;
 	var _currentExercise;
+	var _currentExerciseIndex;
 
 	var _isDefaultMode = false;
 
@@ -296,6 +297,10 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var getCurrentExercise = function(){
 		return _currentExercise;
+	};
+
+	var getCurrentExerciseIndex = function(){
+		return _currentExerciseIndex;
 	};
 
 	var _initACEEditor = function(options){
@@ -820,9 +825,11 @@ CODEditor.CORE = (function(C,$,undefined){
 			return;
 		}
 
-		if(typeof _currentExercise === "object"){
-			var filename = "file.txt";
-			var dataToDownload = JSON.stringify(_currentExercise);
+		var currentResource = _getCurrentResource();
+
+		if(typeof currentResource === "object"){
+			var filename = _getCurrentResourceTitle() + ".txt";
+			var dataToDownload = JSON.stringify(currentResource);
 			var blob = new Blob([dataToDownload], {type: "text/plain;charset=utf-8"});
 			saveAs(blob, filename);
 
@@ -836,10 +843,12 @@ CODEditor.CORE = (function(C,$,undefined){
 			return;
 		}
 
-		if(typeof _currentExercise === "object"){
+		var currentResource = _getCurrentResource();
+
+		if(typeof currentResource === "object"){
 			var record = {};
 			record.saved_at = new Date();
-			record.resource = _currentExercise;
+			record.resource = currentResource;
 
 			var key;
 			if(typeof _currentLSKey === "string"){
@@ -899,7 +908,8 @@ CODEditor.CORE = (function(C,$,undefined){
 		delete _currentExercise.id;
 
 		if((typeof _currentTest != "undefined")&&(errors.length === 0)){
-			//Update test
+			//Save test
+			_currentTest.title = $("#testTitleInput").val();
 			_updateCurrentTestWithCurrentExercise();
 			errors = _validateJSON(_currentTest,{updateCurrent: true});
 		}
@@ -1028,11 +1038,11 @@ CODEditor.CORE = (function(C,$,undefined){
 	};
 
 	var _onFinishExportSCORMStep1 = function(zip){
-		var currentFile = _getCurrentFile();
+		var currentResource = _getCurrentResource();
 
-		if(typeof currentFile != "undefined"){
+		if(typeof currentResource != "undefined"){
 			//CODEditor.File.js
-			zip.file("CODEditor.Viewer.js", "var CODEditor = CODEditor || {};\nCODEditor.Viewer = true;\nCODEditor.File = " + JSON.stringify(currentFile));
+			zip.file("CODEditor.Viewer.js", "var CODEditor = CODEditor || {};\nCODEditor.Viewer = true;\nCODEditor.File = " + JSON.stringify(currentResource));
 			
 			//Modify index.html
 			JSZipUtils.getBinaryContent("index.html", function (err, data) {
@@ -1057,10 +1067,10 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _onFinishExportSCORM = function(zip){
 		var content = zip.generate({type:"blob"});
-		saveAs(content, (_getCurrentFileTitle() + ".zip"));
+		saveAs(content, (_getCurrentResourceTitle() + ".zip"));
 	};
 
-	var _getCurrentFile = function(){
+	var _getCurrentResource = function(){
 		if(typeof _currentTest != "undefined"){
 			return _currentTest;
 		} else if(typeof _currentExercise != "undefined"){
@@ -1068,9 +1078,9 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 	};
 
-	var _getCurrentFileTitle = function(){
-		if((typeof _getCurrentFile() != "undefined")&&(typeof _getCurrentFile().title == "string")&&(_getCurrentFile().title.trim()!="")){
-			return _getCurrentFile().title;
+	var _getCurrentResourceTitle = function(){
+		if((typeof _getCurrentResource() != "undefined")&&(typeof _getCurrentResource().title == "string")&&(_getCurrentResource().title.trim()!="")){
+			return _getCurrentResource().title;
 		}
 		return "Sin título";
 	};
@@ -1406,6 +1416,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		//Menu
 		$("#test_settings").find("img").attr("title","Configuración del Test");
 
+		_currentExerciseIndex = 0;
 		_loadNextTestExercise();
 
 		//Populate MenuWrapper
@@ -1505,8 +1516,8 @@ CODEditor.CORE = (function(C,$,undefined){
 		if((errors.length===0)&&(updateCurrentTest)){
 			_currentTest = json;
 			_currentTest.exercisesQuantity = exercises.length;
-			if(typeof _currentTest.currentExerciseIndex == "undefined"){
-				_currentTest.currentExerciseIndex = 0;
+			if(typeof _currentExerciseIndex == "undefined"){
+				_currentExerciseIndex = 0;
 			}
 			_currentTest.parsed_exercises = exercises;
 			for(var j=0; j<_currentTest.parsed_exercises.length; j++){
@@ -1679,12 +1690,12 @@ CODEditor.CORE = (function(C,$,undefined){
 	//Test management
 
 	var _hasNextExercise = function(){
-		return ((typeof _currentTest != "undefined")&&( _currentTest.currentExerciseIndex < _currentTest.exercisesQuantity))
+		return ((typeof _currentTest != "undefined")&&( _currentExerciseIndex < _currentTest.exercisesQuantity))
 	};
 
 	var _getNextExercise = function(){
 		if(_hasNextExercise()){
-			return _currentTest.parsed_exercises[_currentTest.currentExerciseIndex];
+			return _currentTest.parsed_exercises[_currentExerciseIndex];
 		} else {
 			return undefined;
 		}
@@ -1693,7 +1704,7 @@ CODEditor.CORE = (function(C,$,undefined){
 	var _loadNextTestExercise = function(){
 		if(_hasNextExercise()){
 			var exercise = _getNextExercise();
-			_currentTest.currentExerciseIndex += 1;
+			_currentExerciseIndex += 1;
 			_loadJSON(exercise);
 		}
 	};
@@ -1703,8 +1714,8 @@ CODEditor.CORE = (function(C,$,undefined){
 	};
 
 	var loadTestExercise = function(exerciseIndex){
-		_currentTest.currentExerciseIndex = exerciseIndex;
-		var excercise = _currentTest.parsed_exercises[_currentTest.currentExerciseIndex-1];
+		_currentExerciseIndex = exerciseIndex;
+		var excercise = _currentTest.parsed_exercises[_currentExerciseIndex-1];
 		_loadJSON(excercise);
 		C.UI.updateTestMenuDialog();
 	};
@@ -1848,7 +1859,7 @@ CODEditor.CORE = (function(C,$,undefined){
 	};
 
 	var getPreview = function(){
-		return _getCurrentFile();
+		return _getCurrentResource();
 	};
 
 	var createExercise = function(){
@@ -1873,7 +1884,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _updateCurrentTestWithCurrentExercise = function(){
 		var exercises = JSON.parse(_currentTest.exercises);
-		exercises[_currentTest.currentExerciseIndex-1] = _currentExercise;
+		exercises[_currentExerciseIndex-1] = _currentExercise;
 		_currentTest.exercises = JSON.stringify(exercises);
 	};
 
@@ -1884,12 +1895,12 @@ CODEditor.CORE = (function(C,$,undefined){
 		var errors = _validateJSON(_currentTest,{updateCurrent: true});
 
 		if(errors.length === 0){
-			if(exerciseIndex===_currentTest.currentExerciseIndex){
+			if(exerciseIndex===_currentExerciseIndex){
 				//Delete current
 				loadTestExercise(1);
 			} else {
-				if(exerciseIndex < _currentTest.currentExerciseIndex){
-					_currentTest.currentExerciseIndex -= 1;
+				if(exerciseIndex < _currentExerciseIndex){
+					_currentExerciseIndex -= 1;
 				}
 				C.UI.updateTestMenuDialog();
 			}
@@ -1903,14 +1914,14 @@ CODEditor.CORE = (function(C,$,undefined){
 			_currentTest.exercises = JSON.stringify(exercises);
 			var errors = _validateJSON(_currentTest,{updateCurrent: true});
 			if(errors.length === 0){
-				//Update _currentTest.currentExerciseIndex
-				if(_currentTest.currentExerciseIndex===oldExerciseIndex){
-					_currentTest.currentExerciseIndex = newExerciseIndex;
+				//Update _currentExerciseIndex
+				if(_currentExerciseIndex===oldExerciseIndex){
+					_currentExerciseIndex = newExerciseIndex;
 				} else {
-					if((_currentTest.currentExerciseIndex<oldExerciseIndex)&&(_currentTest.currentExerciseIndex >= newExerciseIndex)){
-						_currentTest.currentExerciseIndex += 1;
-					} else if((_currentTest.currentExerciseIndex>oldExerciseIndex)&&(_currentTest.currentExerciseIndex <= newExerciseIndex)){
-						_currentTest.currentExerciseIndex -= 1;
+					if((_currentExerciseIndex<oldExerciseIndex)&&(_currentExerciseIndex >= newExerciseIndex)){
+						_currentExerciseIndex += 1;
+					} else if((_currentExerciseIndex>oldExerciseIndex)&&(_currentExerciseIndex <= newExerciseIndex)){
+						_currentExerciseIndex -= 1;
 					}
 				}
 			}
@@ -1925,8 +1936,9 @@ CODEditor.CORE = (function(C,$,undefined){
 		getCurrentEditorMode 	: getCurrentEditorMode,
 		getCurrentEditorTheme	: getCurrentEditorTheme,
 		getEditor 				: getEditor,
-		getCurrentExercise 		: getCurrentExercise,
 		getCurrentTest			: getCurrentTest,
+		getCurrentExercise 		: getCurrentExercise,
+		getCurrentExerciseIndex	: getCurrentExerciseIndex,
 		loadTestExercise		: loadTestExercise,
 		exportToSCORM			: exportToSCORM,
 		onDoCurrentExercise		: onDoCurrentExercise,

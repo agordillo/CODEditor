@@ -72,7 +72,8 @@ CODEditor.UI = (function(C,$,undefined){
 
 	var updateUIAfterNewExerciseOnTest = function(){
 		var currentTest = C.CORE.getCurrentTest();
-		$("#test_menu_wrapper p").html(currentTest.currentExerciseIndex.toString() + "/" + currentTest.exercisesQuantity.toString());
+		var currentExerciseIndex = C.CORE.getCurrentExerciseIndex();
+		$("#test_menu_wrapper p").html(currentExerciseIndex.toString() + "/" + currentTest.exercisesQuantity.toString());
 	};
 
 	var updateTestMenuDialog = function(){
