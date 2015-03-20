@@ -648,6 +648,18 @@ CODEditor.CORE = (function(C,$,undefined){
 			_loadScorePanel();
 		});
 
+		$("#metadata").click(function(){
+			if($(this).hasClass("active")){
+				$(this).removeClass("active");
+				$("#metadata_panel").hide();
+			} else {
+				C.Utils.closePanels();
+				_loadScorePanel();
+				$(this).addClass("active");
+				$("#metadata_panel").show();
+			}
+		});
+
 		$("#exit").click(function(){
 			if(typeof _currentExercise !== "undefined"){
 				var r = confirm("Si abandonas el ejercicio perderás todos tus cambios. ¿Estás seguro de que deseas hacerlo?");

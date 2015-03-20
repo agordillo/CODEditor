@@ -6,6 +6,84 @@ CODEditor.UI = (function(C,$,undefined){
 			$("#open").removeClass("first");
 			$("#openurl").addClass("last");
 			$("title").html("CODEditor");
+
+			//Metadata panel
+
+			//Keywords
+			var suggestedTags = ["HTML","JavaScript","CSS","JQuery","Computer Science"];
+			$("#metadata_keywords").tagit({
+				tagSource: suggestedTags,
+				sortable:true,
+				maxLength: 40,
+				maxTags: 8,
+				triggerKeys: ['enter', 'comma', 'tab'],
+				watermarkAllowMessage: "Añadir keywords",
+				watermarkDenyMessage: "No puedes añadir más keywords"
+			});
+
+			//Difficulty
+			var difficulty;
+			if(typeof difficulty != "string"){
+				difficulty = "unspecified";
+			}
+
+			var LOM_difficulty = [];
+			LOM_difficulty[0] = { value: "unspecified", text: "sin especificar"};
+			LOM_difficulty[1] = { value: "very easy", text: "muy fácil"};
+			LOM_difficulty[2] = { value: "easy", text: "fácil"};
+			LOM_difficulty[3] = { value: "medium", text: "media"};
+			LOM_difficulty[4] = { value: "difficult", text: "difícil"};
+			LOM_difficulty[5] = { value: "very difficult", text: "muy difícil"};
+
+			var difficultyNValue;
+			for(var d=0; d<LOM_difficulty.length; d++){
+				if(d.value===difficulty){
+					difficultyNValue = d;
+				}
+			}
+			if(typeof difficultyNValue != "number"){
+				difficultyNValue = 0;
+			}
+
+			$("#metadata_difficulty_slider").slider({
+				min: 0,
+				max: 5,
+				value: [ difficultyNValue ],
+				slide: function(event, ui) {
+					$("#metadata_difficulty_range").attr("difficulty",ui.value);
+					$("#metadata_difficulty_range").val(LOM_difficulty[ui.value].text);
+				}
+			});
+			$("#metadata_difficulty_range").attr("difficulty",difficultyNValue);
+			$("#metadata_difficulty_range").val(LOM_difficulty[difficultyNValue].text);
+
+			//TLT
+			$(document).on('change', '#tlt_hours, #tlt_minutes, #tlt_seconds', _onTLTchange);
+			$(document).on('keyup', '#tlt_hours, #tlt_minutes, #tlt_seconds', _onTLTchange);
+			_onTLTchange();
+
+			//Age Range
+			var ageMin;
+			var ageMax;
+
+			if(typeof ageMin !== "number"){
+				ageMin = 0;
+			}
+			if(typeof ageMax !== "number"){
+				ageMax = 30;
+			}
+
+			$("#metadata_age_range_slider").slider({
+				range: true,
+				min: 0,
+				max: 30,
+				values: [ ageMin, ageMax ],
+				slide: function(event, ui) {
+					$("#metadata_age_range").val( ui.values[0] + " - " + ui.values[1] );
+				}
+			});
+			$("#metadata_age_range").val(ageMin + "-" + ageMax);
+
 		} else {
 			$("ul.menu li.editor:not(.viewer)").css("display","none");
 			$("title").html("CODEditor: Viewer");
@@ -182,6 +260,41 @@ CODEditor.UI = (function(C,$,undefined){
 		
 	};
 
+	var _onTLTchange = function(event){
+		if((event)&&(event.keyCode===13)){
+			$(event.target).blur();
+			return;
+		}
+
+		var TLT = _getTLT();
+		if(TLT===null){
+			$("#tlt_current_value").val("valor inválido");
+		} else if(typeof TLT == "undefined"){
+			$("#tlt_current_value").val("sin especificar");
+		} else if(typeof TLT == "string"){
+			$("#tlt_current_value").val(TLT);
+		}
+	};
+
+	var _getTLT = function(){
+		var TLT = "PT";
+		var hours = $("#tlt_hours").val();
+		var minutes = $("#tlt_minutes").val();
+		var seconds = $("#tlt_seconds").val();
+
+		if(jQuery.isNumeric(hours)&&jQuery.isNumeric(minutes)&&jQuery.isNumeric(seconds)){
+			hours = parseInt(hours);
+			minutes = parseInt(minutes);
+			seconds = parseInt(seconds);
+
+			var totalSecs = seconds + minutes*60 + hours*60*60;
+			if(totalSecs===0){
+				return undefined;
+			}
+			return CODEditor.Utils.iso8601Parser.getISODurationFromSecs(totalSecs);
+		}
+		return null;
+	};
 
 	return {
 		init 							: init,

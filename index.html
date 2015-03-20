@@ -7,6 +7,7 @@
 	<link rel="stylesheet" type="text/css" href="css/jquery-ui.structure.min.css"/>
 	<link rel="stylesheet" type="text/css" href="css/jquery-ui.theme.min.css"/>
 	<link rel="stylesheet" type="text/css" href="css/styles.css"/>
+	<link rel="stylesheet" type="text/css" href="css/tags.css"/>
 	<script src="libs/jquery-2.1.3.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="libs/jquery-ui-1.11.3.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="libs/ace/ace.js" type="text/javascript" charset="utf-8"></script>
@@ -18,6 +19,8 @@
 	<script src="libs/FileSaver.js" type="text/javascript" charset="utf-8"></script>
 	<script src="libs/jszip.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="libs/jszip-utils.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="libs/jquery.watermark.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="libs/tagit.js" type="text/javascript" charset="utf-8"></script>
 	<script src="js/CODEditor.js" type="text/javascript" charset="utf-8"></script>
 	<script src="js/CODEditor.CORE.js" type="text/javascript" charset="utf-8"></script>
 	<script src="js/CODEditor.Utils.js" type="text/javascript" charset="utf-8"></script>
@@ -44,6 +47,8 @@
 			<li id="exit" class="mitem last withoutRightBorder viewer" group="exercise onlydefault"><img src="img/glyphicons-389-exit.png" title="Quitar ejercicio"/></li>
 
 			<li id="test_settings" class="mitem first editor" group="edittest"><img src="img/glyphicons-115-list.png" title="Crear Test"/></li>
+
+			<li id="metadata" class="mitem first editor cpanelicon" group="metadata"><img src="img/glyphicons-67-tags.png" title="Metadatos"/></li>
 
 			<li id="preview_button" class="mitem first editor" group="preview"><img src="img/glyphicons-52-eye-open.png" title="Previsualizar"/></li>
 
@@ -204,7 +209,66 @@
 			</select>
 			<div class="codeditor_button" action="delete">Borrar</div>
 		</div>
-		
+	</div>
+
+	<div id="metadata_panel" class="cpanel">
+		<img class="close_panel_button" src="img/glyphicons-198-remove.png" onclick="CODEditor.Utils.closePanels();"/>
+		<div class="title">Metadatos</div>
+
+		<p class="panel_section_title">Objetivos educativos</p>
+		<div>
+			<textarea id="metadata_eobjectives"></textarea>
+		</div>
+
+		<p class="panel_section_title">Keywords</p>
+		<div>
+			<ul id="metadata_keywords"></ul>
+		</div>
+
+		<p class="panel_section_title">Idioma</p>
+		<div>
+			<select id="metadata_language">
+				<option value="de">Deutsch</option>
+				<option value="en">English</option>
+				<option value="es" selected="1">Español</option>
+				<option value="fr">Français</option>
+				<option value="it">Italiano</option>
+				<option value="pt">Português</option>
+				<option value="ot">Otro</option>
+			</select>
+		</div>
+
+		<div>
+			<p class="panel_section_title section_title_inline">Dificultad: </p>
+			<input type="text" id="metadata_difficulty_range" class="slider_range_input" readonly/>
+			<div id="metadata_difficulty_slider" class="slider_bar"></div>
+		</div>
+
+		<div>
+			<p class="panel_section_title section_title_inline">Tiempo de aprendizaje típico: </p>
+			<input type="text" id="tlt_current_value" class="slider_range_input" readonly="">
+			<div class="tlt_inputs_wrapper">
+				<div class="tlt_input_wrapper">
+					<p class="tlt_input_title" i18n-key="i.Hours">Horas</p>
+					<input type="number" value="0" min="0" max="23" id="tlt_hours" class="tlt_input">
+				</div>
+				<div class="tlt_input_wrapper">
+					<p class="tlt_input_title" i18n-key="i.Minutes">Minutos</p>
+					<input type="number" value="0" min="0" max="59" id="tlt_minutes" class="tlt_input">
+				</div>
+				<div class="tlt_input_wrapper">
+					<p class="tlt_input_title" i18n-key="i.Seconds">Segundos</p>
+					<input type="number" value="0" min="0" max="59" step="5" id="tlt_seconds" class="tlt_input">
+				</div>
+			</div>
+		</div>
+
+		<div>
+			<p class="panel_section_title section_title_inline">Rango de edad: </p>
+			<input type="text" id="metadata_age_range" class="slider_range_input" readonly/>
+			<div id="metadata_age_range_slider" class="slider_bar"></div>
+		</div>
+
 	</div>
 
 	<div id="test_exercises_dialog"></div>
