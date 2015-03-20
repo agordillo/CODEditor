@@ -308,6 +308,8 @@ CODEditor.CORE = (function(C,$,undefined){
 	var _initACEEditor = function(options){
 		_editor = ace.edit("editor");
 
+		_editor.$blockScrolling = Infinity;
+
 		//Specify Default values
 		_changeEditorMode(_editorModes[1]);
 		_changeEditorTheme(_editorThemes[0]);
@@ -617,7 +619,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		});
 
 		$("#editor_tab p").click(function(){
-			if(_currentViewMode==="SCORE"){
+			if(_isScore){
 				if($(this).hasClass("active")){
 					$(this).removeClass("active");
 					$("#score_function_panel").hide();
@@ -921,6 +923,7 @@ CODEditor.CORE = (function(C,$,undefined){
 			var scoreFunctionValue = _editor.getValue();
 			if(_isValidScoreFunctionValue(scoreFunctionValue)){
 				_currentExercise.score_function = scoreFunctionValue;
+				_inferScoreFunctionVars();
 			}
 		} else {
 			_currentExercise.content = _editor.getValue();
@@ -1197,7 +1200,12 @@ CODEditor.CORE = (function(C,$,undefined){
 					case "JavaScript":
 						$("#preview_wrapper.JavaScript #preview_header").html("<p>Consola</p><div id='consoleButtons'><img id='closeJSconsole' title='Cerrar consola' src='img/close_console.png'/></div>");
 						$("#closeJSconsole").click(function(){
-							_changeViewMode("CODE");
+							if(_isScore){
+								_changeViewMode("SCORE");
+							} else {
+								_changeViewMode("CODE");
+							}
+							
 						});
 						break;
 					default:
@@ -1977,7 +1985,7 @@ CODEditor.CORE = (function(C,$,undefined){
 	};
 
 	var _addScoreVar = function(varName){
-		if((typeof varName!="string")||(varName.trim()==="")){
+		if((typeof varName != "string")||(varName.trim() === "")){
 			return;
 		}
 		if(!(_currentExercise.score_function_vars instanceof Array)){
@@ -1985,8 +1993,8 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 		if(_currentExercise.score_function_vars.indexOf(varName)===-1){
 			_currentExercise.score_function_vars.push(varName);
+			_validateJSON(_currentExercise,{updateCurrent: true});
 		}
-		_validateJSON(_currentExercise,{updateCurrent: true});
 	};
 
 	var _removeScoreVar = function(varName){
@@ -1994,6 +2002,27 @@ CODEditor.CORE = (function(C,$,undefined){
 			if(_currentExercise.score_function_vars.indexOf(varName)!=-1){
 				_currentExercise.score_function_vars.splice(_currentExercise.score_function_vars.indexOf(varName),1);
 				_validateJSON(_currentExercise,{updateCurrent: true});
+			}
+		}
+	};
+
+	var _inferScoreFunctionVars = function(){
+		var detectedVars = [];
+		var matches = _currentExercise.score_function.match(/variablesHash\["([aA-zZ0-9]+)"\]/g);
+		if(matches instanceof Array){
+			var matchesLength = matches.length;
+			for(var i=0; i<matchesLength; i++){
+				if(typeof matches[i] == "string"){
+					var match = /variablesHash\["([aA-zZ0-9]+)"\]/g.exec(matches[i]);
+					if((match instanceof Array)&&(match.length === 2)&&(typeof match[1] == "string")){
+						detectedVars.push(match[1]);
+					}
+				}
+			}
+
+			var dVL = detectedVars.length;
+			for(var j=0; j<dVL; j++){
+				_addScoreVar(detectedVars[j]);
 			}
 		}
 	};
