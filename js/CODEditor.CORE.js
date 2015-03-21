@@ -321,6 +321,23 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		_editor.getSession().setTabSize(2);
 
+		//Alternative commands
+		_editor.commands.addCommand({
+			name: 'alternativeToggleBlockComment',
+			bindKey: {win: 'Ctrl-Shift-J',  mac: 'Command-Shift-J'},
+			exec: function(editor) {
+				editor.toggleBlockComment();
+			}
+		});
+
+		_editor.commands.addCommand({
+			name: 'alternativeToggleLinesComment',
+			bindKey: {win: 'Ctrl-J',  mac: 'Command-J'},
+			exec: function(editor) {
+				editor.toggleCommentLines();
+			}
+		});
+
 		_focusEditor();
 	};
 
