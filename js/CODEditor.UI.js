@@ -14,81 +14,154 @@ CODEditor.UI = (function(C,$,undefined){
 			$("#open").removeClass("first");
 			$("#openurl").addClass("last");
 			$("title").html("CODEditor");
-
-			//Metadata panel
-
-			//Keywords
-			var suggestedTags = ["HTML","JavaScript","CSS","JQuery","Computer Science"];
-			$("#metadata_keywords").tagit({
-				tagSource: suggestedTags,
-				sortable:true,
-				maxLength: 40,
-				maxTags: 8,
-				triggerKeys: ['enter', 'comma', 'tab'],
-				watermarkAllowMessage: "Añadir keywords",
-				watermarkDenyMessage: "No puedes añadir más keywords"
-			});
-
-			//Difficulty
-			var difficulty;
-			if(typeof difficulty != "string"){
-				difficulty = "unspecified";
-			}
-
-			var difficultyNValue;
-			for(var d=0; d<LOM_difficulty.length; d++){
-				if(d.value===difficulty){
-					difficultyNValue = d;
-				}
-			}
-			if(typeof difficultyNValue != "number"){
-				difficultyNValue = 0;
-			}
-
-			$("#metadata_difficulty_slider").slider({
-				min: 0,
-				max: 5,
-				value: [ difficultyNValue ],
-				slide: function(event, ui) {
-					$("#metadata_difficulty_range").attr("difficulty",ui.value);
-					$("#metadata_difficulty_range").val(LOM_difficulty[ui.value].text);
-				}
-			});
-			$("#metadata_difficulty_range").attr("difficulty",difficultyNValue);
-			$("#metadata_difficulty_range").val(LOM_difficulty[difficultyNValue].text);
-
-			//TLT
-			$(document).on('change', '#tlt_hours, #tlt_minutes, #tlt_seconds', _onTLTchange);
-			$(document).on('keyup', '#tlt_hours, #tlt_minutes, #tlt_seconds', _onTLTchange);
-			_onTLTchange();
-
-			//Age Range
-			var ageMin;
-			var ageMax;
-
-			if(typeof ageMin !== "number"){
-				ageMin = 0;
-			}
-			if(typeof ageMax !== "number"){
-				ageMax = 0;
-			}
-
-			$("#metadata_age_range_slider").slider({
-				range: true,
-				min: 0,
-				max: 30,
-				values: [ ageMin, ageMax ],
-				slide: function(event, ui) {
-					$("#metadata_age_range").val( ui.values[0] + " - " + ui.values[1] );
-				}
-			});
-			$("#metadata_age_range").val(ageMin + "-" + ageMax);
-
+			_initMetadata();
 		} else {
 			$("ul.menu li.editor:not(.viewer)").css("display","none");
 			$("title").html("CODEditor: Viewer");
 		}
 		adjustView();
+	};
+
+	var _initMetadata = function(){
+		if(!CODEditor.CORE.isEditorMode()){
+			return;
+		}
+
+		//Metadata panel
+	
+		//Keywords
+		var keywordsDOM = $("#metadata_keywords");
+
+		var suggestedTags = ["HTML","JavaScript","CSS","JQuery","Computer Science"];
+		$(keywordsDOM).tagit({
+			tagSource: suggestedTags,
+			sortable:true,
+			maxLength: 40,
+			maxTags: 8,
+			triggerKeys: ['enter', 'comma', 'tab'],
+			watermarkAllowMessage: "Añadir keywords",
+			watermarkDenyMessage: "No puedes añadir más keywords"
+		});
+
+		//Difficulty
+		$("#metadata_difficulty_slider").slider({
+			min: 0,
+			max: 5,
+			value: [ 0 ],
+			slide: function(event, ui) {
+				$("#metadata_difficulty_range").attr("difficulty",ui.value);
+				$("#metadata_difficulty_range").val(LOM_difficulty[ui.value].text);
+			}
+		});
+		$("#metadata_difficulty_range").attr("difficulty",0);
+		$("#metadata_difficulty_range").val(LOM_difficulty[0].text);
+
+		//TLT
+		$(document).on('change', '#tlt_hours, #tlt_minutes, #tlt_seconds', _onTLTchange);
+		$(document).on('keyup', '#tlt_hours, #tlt_minutes, #tlt_seconds', _onTLTchange);
+		_onTLTchange();
+
+		//Age Range
+		var ageMin = 0;
+		var ageMax = 0;
+
+		$("#metadata_age_range_slider").slider({
+			range: true,
+			min: 0,
+			max: 30,
+			values: [ ageMin, ageMax ],
+			slide: function(event, ui) {
+				$("#metadata_age_range").val( ui.values[0] + " - " + ui.values[1] );
+			}
+		});
+		$("#metadata_age_range").val(ageMin + "-" + ageMax);
+	};
+
+	var loadMetadata = function(){
+		var currentResource = C.CORE.getCurrentResource();
+		var metadata;
+		if((typeof currentResource == "object")&&(typeof currentResource.metadata == "object")){
+			metadata = currentResource.metadata;
+		} else {
+			metadata = {};
+		}
+
+		//Educational objectives
+		$("#metadata_eobjectives").val("");
+		if(typeof metadata.description == "string"){
+			$("#metadata_eobjectives").val(metadata.description);
+		}
+		
+		//Keywords
+		var keywordsDOM = $("#metadata_keywords");
+		$(keywordsDOM).tagit("reset");
+		if(metadata.keywords instanceof Array){
+			var keywordsLength = metadata.keywords.length;
+			for(var k=0; k<keywordsLength; k++){
+				$(keywordsDOM).tagit("add",metadata.keywords[k]);
+			};
+		}
+
+		//Language
+		$("#metadata_language").val("es");
+		if(typeof metadata.language == "string"){
+			$("#metadata_language").find("option").each(function(index,option){
+				if($(option).attr("value")===metadata.language){
+					$("#metadata_language").val(metadata.language);
+					return false;
+				}
+			});
+		}
+
+		//Difficulty
+		var difficulty = metadata.difficulty;
+		if(typeof difficulty != "string"){
+			difficulty = "unspecified";
+		}
+
+		var difficultyNValue;
+		for(var d=0; d<LOM_difficulty.length; d++){
+			if(LOM_difficulty[d].value===difficulty){
+				difficultyNValue = d;
+			}
+		}
+		if(typeof difficultyNValue != "number"){
+			difficultyNValue = 0;
+		}
+
+		$("#metadata_difficulty_slider").slider("value",difficultyNValue);
+		$("#metadata_difficulty_range").attr("difficulty",difficultyNValue);
+		$("#metadata_difficulty_range").val(LOM_difficulty[difficultyNValue].text);
+
+		// TLT
+		$("#tlt_hours").val(0);
+		$("#tlt_minutes").val(0);
+		$("#tlt_seconds").val(0);
+		if(typeof metadata.TLT == "string"){
+			var durations = C.Utils.iso8601Parser.getDurationFromISOPerUnit(metadata.TLT);
+			$("#tlt_hours").val(durations[4].toString());
+			$("#tlt_minutes").val(durations[5].toString());
+			$("#tlt_seconds").val(durations[6].toString());
+		}
+		_onTLTchange();
+
+		//Age Range
+		var ageRanges;
+		if(typeof metadata.age_range == "string"){
+			ageRanges = C.Utils.getAgesFromAgeRange(metadata.age_range);
+		} else {
+			ageRanges = [0,0];
+		}
+		var ageMin = ageRanges[0];
+		var ageMax = ageRanges[1];
+		if(typeof ageMin !== "number"){
+			ageMin = 0;
+		}
+		if(typeof ageMax !== "number"){
+			ageMax = 0;
+		}
+		$("#metadata_age_range_slider").slider("values",[ageMin,ageMax]);
+		$("#metadata_age_range").val(ageMin + "-" + ageMax);
 	};
 
 	var adjustView = function(){
@@ -330,9 +403,9 @@ CODEditor.UI = (function(C,$,undefined){
 		}
 
 		//TLT
-		var tlt = _getTLT();
-		if(typeof tlt === "string"){
-			metadata.tlt = tlt;
+		var TLT = _getTLT();
+		if(typeof TLT === "string"){
+			metadata.TLT = TLT;
 		}
 
 		//Age range
@@ -348,6 +421,7 @@ CODEditor.UI = (function(C,$,undefined){
 
 	return {
 		init 							: init,
+		loadMetadata					: loadMetadata,
 		adjustView						: adjustView,
 		updateSettingsPanel 			: updateSettingsPanel,
 		cleanPreview					: cleanPreview,

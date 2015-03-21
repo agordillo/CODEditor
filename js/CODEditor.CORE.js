@@ -199,6 +199,8 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		if(isViewerMode()){
 			C.SCORM.init();
+		} else {
+			C.UI.loadMetadata();
 		}
 	};
 
@@ -790,7 +792,12 @@ CODEditor.CORE = (function(C,$,undefined){
 		if((fileType==="application/json")||(fileType==="text/plain")||(fileType.toString()==="/text.*/")){
 			if(_containsValidJSON(fileContent)){
 				_currentLSKey = undefined;
-				return _loadJSON(JSON.parse(fileContent));
+				var json = JSON.parse(fileContent);
+				if(isEditorMode()){
+					return _initExerciseMode(json);
+				} else {
+					return _loadJSON(json);
+				}
 			}
 		}
 
@@ -908,7 +915,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		} catch (e){}
 		if(_isValidJSON(json)){
 			_currentLSKey = key;
-			_loadJSON(json);
+			_initExerciseMode(json);
 		} else {
 			C.Utils.showDialog("Recurso inválido");
 		}

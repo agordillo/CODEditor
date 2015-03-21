@@ -172,7 +172,8 @@ CODEditor.Utils.iso8601Parser = (function(C,$,undefined){
 
 	return {
 		getDurationFromISO			: getDurationFromISO,
-		getISODurationFromSecs		: getISODurationFromSecs
+		getISODurationFromSecs		: getISODurationFromSecs,
+		getDurationFromISOPerUnit	: getDurationFromISOPerUnit
 	};
 
 }) ();
