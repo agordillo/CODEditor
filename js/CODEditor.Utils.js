@@ -27,6 +27,20 @@ CODEditor.Utils = (function(C,$,undefined){
 		array.splice(toIndex, 0, element);
 	};
 
+	var getAgesFromAgeRange = function(ageRange){
+		var ageRanges = [0,0];
+		if(typeof ageRange != "string"){
+			return ageRanges;
+		}
+		var ageRangeArray = ageRange.split("-");
+		var ageMin = parseInt(ageRangeArray[0]);
+		var ageMax = parseInt(ageRangeArray[1]);
+		if(jQuery.isNumeric(ageMin)&&jQuery.isNumeric(ageMax)){
+			ageRanges = [ageMin,ageMax];
+		}
+		return ageRanges;
+	};
+
 	var isCodeEmpty = function(code){
 		if((typeof code != "string")||(code.trim()==="")){
 			return true;
@@ -222,7 +236,8 @@ CODEditor.Utils = (function(C,$,undefined){
 		clearLocalStorage		: clearLocalStorage,
 		readURLparams			: readURLparams,
 		buildURLwithParams		: buildURLwithParams,
-		getReadableDate			: getReadableDate
+		getReadableDate			: getReadableDate,
+		getAgesFromAgeRange		: getAgesFromAgeRange
 	};
 
 }) (CODEditor,jQuery);

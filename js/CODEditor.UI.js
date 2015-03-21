@@ -1,5 +1,13 @@
 CODEditor.UI = (function(C,$,undefined){
 
+	var LOM_difficulty = [];
+	LOM_difficulty[0] = { value: "unspecified", text: "sin especificar"};
+	LOM_difficulty[1] = { value: "very easy", text: "muy fácil"};
+	LOM_difficulty[2] = { value: "easy", text: "fácil"};
+	LOM_difficulty[3] = { value: "medium", text: "media"};
+	LOM_difficulty[4] = { value: "difficult", text: "difícil"};
+	LOM_difficulty[5] = { value: "very difficult", text: "muy difícil"};
+
 	var init = function(options){
 		if(CODEditor.CORE.isEditorMode()){
 			$("ul.menu li.viewer:not(.editor)").css("display","none");
@@ -26,14 +34,6 @@ CODEditor.UI = (function(C,$,undefined){
 			if(typeof difficulty != "string"){
 				difficulty = "unspecified";
 			}
-
-			var LOM_difficulty = [];
-			LOM_difficulty[0] = { value: "unspecified", text: "sin especificar"};
-			LOM_difficulty[1] = { value: "very easy", text: "muy fácil"};
-			LOM_difficulty[2] = { value: "easy", text: "fácil"};
-			LOM_difficulty[3] = { value: "medium", text: "media"};
-			LOM_difficulty[4] = { value: "difficult", text: "difícil"};
-			LOM_difficulty[5] = { value: "very difficult", text: "muy difícil"};
 
 			var difficultyNValue;
 			for(var d=0; d<LOM_difficulty.length; d++){
@@ -70,7 +70,7 @@ CODEditor.UI = (function(C,$,undefined){
 				ageMin = 0;
 			}
 			if(typeof ageMax !== "number"){
-				ageMax = 30;
+				ageMax = 0;
 			}
 
 			$("#metadata_age_range_slider").slider({
@@ -296,13 +296,64 @@ CODEditor.UI = (function(C,$,undefined){
 		return null;
 	};
 
+	var getMetadataFromUI = function(){
+		var currentResource = C.CORE.getCurrentResource();
+		var metadata = {};
+
+		//Title
+		if((typeof currentResource != "undefined")&&(typeof currentResource.title == "string")&&(currentResource.title.trim()!=="")){
+			metadata.title = currentResource.title;
+		}
+
+		//Educational objectives
+		var educationalObjectives = $("#metadata_eobjectives").val();
+		if(educationalObjectives.trim()!==""){
+			metadata.description = educationalObjectives;
+		}
+
+		//Tags
+		var keywords = [];
+		$.each($("#metadata_keywords").tagit("tags"), function(index, tag) {
+			keywords.push(tag.value);
+		});
+		if(keywords.length>0){
+			metadata.keywords = keywords;
+		}
+		
+		//Language
+		metadata.language = $("#metadata_language").val();
+
+		//Difficulty
+		var difficultyValue = parseInt($("#metadata_difficulty_range").attr("difficulty"));
+		if(jQuery.isNumeric(difficultyValue)&&(difficultyValue>0)&&(typeof LOM_difficulty[difficultyValue] == "object")){
+			metadata.difficulty = LOM_difficulty[difficultyValue].value;
+		}
+
+		//TLT
+		var tlt = _getTLT();
+		if(typeof tlt === "string"){
+			metadata.tlt = tlt;
+		}
+
+		//Age range
+		var ageRange = C.Utils.getAgesFromAgeRange($("#metadata_age_range").val());
+		var ageMin = ageRange[0];
+		var ageMax = ageRange[1];
+		if((ageMin!=0)||(ageMax!=0)){
+			metadata.age_range = ageMin + "-" + ageMax;
+		}
+		
+		return metadata;
+	};
+
 	return {
 		init 							: init,
 		adjustView						: adjustView,
 		updateSettingsPanel 			: updateSettingsPanel,
 		cleanPreview					: cleanPreview,
 		updateUIAfterNewExerciseOnTest	: updateUIAfterNewExerciseOnTest,
-		updateTestMenuDialog			: updateTestMenuDialog
+		updateTestMenuDialog			: updateTestMenuDialog,
+		getMetadataFromUI				: getMetadataFromUI
 	};
 
 }) (CODEditor,jQuery);

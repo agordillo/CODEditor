@@ -862,10 +862,10 @@ CODEditor.CORE = (function(C,$,undefined){
 			return;
 		}
 
-		var currentResource = _getCurrentResource();
+		var currentResource = getCurrentResource();
 
 		if(typeof currentResource === "object"){
-			var filename = _getCurrentResourceTitle() + ".txt";
+			var filename = getCurrentResourceTitle() + ".txt";
 			var dataToDownload = JSON.stringify(currentResource);
 			var blob = new Blob([dataToDownload], {type: "text/plain;charset=utf-8"});
 			saveAs(blob, filename);
@@ -880,7 +880,7 @@ CODEditor.CORE = (function(C,$,undefined){
 			return;
 		}
 
-		var currentResource = _getCurrentResource();
+		var currentResource = getCurrentResource();
 
 		if(typeof currentResource === "object"){
 			var record = {};
@@ -942,12 +942,20 @@ CODEditor.CORE = (function(C,$,undefined){
 			_currentExercise.editorMode = _currentEditorMode;
 		}
 
+		//Metadata
+		var metadata = C.UI.getMetadataFromUI();
+		var currentResource = getCurrentResource();
+		if((typeof metadata === "object")&&(Object.keys(metadata).length > 0)){
+			currentResource.metadata = metadata;
+		}
+		
 		var errors = _validateJSON(_currentExercise,{updateCurrent: true});
 		delete _currentExercise.id;
 
 		if((typeof _currentTest != "undefined")&&(errors.length === 0)){
 			//Save test
 			_currentTest.title = $("#testTitleInput").val();
+			delete _currentExercise.metadata;
 			_updateCurrentTestWithCurrentExercise();
 			errors = _validateJSON(_currentTest,{updateCurrent: true});
 		}
@@ -1076,7 +1084,7 @@ CODEditor.CORE = (function(C,$,undefined){
 	};
 
 	var _onFinishExportSCORMStep1 = function(zip){
-		var currentResource = _getCurrentResource();
+		var currentResource = getCurrentResource();
 
 		if(typeof currentResource != "undefined"){
 			//CODEditor.File.js
@@ -1105,10 +1113,10 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _onFinishExportSCORM = function(zip){
 		var content = zip.generate({type:"blob"});
-		saveAs(content, (_getCurrentResourceTitle() + ".zip"));
+		saveAs(content, (getCurrentResourceTitle() + ".zip"));
 	};
 
-	var _getCurrentResource = function(){
+	var getCurrentResource = function(){
 		if(typeof _currentTest != "undefined"){
 			return _currentTest;
 		} else if(typeof _currentExercise != "undefined"){
@@ -1116,9 +1124,9 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 	};
 
-	var _getCurrentResourceTitle = function(){
-		if((typeof _getCurrentResource() != "undefined")&&(typeof _getCurrentResource().title == "string")&&(_getCurrentResource().title.trim()!="")){
-			return _getCurrentResource().title;
+	var getCurrentResourceTitle = function(){
+		if((typeof getCurrentResource() != "undefined")&&(typeof getCurrentResource().title == "string")&&(getCurrentResource().title.trim()!="")){
+			return getCurrentResource().title;
 		}
 		return "Sin título";
 	};
@@ -1927,7 +1935,7 @@ CODEditor.CORE = (function(C,$,undefined){
 	};
 
 	var getPreview = function(){
-		return _getCurrentResource();
+		return getCurrentResource();
 	};
 
 	var createExercise = function(){
@@ -2050,6 +2058,8 @@ CODEditor.CORE = (function(C,$,undefined){
 		getCurrentTest			: getCurrentTest,
 		getCurrentExercise 		: getCurrentExercise,
 		getCurrentExerciseIndex	: getCurrentExerciseIndex,
+		getCurrentResource 		: getCurrentResource,
+		getCurrentResourceTitle : getCurrentResourceTitle,
 		loadTestExercise		: loadTestExercise,
 		exportToSCORM			: exportToSCORM,
 		onDoCurrentExercise		: onDoCurrentExercise,
