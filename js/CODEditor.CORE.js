@@ -1114,6 +1114,8 @@ CODEditor.CORE = (function(C,$,undefined){
 			//CODEditor.File.js
 			zip.file("CODEditor.Viewer.js", "var CODEditor = CODEditor || {};\nCODEditor.Viewer = true;\nCODEditor.File = " + JSON.stringify(currentResource));
 			
+			var filesCount = 2;
+
 			//Modify index.html
 			JSZipUtils.getBinaryContent("index.html", function (err, data) {
 				if(err) {
@@ -1123,11 +1125,37 @@ CODEditor.CORE = (function(C,$,undefined){
 				//ArrayBuffer to String
 				var indexHTMLContent = String.fromCharCode.apply(null, new Uint8Array(data));
 				var position = indexHTMLContent.indexOf("</head>");
+
 				var fileScript = '<script src="CODEditor.Viewer.js" type="text/javascript" charset="utf-8"></script>';
+				
 				indexHTMLContent = (indexHTMLContent.substr(0, position) + "    " + fileScript + "\n" + indexHTMLContent.substr(position));
 				zip.file("index.html", indexHTMLContent);
 
-				_onFinishExportSCORM(zip);
+				filesCount -= 1;
+				if(filesCount===0){
+					_onFinishExportSCORM(zip);
+				}
+			});
+
+			//Modify imsmanifest.xml
+			JSZipUtils.getBinaryContent("imsmanifest.xml", function (err, data) {
+				if(err) {
+					throw err;
+				}
+				
+				//ArrayBuffer to String
+				var xmlContent = String.fromCharCode.apply(null, new Uint8Array(data));
+				var position = xmlContent.indexOf('</lom>');
+
+				var XML_LOM_Metadata = 'Metadata TEST';
+				
+				xmlContent = (xmlContent.substr(0, position) + "  " + XML_LOM_Metadata + "\n    " + xmlContent.substr(position));
+				zip.file("imsmanifest.xml", xmlContent);
+
+				filesCount -= 1;
+				if(filesCount===0){
+					_onFinishExportSCORM(zip);
+				}
 			});
 
 		} else {
