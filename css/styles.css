@@ -389,6 +389,14 @@ ul.menu li#exit {
 	padding: 15px 10px 15px 10px;
 }
 
+.cpanel table.tlist {
+	margin-top: 8px;
+}
+
+.cpanel table.tlist td {
+	padding: 4px 5px 4px 0px;
+}
+
 div.panel_button_wrapper {
 	padding: 1px;
 	width: 125px;

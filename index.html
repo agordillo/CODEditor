@@ -212,6 +212,35 @@
 		</div>
 	</div>
 
+	<div id="html_panel" class="cpanel">
+		<img class="close_panel_button" src="img/glyphicons-198-remove.png" onclick="CODEditor.Utils.closePanels();"/>
+		<div class="title">HTML</div>
+
+		<p class="panel_section_title">Librerías</p>
+		<table class="tlist libraries">
+			<tr>
+				<td><input value="jquery" type="checkbox"/></td>
+				<td>JQuery 1.11.2</td>
+			</tr>
+			<tr>
+				<td><input value="zepto" type="checkbox"/></td>
+				<td>Zepto 1.1.4</td>
+			</tr>
+			<tr>
+				<td><input value="gmapsapi" type="checkbox"/></td>
+				<td>Google Maps</td>
+			</tr>
+			<tr>
+				<td><input value="gmaps" type="checkbox"/></td>
+				<td>GMaps.js</td>
+			</tr>
+			<tr>
+				<td><input value="bootstrap" type="checkbox"/></td>
+				<td>Bootstrap 3.3.4</td>
+			</tr>
+		</table>
+	</div>
+
 	<div id="metadata_panel" class="cpanel">
 		<img class="close_panel_button" src="img/glyphicons-198-remove.png" onclick="CODEditor.Utils.closePanels();"/>
 		<div class="title">Metadatos</div>
@@ -286,6 +315,7 @@
 		</div>
 	</div>
 
+	<iframe id="hiddenIframe" style="display:none;"></iframe>
 
 </body>
 <script type="text/javascript">

@@ -16,7 +16,7 @@ CODEditor.CORE = (function(C,$,undefined){
 	var _currentPreviewMode;
 
 	var defaultValues = {};
-	defaultValues["HTML"] = "<html>\n  <head></head>\n  <body>\n    \n  </body>\n</html>";
+	defaultValues["HTML"] = "<html>\n  <head>\n  </head>\n  <body>\n    \n  </body>\n</html>";
 	defaultValues["JavaScript"] = "";
 	defaultValues["SCORE"] = {};
 	defaultValues["SCORE"]["HTML"] = '/*\nvar score = function(document){\n  var grade = {};\n  grade.successes = [];\n  grade.errors = [];\n  grade.feedback = [];\n\n  grade.score = 10;\n  grade.successes.push("Correcto.");\n\n  return grade;\n};\n*/';
@@ -638,16 +638,34 @@ CODEditor.CORE = (function(C,$,undefined){
 		});
 
 		$("#editor_tab p").click(function(){
-			if(_isScore){
-				if($(this).hasClass("active")){
-					$(this).removeClass("active");
-					$("#score_function_panel").hide();
-				} else {
-					C.Utils.closePanels();
-					_loadScorePanel();
-					$(this).addClass("active");
-					$("#score_function_panel").show();
-				}
+
+			var isActive = $(this).hasClass("active");
+			if(isActive){
+				$(this).removeClass("active");
+				C.Utils.closePanels();
+			};
+
+			switch(_currentEditorMode){
+				case "JavaScript":
+					if(_isScore){
+						if(!isActive){
+							C.Utils.closePanels();
+							_loadScorePanel();
+							$(this).addClass("active");
+							$("#score_function_panel").show();
+						}
+					}
+					break;
+				case "HTML":
+					if(!isActive){
+						C.Utils.closePanels();
+						_loadHTMLPanel();
+						$(this).addClass("active");
+						$("#html_panel").show();
+					}
+					break;
+				default:
+					break;
 			}
 		});
 
@@ -665,6 +683,10 @@ CODEditor.CORE = (function(C,$,undefined){
 			}
 			_removeScoreVar($("#score_vars_select").val());
 			_loadScorePanel();
+		});
+
+		$('#html_panel table.libraries input[type="checkbox"]').change(function(){
+			_applyLibrary($(this).attr("value"),$(this).is(':checked'));
 		});
 
 		$("#metadata").click(function(){
@@ -2113,6 +2135,153 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 
 		$("#score_var_name_input").val("");
+	};
+
+	var _loadHTMLPanel = function(){
+		var libs = _getAppliedLibraries();
+		$('#html_panel table.libraries input[type="checkbox"]').each(function(index,checkbox){
+			var libname = $(checkbox).attr("value");
+			if(libs.indexOf(libname)!==-1){
+				$(checkbox).prop('checked', true);
+			} else {
+				$(checkbox).prop('checked', false);
+			}
+		});
+	};
+
+	var _applyLibrary = function(library,enable,reload){
+		if(_currentEditorMode!="HTML"){
+			return;
+		}
+
+		if(typeof enable != "boolean"){
+			enable = true;
+		}
+
+		if(typeof reload != "boolean"){
+			reload = false;
+		}
+
+		var libs = _getAppliedLibraries();
+		if(((enable)&&(libs.indexOf(library)!==-1))||((!enable)&&(libs.indexOf(library)===-1))){
+			return;
+		}
+
+		var editorContent = _editor.getValue();
+		
+		var position = -1;
+		var headIdentation = "      ";
+		var i = headIdentation.length;
+		while((position===-1)&&(i>=0)){
+			position = editorContent.indexOf(headIdentation + "</head>");
+			if(position===-1){
+				i -= 1;
+				headIdentation = headIdentation.replace(" ","");
+			}
+		}
+
+		if(position===-1){
+			C.Utils.showDialog("Debes incluir una cabecera <head> para añadir librerías.");
+			$('#html_panel table.libraries input[type="checkbox"][value="' + library + '"]').prop('checked', false);
+			return;
+		}
+
+		var files = [];
+		switch(library){
+			case "jquery":
+				files.push('<script libname="jquery" src="//code.jquery.com/jquery-1.11.2.min.js"></script>');
+				break;
+			case "zepto":
+				files.push('<script libname="zepto" src="//cdnjs.cloudflare.com/ajax/libs/zepto/1.1.4/zepto.min.js"></script>');
+				break;
+			case "gmapsapi":
+				files.push('<script libname="gmapsapi" src="//maps.googleapis.com/maps/api/js?sensor=true"></script>');
+				break;
+			case "gmaps":
+				if((enable)&&(libs.indexOf("gmapsapi")===-1)&&(!reload)){
+					_applyLibrary("gmapsapi",true);
+					$('#html_panel table.libraries input[type="checkbox"][value="' + "gmapsapi" + '"]').prop('checked', true);
+					return _applyLibrary("gmaps",true,true);
+				}
+				files.push('<script libname="gmaps" src="//hpneo.github.io/gmaps/gmaps.js"></script>');
+				break;
+			case "bootstrap":
+				if((enable)&&(libs.indexOf("jquery")===-1)&&(!reload)){
+					_applyLibrary("jquery",true);
+					$('#html_panel table.libraries input[type="checkbox"][value="' + "jquery" + '"]').prop('checked', true);
+					return _applyLibrary("bootstrap",true,true);
+				}
+				files.push('<link libname="bootstrap" rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">');
+				files.push('<link libname="bootstrap" rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">');
+				files.push('<script libname="bootstrap" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>');
+			default:
+				break;
+		}
+
+		var filesLength = files.length;
+		if(filesLength===0){
+			return;
+		}
+
+		var filesIdentation = headIdentation + "  ";
+		var fullText = "";
+		for(var i=0; i<filesLength; i++){
+			fullText += filesIdentation + files[i] + "\n";
+		}
+
+		if(enable){
+			editorContent = (editorContent.substr(0, position) + fullText + editorContent.substr(position));
+		} else {
+			editorContent = editorContent.replace(fullText,"");
+			for(var i=0; i<filesLength; i++){
+				var fullLine = filesIdentation + files[i] + "\n";
+				editorContent = editorContent.replace(fullLine,"");
+				editorContent = editorContent.replace(files[i],"");
+			}
+		}
+
+		_editor.setValue(editorContent,1);
+	};
+
+	var _getAppliedLibraries = function(){
+		var libs = [];
+
+		if(_currentEditorMode!="HTML"){
+			return libs;
+		}
+
+		var doc = _getCurrentHTMLdocument();
+		$(doc).find("head > [libname]").each(function(index,el){
+			var libname = $(el).attr("libname");
+			if(libs.indexOf(libname)===-1){
+				libs.push(libname);
+			}
+		});
+
+		// //Look for sources
+		// $(doc).find("head > script").each(function(index,el){
+		// 	var source = $(el).attr("src");
+		// 	var libname;
+
+		// 	if(source.match(/jquery[.aA-zZ0-9]*js/g) !== null){
+		// 		libname = "jquery";
+		// 	}
+
+		// 	if((typeof libname == "string")&&(libs.indexOf(libname)===-1)){
+		// 		libs.push(libname);
+		// 	}
+		// });
+		
+		return libs;
+	};
+
+	var _getCurrentHTMLdocument = function(){
+		var iframe = $("#hiddenIframe");
+		var doc = $(iframe).contents()[0];
+		doc.open();
+		doc.writeln(_editor.getValue());
+		doc.close();
+		return doc;
 	};
 
 	var getPreview = function(){
