@@ -22,10 +22,12 @@
 	<script src="libs/jquery.watermark.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="libs/tagit.js" type="text/javascript" charset="utf-8"></script>
 	<script src="libs/marknote.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/lang.js" type="text/javascript" charset="utf-8"></script>
 	<script src="js/CODEditor.js" type="text/javascript" charset="utf-8"></script>
 	<script src="js/CODEditor.CORE.js" type="text/javascript" charset="utf-8"></script>
 	<script src="js/CODEditor.Utils.js" type="text/javascript" charset="utf-8"></script>
 	<script src="js/CODEditor.Utils.iso8601Parser.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/CODEditor.I18n.js" type="text/javascript" charset="utf-8"></script>
 	<script src="js/CODEditor.UI.js" type="text/javascript" charset="utf-8"></script>
 	<script src="js/CODEditor.FullScreen.js" type="text/javascript" charset="utf-8"></script>
 	<script src="js/CODEditor.Score.js" type="text/javascript" charset="utf-8"></script>
@@ -38,43 +40,43 @@
 <body>
 
 	<div id="header">
-		<p id="login" class="" title="login"></p>
+		<p id="login" i18n-key-title="i.menuLogin" title="Login"></p>
 		<ul class="menu">
-			<li id="editorModeMenu" class="mitem mitemmode viewer editor" title="Cambiar Lenguaje"></li>
+			<li id="editorModeMenu" class="mitem mitemmode viewer editor" i18n-key-title="i.menuLanguage" title="Cambiar Lenguaje"></li>
 
-			<li id="examples" class="mitem first last withoutRightBorder viewer cpanelicon" group="examples"><img src="img/glyphicons-156-show-big-thumbnails.png" title="Cargar ejemplos"/></li>
+			<li id="examples" class="mitem first last withoutRightBorder viewer cpanelicon" group="examples"><img src="img/glyphicons-156-show-big-thumbnails.png" i18n-key-title="i.menuExamples" title="Cargar ejemplos"/></li>
 
-			<li id="refresh" class="mitem first viewer" group="exercise"><img src="img/glyphicons-82-refresh.png" title="Recargar ejemplo"/></li>
-			<li id="exit" class="mitem last withoutRightBorder viewer" group="exercise onlydefault"><img src="img/glyphicons-389-exit.png" title="Quitar ejercicio"/></li>
+			<li id="refresh" class="mitem first viewer" group="exercise"><img src="img/glyphicons-82-refresh.png" i18n-key-title="i.menuReload" title="Recargar ejemplo"/></li>
+			<li id="exit" class="mitem last withoutRightBorder viewer" group="exercise onlydefault"><img src="img/glyphicons-389-exit.png" i18n-key-title="i.menuExitExercise" title="Quitar ejercicio"/></li>
 
-			<li id="test_settings" class="mitem first editor" group="edittest"><img src="img/glyphicons-115-list.png" title="Crear Test"/></li>
+			<li id="test_settings" class="mitem first editor" group="edittest"><img src="img/glyphicons-115-list.png" i18n-key-title="i.menuCreateTest" title="Crear Test"/></li>
 
-			<li id="metadata" class="mitem first editor cpanelicon" group="metadata"><img src="img/glyphicons-67-tags.png" title="Metadatos"/></li>
+			<li id="metadata" class="mitem first editor cpanelicon" group="metadata"><img src="img/glyphicons-67-tags.png" i18n-key-title="i.menuMetadata" title="Metadatos"/></li>
 
-			<li id="preview_button" class="mitem first editor" group="preview"><img src="img/glyphicons-52-eye-open.png" title="Previsualizar"/></li>
+			<li id="preview_button" class="mitem first editor" group="preview"><img src="img/glyphicons-52-eye-open.png" i18n-key-title="i.menuPreview" title="Previsualizar"/></li>
 
-			<li id="save_editor" class="mitem first editor" group="editor"><img src="img/glyphicons-444-floppy-disk.png" title="Salvar recurso"/></li>
-			<li id="save_file_editor" class="mitem editor" group="editor"><img src="img/glyphicons-416-disk-open.png" title="Salvar"/></li>
-			<li id="save_scorm" class="mitem last withoutRightBorder editor" group="editor"><img src="img/glyphicons-364-cloud-download.png" title="Exportar a SCORM"/></li>
+			<li id="save_editor" class="mitem first editor" group="editor"><img src="img/glyphicons-444-floppy-disk.png" i18n-key-title="i.menuSaveLS" title="Salvar recurso"/></li>
+			<li id="save_file_editor" class="mitem editor" group="editor"><img src="img/glyphicons-416-disk-open.png" i18n-key-title="i.menuSaveFile" title="Salvar"/></li>
+			<li id="save_scorm" class="mitem last withoutRightBorder editor" group="editor"><img src="img/glyphicons-364-cloud-download.png" i18n-key-title="i.menuExportSCORM" title="Exportar a SCORM"/></li>
 
-			<li id="open_lsfile" class="mitem first editor cpanelicon" group="files"><img src="img/glyphicons-447-floppy-save.png" title="Cargar recurso"/></li>
+			<li id="open_lsfile" class="mitem first editor cpanelicon" group="files"><img src="img/glyphicons-447-floppy-save.png" i18n-key-title="i.menuLoadLS" title="Cargar recurso"/></li>
 			<li id="open" class="mitem first viewer editor" group="files">
 				<label for="openFileInput">
-					<img src="img/glyphicons-415-disk-save.png" title="Cargar fichero"/>
+					<img src="img/glyphicons-415-disk-save.png" i18n-key-title="i.menuLoadFile" title="Cargar fichero"/>
 				</label>
 				<input id="openFileInput" type="file" style="display:none" />
 			</li>
-			<li id="openurl" class="mitem viewer editor" group="files"><img src="img/glyphicons-365-cloud-upload.png" title="Cargar fichero por URL"/></li>
-			<li id="save" class="mitem last viewer" group="files"><img src="img/glyphicons-416-disk-open.png" title="Exportar a fichero"/></li>
+			<li id="openurl" class="mitem viewer editor" group="files"><img src="img/glyphicons-365-cloud-upload.png" i18n-key-title="i.menuLoadURL" title="Cargar fichero por URL"/></li>
+			<li id="save" class="mitem last viewer" group="files"><img src="img/glyphicons-416-disk-open.png" i18n-key-title="i.menuSaveFileViewer" title="Exportar a fichero"/></li>
 
-			<li viewMode="CODE" class="mitem first withoutLeftBorder viewer editor" group="view"><img src="img/glyphicons-151-edit.png" title="Vista Edición"/></li>
-			<li viewMode="SCORE" class="mitem editor" group="view"><img src="img/glyphicons-153-check.png" title="Escribir solución"/></li>
-			<li viewMode="HYBRID" class="mitem viewer editor" group="view"><img src="img/glyphicons-489-multiple-displays.png" title="Vista Híbrida"/></li>
-			<li viewMode="RESULT" class="mitem last viewer editor" group="view"><img src="img/glyphicons-87-display.png" title="Vista Resultado"/></li>
+			<li viewMode="CODE" class="mitem first withoutLeftBorder viewer editor" group="view"><img src="img/glyphicons-151-edit.png" i18n-key-title="i.menuEditionView" title="Vista Edición"/></li>
+			<li viewMode="SCORE" class="mitem editor" group="view"><img src="img/glyphicons-153-check.png" i18n-key-title="i.menuScoreView" title="Escribir solución"/></li>
+			<li viewMode="HYBRID" class="mitem viewer editor" group="view"><img src="img/glyphicons-489-multiple-displays.png" i18n-key-title="i.menuHybridView" title="Vista Híbrida"/></li>
+			<li viewMode="RESULT" class="mitem last viewer editor" group="view"><img src="img/glyphicons-87-display.png" i18n-key-title="i.menuResultView" title="Vista Resultado"/></li>
 			
-			<li id="run" class="mitem unique viewer editor"><img src="img/glyphicons-221-play-button.png" title="Run Code"/></li>
-			<li id="settings" class="mitem unique viewer editor cpanelicon"><img src="img/glyphicons-137-cogwheel.png" title="Settings"/></li>
-			<li id="fullscreen_button" class="mitem unique viewer editor"><img id="fullscreen_img" title="Pantalla completa"/></li>
+			<li id="run" class="mitem unique viewer editor"><img src="img/glyphicons-221-play-button.png" i18n-key-title="i.menuRunCode" title="Run Code"/></li>
+			<li id="settings" class="mitem unique viewer editor cpanelicon"><img src="img/glyphicons-137-cogwheel.png" i18n-key-title="i.menuSetings" title="Settings"/></li>
+			<li id="fullscreen_button" class="mitem unique viewer editor"><img id="fullscreen_img" i18n-key-title="i.menuFullScreen" title="Pantalla completa"/></li>
 		</ul>
 	</div>
 
@@ -107,10 +109,10 @@
 
 	<div id="settings_panel" class="cpanel" >
 		<img class="close_panel_button" src="img/glyphicons-198-remove.png" onclick="CODEditor.Utils.closePanels();"/>
-		<div class="title">Opciones</div>
+		<div i18n-key="i.settingsPanelOptions" class="title">Opciones</div>
 		<table>
 			<tr>
-				<td>Modo</td>
+				<td i18n-key="i.settingsPanelMode">Modo</td>
 				<td>
 					<select id="settings_mode" size="1">
 						<option value="HTML">HTML</option>
@@ -119,7 +121,7 @@
 			  	</td>
 			</tr>
 			<tr>
-				<td>Theme</td>
+				<td i18n-key="i.settingsPanelTheme">Theme</td>
 				<td>
 					<select id="settings_theme" size="1">
 						<option value="Chrome">Chrome</option>
@@ -128,7 +130,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td>Font Size</td>
+				<td i18n-key="i.settingsPanelFontSize">Font Size</td>
 				<td>
 					<select id="settings_fontsize" size="1">
 						<option value="10px">10px</option>
@@ -198,17 +200,17 @@
 
 	<div id="score_function_panel" class="cpanel">
 		<img class="close_panel_button" src="img/glyphicons-198-remove.png" onclick="CODEditor.Utils.closePanels();"/>
-		<div class="title">Score function</div>
+		<div class="title" i18n-key="i.ScorePanelTitle">Score function</div>
 
-		<p class="panel_section_title">Variables del ejercicio</p>
+		<p class="panel_section_title" i18n-key="i.ScorePanelVars">Variables del ejercicio</p>
 		<div>
-			<div class="codeditor_button" action="add_score_var">Añadir variable</div>
+			<div class="codeditor_button" action="add_score_var" i18n-key="i.ScorePanelAddVar">Añadir variable</div>
 			<input id="score_var_name_input" type="text">
 		</div>
 		<div>
 			<select id="score_vars_select" size="1">
 			</select>
-			<div class="codeditor_button" action="delete">Borrar</div>
+			<div class="codeditor_button" action="delete" i18n-key="i.delete">Borrar</div>
 		</div>
 	</div>
 
@@ -216,7 +218,7 @@
 		<img class="close_panel_button" src="img/glyphicons-198-remove.png" onclick="CODEditor.Utils.closePanels();"/>
 		<div class="title">HTML</div>
 
-		<p class="panel_section_title">Librerías</p>
+		<p class="panel_section_title" i18n-key="i.htmlPanelLibraries">Librerías</p>
 		<table class="tlist libraries">
 			<tr>
 				<td><input value="jquery" type="checkbox"/></td>

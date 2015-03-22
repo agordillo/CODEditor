@@ -32,6 +32,11 @@ CODEditor.Utils = (function(C,$,undefined){
 		String.prototype.isLatin=function(){
 			return this==this.latinise()
 		}
+
+		String.prototype.replaceAll = function(find,replace){
+			var str = this;
+			return str.replace(new RegExp(find.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), replace);
+		};
 	};
 
 	var moveElementInArray = function(array, fromIndex, toIndex) {

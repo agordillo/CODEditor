@@ -236,7 +236,7 @@ CODEditor.UI = (function(C,$,undefined){
 
 		if(C.CORE.isEditorMode()){
 			//Add "New Exercise" button
-			var newExerciseButton = $('<div id="newExerciseButton" class="codeditor_button"><img src="img/glyphicons-433-plus.png"/> Crear nuevo ejercicio</div>');
+			var newExerciseButton = $('<div id="newExerciseButton" class="codeditor_button"><img src="img/glyphicons-433-plus.png"/> ' + C.I18n.getTrans("i.createNewExercise") + '</div>');
 			$(menuDOM).prepend(newExerciseButton);
 
 			$("#newExerciseButton").click(function(){

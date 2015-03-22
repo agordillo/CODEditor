@@ -42,6 +42,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 
 	var init = function(options){
+		C.I18n.init();
 
 		if(typeof options !== "object") {
 			options = {};
@@ -158,19 +159,19 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		//Title
 		var exerciseTitleDOM = $("#exercise_title");
-		var exerciseTitleInput = $('<input id="exerciseTitleInput" placeholder="Título del ejercicio" type="text"/>');
+		var exerciseTitleInput = $('<input id="exerciseTitleInput" placeholder="' + CODEditor.I18n.getTrans("i.exerciseTitle") + '" type="text"/>');
 		$(exerciseTitleDOM).append(exerciseTitleInput);
 
 		//Description
 		$("#exercise_description").show();
-		var exerciseDescriptionTextArea = $('<textarea id="exerciseDescriptionTextArea" placeholder="Descripción"></textarea>');
+		var exerciseDescriptionTextArea = $('<textarea id="exerciseDescriptionTextArea" placeholder="' + CODEditor.I18n.getTrans("i.description") + '"></textarea>');
 		$("#exercise_description").append(exerciseDescriptionTextArea);
 
 		//Test
 		var testWrapper = $("#test_menu_wrapper");
 
 		//Test: Title
-		var testTitleInput = $('<input id="testTitleInput" placeholder="Título del test" type="text"/>');
+		var testTitleInput = $('<input id="testTitleInput" placeholder="' + C.I18n.getTrans("i.testTitle") + '" type="text"/>');
 		$(testTitleInput).insertBefore("#test_title");
 		$("#test_title").remove();
 
@@ -255,7 +256,7 @@ CODEditor.CORE = (function(C,$,undefined){
 					var key = localStorage.key(i);
 					var record = JSON.parse(localStorage.getItem(key));
 					var resource = record.resource;
-					var recordTitle = "Sin título" + " (Salvado el " + CODEditor.Utils.getReadableDate(record.saved_at) +  ")";
+					var recordTitle = C.I18n.getTrans("i.untitled") + " (Salvado el " + CODEditor.Utils.getReadableDate(record.saved_at) +  ")";
 					if((typeof resource.title == "string")&&(resource.title.trim()!=="")){
 						recordTitle = resource.title;
 					}
@@ -484,7 +485,7 @@ CODEditor.CORE = (function(C,$,undefined){
 				}
 				dialogTitle = $("#testTitleInput").val();
 				if(dialogTitle.trim()===""){
-					dialogTitle = "Sin título";
+					dialogTitle = C.I18n.getTrans("i.untitled");
 				}
 				C.UI.updateTestMenuDialog();
 			} else {
@@ -611,7 +612,7 @@ CODEditor.CORE = (function(C,$,undefined){
 				$('<iframe class="preview_iframe" src="index.html"></iframe>').dialog({
 					autoOpen: true,
 					dialogClass:'previewDialog',
-					title: "Vista Previa",
+					title: C.I18n.getTrans("i.previewDialogTitle"),
 					width: "90%",
 					height: 500,
 					closeOnEscape: true,
@@ -628,7 +629,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		$("#test_settings").click(function(){
 			if(typeof _currentTest == "undefined"){
 				//Create Test
-				var r = confirm("¿Estás seguro de que quieres convertir este ejercicio en un Test?");
+				var r = confirm(C.I18n.getTrans("i.createTestConfirmation"));
 				if (r === true) {
 					_onCreateTest();
 				}
@@ -1331,7 +1332,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		if((typeof getCurrentResource() != "undefined")&&(typeof getCurrentResource().title == "string")&&(getCurrentResource().title.trim()!="")){
 			return getCurrentResource().title;
 		}
-		return "Sin título";
+		return C.I18n.getTrans("i.untitled");
 	};
 
 	var _changeViewMode = function(viewMode){
