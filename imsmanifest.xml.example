@@ -52,11 +52,11 @@
       <educational>
         <interactivityType>
           <source>LOMv1.0</source>
-          <value>mixed</value>
+          <value>active</value>
         </interactivityType>
         <learningResourceType>
           <source>LOMv1.0</source>
-          <value>lecture</value>
+          <value>exercise</value>
         </learningResourceType>
         <interactivityLevel>
           <source>LOMv1.0</source>
@@ -68,8 +68,21 @@
         </intendedEndUserRole>
         <context>
           <source>LOMv1.0</source>
-          <value>school</value>
+          <value>higher education</value>
         </context>
+        <typicalAgeRange>
+          <string language="en">15 - 18</string>
+        </typicalAgeRange>
+        <difficulty>
+          <source>LOMv1.0</source>
+          <value>medium</value>
+        </difficulty>
+        <typicalLearningTime>
+          <duration>PT40M</duration>
+        </typicalLearningTime>
+        <description>
+          <string language="es">LO description</string>
+        </description>
         <language>es</language>
       </educational>
       <rights>
@@ -87,13 +100,13 @@
   <organizations default="defaultOrganization">
     <organization identifier="defaultOrganization" structure="hierarchical">
       <title>CODEditor</title>
-      <item identifier="CODEditor_v2" identifierref="CODEditor_v2_resource">
-        <title>CODEditor v2</title>
+      <item identifier="CODEditor" identifierref="CODEditor_resource">
+        <title>CODEditor</title>
       </item>
     </organization>
   </organizations>
   <resources>
-    <resource identifier="CODEditor_v2_resource" type="webcontent" href="index.html" adlcp:scormType="sco">
+    <resource identifier="CODEditor_resource" type="webcontent" href="index.html" adlcp:scormType="sco">
       <file href="index.html"/>
     </resource>
   </resources>

@@ -1116,6 +1116,156 @@ CODEditor.CORE = (function(C,$,undefined){
 			
 			var filesCount = 2;
 
+			var metadata = C.UI.getMetadataFromUI();
+			if((typeof metadata == "object")&&(Object.keys(metadata).length > 0)){
+				//Modify imsmanifest.xml
+				JSZipUtils.getBinaryContent("imsmanifest.xml", function (err, data) {
+					if(err) {
+						throw err;
+					}
+					
+					//ArrayBuffer to String
+					var xmlContent = String.fromCharCode.apply(null, new Uint8Array(data));
+
+					//Generate LOM Metadata in XML format (using marknote library: https://code.google.com/p/marknote/wiki/DevelopersGuide)
+					var parser = new marknote.Parser();
+					var XML_LOM_Metadata = parser.parse(xmlContent);
+					var LOM_element = XML_LOM_Metadata.rootElement.getChildElement("metadata").getChildElement("lom");
+
+					//Extra vars
+					var metadata_language = (typeof metadata.language == "string") ? metadata.language : "en";
+					var metadata_title = C.Utils.encodeForXML(metadata.title);
+					var metadata_description = C.Utils.encodeForXML(metadata.description);
+
+					//<general>
+					var generalElement = LOM_element.getChildElement("general");
+					
+					if(typeof metadata_title === "string"){
+						var titleElement = new marknote.Element("title");
+						var titleStringElement = new marknote.Element("string");
+						titleStringElement.setAttribute("language", metadata_language);
+						titleStringElement.setText(metadata_title);
+						titleElement.addChildElement(titleStringElement);
+						generalElement.addChildElement(titleElement);
+					}
+
+					if(typeof metadata.language === "string"){
+						var languageElement = new marknote.Element("language");
+						languageElement.setText(metadata.language);
+						generalElement.addChildElement(languageElement);
+					}
+
+					if(typeof metadata_description === "string"){
+						var descriptionElement = new marknote.Element("description");
+						var descriptionStringElement = new marknote.Element("string");
+						descriptionStringElement.setAttribute("language", metadata_language);
+						descriptionStringElement.setText(metadata_description);
+						// var descriptionCDATA = new marknote.CDATA(metadata_description);
+						// descriptionStringElement.addContent(descriptionCDATA);
+						descriptionElement.addChildElement(descriptionStringElement);
+						generalElement.addChildElement(descriptionElement);
+					}
+
+					if(metadata.keywords instanceof Array){
+						var keywordsLength = metadata.keywords.length;
+						for(var i=0; i<keywordsLength; i++){
+							var keywordElement = new marknote.Element("keyword");
+							var keywordStringElement = new marknote.Element("string");
+							keywordStringElement.setAttribute("language", metadata_language);
+							keywordStringElement.setText(metadata.keywords[i]);
+							keywordElement.addChildElement(keywordStringElement);
+							generalElement.addChildElement(keywordElement);
+						}
+					}
+
+					var structureElement = new marknote.Element("structure");
+					var structureSourceElement = new marknote.Element("source");
+					structureSourceElement.setText("LOMv1.0");
+					var structureValueElement = new marknote.Element("value");
+					var LO_structure = (currentResource.type==="test") ? "linear" : "atomic";
+					structureValueElement.setText(LO_structure);
+					structureElement.addChildElement(structureSourceElement);
+					structureElement.addChildElement(structureValueElement);
+					generalElement.addChildElement(structureElement);
+
+					var aggregationElement = new marknote.Element("aggregationLevel");
+					var aggregationSourceElement = new marknote.Element("source");
+					aggregationSourceElement.setText("LOMv1.0");
+					var aggregationValueElement = new marknote.Element("value");
+					var LO_aggregation = (currentResource.type==="test") ? 2 : 1;
+					aggregationValueElement.setText(LO_aggregation);
+					aggregationElement.addChildElement(aggregationSourceElement);
+					aggregationElement.addChildElement(aggregationValueElement);
+					generalElement.addChildElement(aggregationElement);
+
+					//<technical>
+					var technicalElement = LOM_element.getChildElement("technical");
+					var toolElement = technicalElement.getChildElement("otherPlatformRequirements").getChildElementAt(1);
+					if(toolElement instanceof marknote.Element){
+						toolElement.setText("CODEditor " + CODEditor.VERSION + " (http://github.com/agordillo/CodeEditorApp)");
+					}
+					
+					//<educational>
+					var educationalElement = LOM_element.getChildElement("educational");
+
+					if(typeof metadata.age_range === "string"){
+						var ageElement = new marknote.Element("typicalAgeRange");
+						var ageStringElement = new marknote.Element("string");
+						ageStringElement.setAttribute("language", metadata_language);
+						ageStringElement.setText(metadata.age_range);
+						ageElement.addChildElement(ageStringElement);
+						educationalElement.addChildElement(ageElement);
+					}
+
+					if(typeof metadata.difficulty === "string"){
+						var difficultyElement = new marknote.Element("difficulty");
+						var difficultySourceElement = new marknote.Element("source");
+						difficultySourceElement.setText("LOMv1.0");
+						var difficultyValueElement = new marknote.Element("value");
+						difficultyValueElement.setText(metadata.difficulty);
+						difficultyElement.addChildElement(difficultySourceElement);
+						difficultyElement.addChildElement(difficultyValueElement);
+						educationalElement.addChildElement(aggregationElement);
+					}
+
+					if(typeof metadata.TLT === "string"){
+						var TLTElement = new marknote.Element("typicalLearningTime");
+						var TLTdurationElement = new marknote.Element("duration");
+						TLTdurationElement.setText(metadata.TLT);
+						TLTElement.addChildElement(TLTdurationElement);
+						educationalElement.addChildElement(TLTElement);
+					}
+
+					if(typeof metadata_description === "string"){
+						var eDescriptionElement = new marknote.Element("description");
+						var eDescriptionStringElement = new marknote.Element("string");
+						eDescriptionStringElement.setAttribute("language", metadata_language);
+						eDescriptionStringElement.setText(metadata_description);
+						// var eDescriptionCDATA = new marknote.CDATA(metadata_description);
+						// eDescriptionStringElement.addContent(eDescriptionCDATA);
+						eDescriptionElement.addChildElement(eDescriptionStringElement);
+						educationalElement.addChildElement(eDescriptionElement);
+					}
+
+					if(typeof metadata.language === "string"){
+						var eLanguageElement = new marknote.Element("language");
+						eLanguageElement.setText(metadata.language);
+						educationalElement.addChildElement(eLanguageElement);
+					}
+
+
+					xmlContent = XML_LOM_Metadata.toString("  ");
+					zip.file("imsmanifest.xml", xmlContent);
+
+					filesCount -= 1;
+					if(filesCount===0){
+						_onFinishExportSCORM(zip);
+					}
+				});
+			} else {
+				filesCount -= 1;
+			}
+
 			//Modify index.html
 			JSZipUtils.getBinaryContent("index.html", function (err, data) {
 				if(err) {
@@ -1130,27 +1280,6 @@ CODEditor.CORE = (function(C,$,undefined){
 				
 				indexHTMLContent = (indexHTMLContent.substr(0, position) + "    " + fileScript + "\n" + indexHTMLContent.substr(position));
 				zip.file("index.html", indexHTMLContent);
-
-				filesCount -= 1;
-				if(filesCount===0){
-					_onFinishExportSCORM(zip);
-				}
-			});
-
-			//Modify imsmanifest.xml
-			JSZipUtils.getBinaryContent("imsmanifest.xml", function (err, data) {
-				if(err) {
-					throw err;
-				}
-				
-				//ArrayBuffer to String
-				var xmlContent = String.fromCharCode.apply(null, new Uint8Array(data));
-				var position = xmlContent.indexOf('</lom>');
-
-				var XML_LOM_Metadata = 'Metadata TEST';
-				
-				xmlContent = (xmlContent.substr(0, position) + "  " + XML_LOM_Metadata + "\n    " + xmlContent.substr(position));
-				zip.file("imsmanifest.xml", xmlContent);
 
 				filesCount -= 1;
 				if(filesCount===0){
