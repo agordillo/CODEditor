@@ -642,6 +642,14 @@ CODEditor.CORE = (function(C,$,undefined){
 			}
 		});
 
+		$("#new_resource").click(function(){
+			//Create new resource
+			var r = confirm(C.I18n.getTrans("i.createResourceConfirmation"));
+			if (r === true) {
+				_onCreateNewResource();
+			}
+		});
+
 		$("#editor_tab p").click(function(){
 
 			var isActive = $(this).hasClass("active");
@@ -1712,6 +1720,13 @@ CODEditor.CORE = (function(C,$,undefined){
 		C.UI.adjustView();
 	};
 
+	var _unloadTestEditor = function(){
+		$("#test_header").css("display","none");
+		$("#test_menu_wrapper").css("display","none");
+		$("#testTitleInput").val("");
+		$("#test_settings").find("img").attr("title",C.I18n.getTrans("i.menuCreateTest"));
+	};
+
 	var _onCreateTest = function(){
 		var errors = _saveCurrentJSON({raise_errors: true});
 		if(errors.length === 0){
@@ -1722,6 +1737,23 @@ CODEditor.CORE = (function(C,$,undefined){
 			_loadJSON(_currentTest);
 			$("#testTitleInput").focus();
 		}
+	};
+
+	var _onCreateNewResource = function(){
+		_currentExcercise = {};
+		_currentExcercise.type = "exercise";
+		_currentExcercise.title = "";
+		_currentExcercise.description = "";
+		_currentExcercise.editorMode = _currentEditorMode;
+		_currentExcercise.content = "";
+
+		_currentTest = undefined;
+		_currentExerciseIndex = undefined;
+		_currentLSKey = undefined;
+		_unloadTestEditor();
+
+		_loadJSON(_currentExcercise);
+		$("#exerciseTitleInput").focus();
 	};
 
 	var _openEditorTestPanel = function(){
