@@ -800,7 +800,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		//Look for JSON files
 		if(fileType.trim()===""){
-			if(file.name.match(/[aA-zZ0-9-]+\.json$/)){
+			if(file.name.match(/\.json$/)){
 				//fileName ends with ".json"
 				return "application/json";
 			}
@@ -930,7 +930,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		var currentResource = getCurrentResource();
 
 		if(typeof currentResource === "object"){
-			var filename = getCurrentResourceTitle() + ".txt";
+			var filename = getCurrentResourceTitle() + ".json";
 			var dataToDownload = JSON.stringify(currentResource);
 			var blob = new Blob([dataToDownload], {type: "text/plain;charset=utf-8"});
 			saveAs(blob, filename);
