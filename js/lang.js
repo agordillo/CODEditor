@@ -98,6 +98,7 @@ var CODEditor_i18n = {
 		"i.loadFileURLBody"				: "Type the URL of the file to load:",
 		"i.load"						: "Load",
 		"i.solution"					: "Solution",
+		"i.exitConfirmation"			: "You are about to leave CODEditor. You will lose any changes you have not saved.",
 
 		"i.validationInvalidJSON"		: "Invalid json. Is not an object.",
 		"i.validationInvalidType"		: "Invalid 'type' value.",
@@ -227,6 +228,7 @@ var CODEditor_i18n = {
 		"i.loadFileURLBody"				: "Introduzca la URL del fichero a cargar:",
 		"i.load"						: "Cargar",
 		"i.solution"					: "Solución",
+		"i.exitConfirmation"			: "Vas a abandonar CODEditor. Se perderán todos los cambios que no hayas salvado.",
 
 		"i.validationInvalidJSON"		: "JSON inválido. No es un objeto.",
 		"i.validationInvalidType"		: "El valor de 'type' no es válido.",

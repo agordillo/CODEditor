@@ -33,6 +33,8 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _currentLSKey;
 
+	var _lastSavedResource;
+
 	var _examples = {};
 
 	var _currentUser;
@@ -372,8 +374,15 @@ CODEditor.CORE = (function(C,$,undefined){
 		};
 
 		window.onbeforeunload = function(){
-			if(C.SCORM.isConnected()){
-				C.SCORM.onExit();
+			if(isViewerMode()){
+				if(C.SCORM.isConnected()){
+					C.SCORM.onExit();
+				}
+			} else {
+				//Editor mode
+				if(_hasResourceChanged()){
+					return C.I18n.getTrans("i.exitConfirmation");
+				}
 			}
 		};
 
@@ -571,7 +580,6 @@ CODEditor.CORE = (function(C,$,undefined){
 			var fileURL = $(input).val();
 			var dialogDOM = $("#file_url_dialog");
 			$(dialogDOM).dialog('close');
-			//TODO
 			_onGetExternalJSONFile(fileURL);
 		});
 
@@ -940,6 +948,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		if(typeof currentResource === "object"){
 			var filename = getCurrentResourceTitle() + ".json";
 			var dataToDownload = JSON.stringify(currentResource);
+			_lastSavedResource = dataToDownload;
 			var blob = new Blob([dataToDownload], {type: "text/plain;charset=utf-8"});
 			saveAs(blob, filename);
 
@@ -969,6 +978,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 			_currentLSKey = key;
 			localStorage.setItem(key,JSON.stringify(record));
+			_lastSavedResource = JSON.stringify(currentResource);
 
 			C.Utils.showDialog(C.I18n.getTrans("i.savedSuccessfully"));
 		}
@@ -1641,8 +1651,6 @@ CODEditor.CORE = (function(C,$,undefined){
 		} else {
 			//Show exit feature
 			$("ul.menu li[group*='exerciseonlydefault']").css("display","inline-block");
-			//Hide examples...
-			//TODO
 		}
 
 		C.UI.cleanPreview();
@@ -2459,6 +2467,41 @@ CODEditor.CORE = (function(C,$,undefined){
 				_addScoreVar(detectedVars[j]);
 			}
 		}
+	};
+
+	var _hasResourceChanged = function(){
+		_saveCurrentJSON({raise_errors: false});
+		var currentResource = getCurrentResource();
+		if((typeof _lastSavedResource == "undefined")||(typeof currentResource == "undefined")){
+			return (!_isEmptyResource(currentResource));
+		}
+		return (_lastSavedResource!==JSON.stringify(currentResource));
+	};
+
+	var _isEmptyResource = function(resource){
+		if(typeof resource !== "object"){
+			return true;
+		}
+
+		try {
+			var commonFieldsEmpty = ((resource.title.trim()==="")&&((typeof resource.description == "undefined")||(resource.description.trim()===""))&&((typeof resource.metadata != "object")||(Object.keys(resource.metadata).length<2)));
+			switch(resource.type){
+				case "exercise":
+					if((commonFieldsEmpty)&&(resource.content.trim()==="")&&(typeof resource.parsed_score_function == "undefined")&&(typeof resource.score_function == "undefined")){
+						return true;
+					}
+					break;
+				case "test":
+					if((commonFieldsEmpty)&&((typeof resource.parsed_exercises == "undefined")||(resource.parsed_exercises.length===1))&&(_isEmptyResource(resource.parsed_exercises[0]))){
+						return true;
+					}
+					break;
+				default:
+					break;
+			}
+		} catch (e){}
+
+		return false;
 	};
 
 	return {
