@@ -13,13 +13,13 @@ CODEditor.I18n = (function(C,$,undefined){
 		var i18n = CODEditor_i18n;
 		_defaultTranslations = i18n[_defaultLanguage];
 
-		// if((typeof lang != "string")||(typeof i18n[lang] != "object")){
-		// 	//Try to infer language from browser
-		// 	var userLang = navigator.language || navigator.userLanguage;
-		// 	if(typeof userLang == "string"){
-		// 		lang = userLang;
-		// 	}
-		// }
+		if((typeof lang != "string")||(typeof i18n[lang] != "object")){
+			//Try to infer language from browser
+			var userLang = navigator.language || navigator.userLanguage;
+			if(typeof userLang == "string"){
+				lang = userLang;
+			}
+		}
 
 		//Set language
 		if((typeof lang == "string")&&(typeof i18n[lang] == "object")){
