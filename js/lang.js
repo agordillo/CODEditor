@@ -95,6 +95,7 @@ var CODEditor_i18n = {
 		"i.loadFileURLTitle"			: "Load file from Internet",
 		"i.loadFileURLBody"				: "Type the URL of the file to load:",
 		"i.load"						: "Load",
+		"i.solution"					: "Solution",
 
 		"i.validationInvalidJSON"		: "Invalid json. Is not an object.",
 		"i.validationInvalidType"		: "Invalid 'type' value.",
@@ -221,6 +222,7 @@ var CODEditor_i18n = {
 		"i.loadFileURLTitle"			: "Cargar fichero de Internet",
 		"i.loadFileURLBody"				: "Introduzca la URL del fichero a cargar:",
 		"i.load"						: "Cargar",
+		"i.solution"					: "Solución",
 
 		"i.validationInvalidJSON"		: "JSON inválido. No es un objeto.",
 		"i.validationInvalidType"		: "El valor de 'type' no es válido.",

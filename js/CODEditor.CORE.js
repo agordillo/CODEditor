@@ -40,6 +40,8 @@ CODEditor.CORE = (function(C,$,undefined){
 	//Enable debugging
 	var _debug = false;
 
+	_URLparams = {};
+
 
 	var init = function(options){
 		C.I18n.init();
@@ -52,9 +54,9 @@ CODEditor.CORE = (function(C,$,undefined){
 			_isViewer = options.viewer;
 		}
 
-		var URLparams = C.Utils.readURLparams();
+		_URLparams = C.Utils.readURLparams();
 
-		if(URLparams["debug"] === "true"){
+		if(_URLparams["debug"] === "true"){
 			_debug = true;
 		}
 
@@ -78,25 +80,29 @@ CODEditor.CORE = (function(C,$,undefined){
 			_initEditor();
 		}
 
-		if(typeof URLparams["file"] === "string"){
-			_onGetExternalJSONFile(URLparams["file"],URLparams);
+		if(typeof _URLparams["file"] === "string"){
+			_onGetExternalJSONFile(_URLparams["file"],{initExerciseMode: true});
 		} else if(typeof options.file == "object") {
 			if(_isValidJSON(options.file)){
 				_initExerciseMode(options.file);
 			} else {
 				C.Utils.showDialog(C.I18n.getTrans("i.invalidResourceToLoad"));
-				_initDefaultMode(URLparams);
+				_initDefaultMode();
 			}
 		} else {
-			if((_debug)&&(typeof URLparams["example"] === "string")){
-				_initExerciseMode(C.Samples.getExample(URLparams["example"]));
+			if((_debug)&&(typeof _URLparams["example"] === "string")){
+				_initExerciseMode(C.Samples.getExample(_URLparams["example"]));
 			} else {
-				_initDefaultMode(URLparams);
+				_initDefaultMode();
 			}
 		}
 	};
 
-	var _onGetExternalJSONFile = function(fileURL,initParams){
+	var _onGetExternalJSONFile = function(fileURL,options){
+		if(typeof options != "object"){
+			options = {};
+		}
+
 		if((typeof fileURL !== "string")||(fileURL.trim() === "")){
 			return C.Utils.showDialog(C.I18n.getTrans("i.invalidResourceURL"));
 		}
@@ -111,42 +117,36 @@ CODEditor.CORE = (function(C,$,undefined){
 			//On success
 			if(_isValidJSON(json)){
 				if(isViewerMode()){
-					if(C.Utils.isHistorySupported()){
-						var URLparams = C.Utils.readURLparams();
-						if(typeof URLparams["file"] === "undefined"){
-							URLparams["file"] = fileURL;
-						}
-						var newURL = C.Utils.buildURLwithParams(URLparams);
-						window.history.replaceState("","",newURL);
+					if(options.initExerciseMode===true){
+						_initExerciseMode(json);
+					} else {
+						_loadJSON(json);
 					}
+				} else {
+					_currentLSKey = undefined;
+					_initExerciseMode(json);
 				}
-				_currentLSKey = undefined;
-				_initExerciseMode(json);
 			} else {
 				C.Utils.showDialog(C.I18n.getTrans("i.invalidResourceToLoad"));
-				if(typeof initParams !== "undefined"){
-					_initDefaultMode(initParams);
-				}
+				_initDefaultMode();
 			}
 		}, function(jqXHR,textStatus,errorThrown){
 			//On failure
 			C.Utils.showDialog(C.I18n.getTrans("i.errorLoadingResourceURL",{url: fileURL}));
-			if(typeof initParams !== "undefined"){
-				_initDefaultMode(initParams);
-			}
+			__URLparams();
 		});
 	};
 
 	//Init CODeditor when no excercise is loaded
-	var _initDefaultMode = function(initParams){
+	var _initDefaultMode = function(){
 		_isDefaultMode = true;
 
 		if(isViewerMode()){
 			$("ul.menu li[group*='examples']").css("display","inline-block");
 			_populateExamples();
 
-			if(typeof initParams["emode"] === "string"){
-				_changeEditorMode(initParams["emode"]);
+			if(typeof _URLparams["emode"] === "string"){
+				_changeEditorMode(_URLparams["emode"]);
 			}
 
 			C.SCORM.init();
@@ -195,6 +195,9 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _initExerciseMode = function(json){
 		_isDefaultMode = false;
+
+		//Hide examples
+		$("ul.menu li[group*='examples']").css("display","none");
 
 		_loadJSON(json);
 
@@ -568,6 +571,7 @@ CODEditor.CORE = (function(C,$,undefined){
 			var fileURL = $(input).val();
 			var dialogDOM = $("#file_url_dialog");
 			$(dialogDOM).dialog('close');
+			//TODO
 			_onGetExternalJSONFile(fileURL);
 		});
 
@@ -881,15 +885,29 @@ CODEditor.CORE = (function(C,$,undefined){
 			C.Utils.showDialog(C.I18n.getTrans("i.fileSaverSupportDeny"));
 		}
 
-		var filename = "file.txt";
+		var filename = C.I18n.getTrans("i.untitled");
+		if(typeof _currentExercise != "undefined"){
+			if((typeof _currentExercise.title == "string")&&(_currentExercise.title.trim()!=="")){
+				filename = _currentExercise.title;
+			}
+			filename +=  " - " + C.I18n.getTrans("i.solution");
+		}
+
 		switch(_currentEditorMode){
 			case "HTML":
-				filename = "index.html";
+				if(typeof _currentExercise == "undefined"){
+					filename = "index";
+				}
+				filename += ".html";
 				break;
 			case "JavaScript":
-				filename = "script.js";
+				if(typeof _currentExercise == "undefined"){
+					filename = "script";
+				}
+				filename += ".js";
 				break;
 			default:
+				filename += ".txt";
 				return;
 		}
 
@@ -1405,12 +1423,16 @@ CODEditor.CORE = (function(C,$,undefined){
 						aceMode = "ace/mode/javascript";
 						if(_isScore){
 							$("#editor_tab p").html("score.js");
-							$("ul.menu li[viewmode='CODE']").removeClass("active");
-							$("ul.menu li[viewmode='SCORE']").addClass("active");
+							if(_currentViewMode!=="HYBRID"){
+								$("ul.menu li[viewmode='CODE']").removeClass("active");
+								$("ul.menu li[viewmode='SCORE']").addClass("active");
+							}
 						} else {
 							$("#editor_tab p").html("script.js");
-							$("ul.menu li[viewmode='CODE']").addClass("active");
-							$("ul.menu li[viewmode='SCORE']").removeClass("active");
+							if(_currentViewMode!=="HYBRID"){
+								$("ul.menu li[viewmode='CODE']").addClass("active");
+								$("ul.menu li[viewmode='SCORE']").removeClass("active");
+							}
 						}
 						break;
 					default:
@@ -1598,13 +1620,21 @@ CODEditor.CORE = (function(C,$,undefined){
 		$("ul.menu li[group='exercise']").css("display","inline-block");
 
 		if(_isDefaultMode!==true){
-			//Disallow loading
+			//Disallow loading files/resources
 			$("#openFileInput").attr("disabled","disabled");
 			$("label[for=openFileInput]").attr("disabled","disabled");
+			$("#open").hide();
+
 			$("#openurl").attr("disabled","disabled");
+			$("#openurl").hide();
+
+			$("#refresh").addClass("last");
+			$("#save").removeClass("first").removeClass("last").addClass("unique");
 		} else {
 			//Show exit feature
-			$("ul.menu li[group*='exercise']").css("display","inline-block");
+			$("ul.menu li[group*='exerciseonlydefault']").css("display","inline-block");
+			//Hide examples...
+			//TODO
 		}
 
 		C.UI.cleanPreview();
@@ -1934,13 +1964,6 @@ CODEditor.CORE = (function(C,$,undefined){
 		_changeEditorMode(_editorModeToSet);
 		
 		C.UI.adjustView();
-
-		if(C.Utils.isHistorySupported()){
-			var URLparams = C.Utils.readURLparams();
-			delete URLparams.file;
-			var newURL = C.Utils.buildURLwithParams(URLparams);
-			window.history.replaceState("","",newURL);
-		}
 	};
 
 
