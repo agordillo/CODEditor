@@ -1863,6 +1863,14 @@ CODEditor.CORE = (function(C,$,undefined){
 						//score should be a number, or a object like {*score: {number}, errors: [], feedback: []}
 
 						var scoreFunctionVariablesHash = {};
+
+						if((!(json.score_function_vars instanceof Array))&&(typeof json.score_function_vars == "object")&&(typeof json.score_function_vars.length == "number")){
+							//Convert json.score_function_vars to array if it's not detected as a real array
+							try {
+								json.score_function_vars = jQuery.extend([], json.score_function_vars);
+							} catch(e){}
+						}
+
 						if(json.score_function_vars instanceof Array){
 							for(var sfv=0; sfv<json.score_function_vars.length; sfv++){
 								if(typeof json.score_function_vars[sfv] == "string"){
