@@ -56,7 +56,7 @@ CODEditor.Score = (function(C,$,undefined){
 				var successesContentWrapper = $("<div class='successes_content_wrapper output_content_wrapper'></div>");
 				var successesContent = $("<pre class='successes'></pre>");
 				
-				$(successesHeader).append("Aciertos");
+				$(successesHeader).append(C.I18n.getTrans("i.successes"));
 				for(var s=0; s<score.successes.length; s++){
 					$(successesContent).append("<img class='success_icon' src='img/success_icon.png'/>" + C.Utils.purgeTextString(score.successes[s]) + "\n");
 				}
@@ -75,7 +75,7 @@ CODEditor.Score = (function(C,$,undefined){
 				var errorsContentWrapper = $("<div class='errors_content_wrapper output_content_wrapper'></div>");
 				var errorsContent = $("<pre class='errors'></pre>");
 				
-				$(errorsHeader).append("Errores");
+				$(errorsHeader).append(C.I18n.getTrans("i.errors"));
 				for(var e=0; e<score.errors.length; e++){
 					$(errorsContent).append("<img class='error_icon' src='img/error_icon.png'/>" + C.Utils.purgeTextString(score.errors[e]) + "\n");
 				}
@@ -94,7 +94,7 @@ CODEditor.Score = (function(C,$,undefined){
 				var feedbackContentWrapper = $("<div class='feedback_content_wrapper output_content_wrapper'></div>");
 				var feedbackContent = $("<pre class='feedback'></pre>");
 				
-				$(feedbackHeader).append("Feedback");
+				$(feedbackHeader).append(C.I18n.getTrans("i.feedback"));
 				for(var f=0; f<score.feedback.length; f++){
 					$(feedbackContent).append(C.Utils.purgeTextString(score.feedback[f]) + "\n\n");
 				}
@@ -112,11 +112,11 @@ CODEditor.Score = (function(C,$,undefined){
 
 			if(score.score >= 5){
 				$(overallScoreDOM).addClass("passed");
-				$(overallScoreDOM).append("<p><img class='success_icon' src='img/success_icon.png'/> ¡La solución es correcta!</p>");
-				$(overallScoreDOM).append("<p>Puntuación: <span class='overall_score'>" + score.score.toString() + "</span>/10</p>");
+				$(overallScoreDOM).append("<p><img class='success_icon' src='img/success_icon.png'/> " + C.I18n.getTrans("i.scoreCorrectSolution") + "</p>");
+				$(overallScoreDOM).append("<p>" + C.I18n.getTrans("i.score") + ": <span class='overall_score'>" + score.score.toString() + "</span>/10</p>");
 			} else {
 				$(overallScoreDOM).addClass("failed");
-				$(overallScoreDOM).append("<p>La solución no es correcta.</p>");
+				$(overallScoreDOM).append("<p>" + C.I18n.getTrans("i.scoreIncorrectSolution") + "</p>");
 			}
 		}
 	};
@@ -128,7 +128,7 @@ CODEditor.Score = (function(C,$,undefined){
 		var errorsContentWrapper = $("<div class='errors_content_wrapper output_content_wrapper'></div>");
 		var errorsContent = $("<pre class='errors'></pre>");
 		
-		$(errorsHeader).append("Errores");
+		$(errorsHeader).append(C.I18n.getTrans("i.errors"));
 		for(var i=0; i<errors.length; i++){
 			$(errorsContent).append(errors[i] + "\n");
 		}

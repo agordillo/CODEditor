@@ -943,6 +943,8 @@ p.panel_section_title {
 #metadata_panel .tlt_inputs_wrapper {
   padding: 0px;
   margin: 0px;
+  display: inline-block;
+  width: 100%;
 }
 
 #metadata_panel .tlt_input_wrapper {

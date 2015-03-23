@@ -99,7 +99,7 @@ CODEditor.Utils = (function(C,$,undefined){
 		message = (typeof message === "string") ? message : "undefined";
 		options = (typeof options === "object") ? options : {};
 		var divContent = (options.error === true) ? ("<pre>" + message + "</pre>") : ("<p>" + message + "</p>");
-		var dialogTitle = (typeof options.title === "string") ? options.title : "Notificación";
+		var dialogTitle = (typeof options.title === "string") ? options.title : C.I18n.getTrans("i.notification");
 		$('<div></div>').html(divContent).dialog({
 			autoOpen: true,
 			dialogClass:'notificationDialog',
@@ -155,7 +155,7 @@ CODEditor.Utils = (function(C,$,undefined){
 	};
 
 	var buildURLwithParams = function(URLparams){
-		var url = (C.CORE.isViewerMode() ? "index.html" : "edit.html");
+		var url = (C.CORE.isViewerMode() ? "viewer.html" : "index.html");
 		var index = 0;
 
 		if(typeof URLparams === "object"){

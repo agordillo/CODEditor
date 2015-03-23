@@ -71,7 +71,7 @@ CODEditor.JS = (function(C,$,undefined){
 			}
 		} else {
 			if(!C.Utils.isCodeEmpty(jscode)){
-				C.Score.displayErrors(["Se produjo un error de ejecución."],wrapper);
+				C.Score.displayErrors([C.I18n.getTrans("i.executionError")],wrapper);
 			}
 		}
 
@@ -86,7 +86,7 @@ CODEditor.JS = (function(C,$,undefined){
 
 		//1. Check if jscode is a not empty string
 		if(C.Utils.isCodeEmpty(jscode)){
-			evaluation.errors.push("No ha enviado ningún código para ser ejecutado.");
+			evaluation.errors.push(C.I18n.getTrans("i.noCodeToExecute"));
 			return evaluation;
 		}
 
@@ -136,17 +136,17 @@ CODEditor.JS = (function(C,$,undefined){
 					// console.log("Result from return statement");
 					return evaluation;
 				} catch (e){
-					evaluation.errors.push("Error: " + e.message);
+					evaluation.errors.push(C.I18n.getTrans("i.errorOnJSExecution") + ": " + e.message);
 					return evaluation;
 				}
 			} else {
 				//Fail, exception raised
-				evaluation.errors.push("Error: " + jsCodeEval[1].message);
+				evaluation.errors.push(C.I18n.getTrans("i.errorOnJSExecution") + ": " + jsCodeEval[1].message);
 				return evaluation;
 			}
 		}
 
-		evaluation.errors.push("No se encontró ningún resultado.\nIncluya una sentencia 'return' o almacene el resultado en una variable de nombre 'result'.");
+		evaluation.errors.push(C.I18n.getTrans("i.jsExecutionNoResult1") + "\n" + C.I18n.getTrans("i.jsExecutionNoResult2"));
 		return evaluation;
 	};
 
@@ -190,11 +190,11 @@ CODEditor.JS = (function(C,$,undefined){
 			if(Object.keys(jsCodeEval[1]).indexOf("score") !== -1){
 				evaluation.response = jsCodeEval[1]["score"];
 			} else {
-				evaluation.errors.push("Error: No 'score' var found.")
+				evaluation.errors.push(C.I18n.getTrans("i.errorOnJSExecution") + ": " + C.I18n.getTrans("i.validationInvalidSFunctionScore"));
 			}
 		} else {
 			//Fail, exception raised
-			evaluation.errors.push("Error: " + jsCodeEval[1].message);
+			evaluation.errors.push(C.I18n.getTrans("i.errorOnJSExecution") + ": " + jsCodeEval[1].message);
 		}
 		return evaluation;
 	};

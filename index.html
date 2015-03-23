@@ -185,7 +185,7 @@
 
 	<div id="lsfiles_panel" class="cpanel">
 		<img class="close_panel_button" src="img/glyphicons-198-remove.png" onclick="CODEditor.Utils.closePanels();"/>
-		<div class="title">Recursos guardados</div>
+		<div class="title" i18n-key="i.storedResources">Recursos guardados</div>
 
 		<br/>
 
@@ -193,8 +193,8 @@
 		</select>
 
 		<div>
-			<div class="codeditor_button" action="open">Abrir</div>
-			<div class="codeditor_button" action="delete">Borrar</div>
+			<div class="codeditor_button" action="open" i18n-key="i.open">Abrir</div>
+			<div class="codeditor_button" action="delete" i18n-key="i.delete">Borrar</div>
 		</div>
 	</div>
 
@@ -245,24 +245,24 @@
 
 	<div id="metadata_panel" class="cpanel">
 		<img class="close_panel_button" src="img/glyphicons-198-remove.png" onclick="CODEditor.Utils.closePanels();"/>
-		<div class="title">Metadatos</div>
+		<div i18n-key="i.metadata_title" class="title">Metadatos</div>
 
-		<p class="panel_section_title">Objetivos educativos</p>
+		<p class="panel_section_title" i18n-key="i.metadata_eobjectives">Objetivos educativos</p>
 		<div>
 			<textarea id="metadata_eobjectives"></textarea>
 		</div>
 
-		<p class="panel_section_title">Keywords</p>
+		<p class="panel_section_title" i18n-key="i.metadata_keywords">Palabras clave</p>
 		<div>
 			<ul id="metadata_keywords"></ul>
 		</div>
 
-		<p class="panel_section_title">Idioma</p>
+		<p class="panel_section_title" i18n-key="i.metadata_language">Idioma</p>
 		<div>
 			<select id="metadata_language">
 				<option value="de">Deutsch</option>
 				<option value="en">English</option>
-				<option value="es" selected="1">Español</option>
+				<option value="es">Español</option>
 				<option value="fr">Français</option>
 				<option value="it">Italiano</option>
 				<option value="pt">Português</option>
@@ -271,32 +271,32 @@
 		</div>
 
 		<div>
-			<p class="panel_section_title section_title_inline">Dificultad: </p>
+			<p class="panel_section_title section_title_inline"><span i18n-key="i.metadata_diffculty">Dificultad</span>: </p>
 			<input type="text" id="metadata_difficulty_range" class="slider_range_input" readonly/>
 			<div id="metadata_difficulty_slider" class="slider_bar"></div>
 		</div>
 
 		<div>
-			<p class="panel_section_title section_title_inline">Tiempo de aprendizaje típico: </p>
-			<input type="text" id="tlt_current_value" class="slider_range_input" readonly="">
+			<p class="panel_section_title section_title_inline"><span i18n-key="i.metadata_tlt">Tiempo de aprendizaje típico</span>: </p>
+			<input type="text" id="tlt_current_value" class="slider_range_input" readonly=""/>
 			<div class="tlt_inputs_wrapper">
 				<div class="tlt_input_wrapper">
 					<p class="tlt_input_title" i18n-key="i.Hours">Horas</p>
-					<input type="number" value="0" min="0" max="23" id="tlt_hours" class="tlt_input">
+					<input type="number" value="0" min="0" max="23" id="tlt_hours" class="tlt_input"/>
 				</div>
 				<div class="tlt_input_wrapper">
 					<p class="tlt_input_title" i18n-key="i.Minutes">Minutos</p>
-					<input type="number" value="0" min="0" max="59" id="tlt_minutes" class="tlt_input">
+					<input type="number" value="0" min="0" max="59" id="tlt_minutes" class="tlt_input"/>
 				</div>
 				<div class="tlt_input_wrapper">
 					<p class="tlt_input_title" i18n-key="i.Seconds">Segundos</p>
-					<input type="number" value="0" min="0" max="59" step="5" id="tlt_seconds" class="tlt_input">
+					<input type="number" value="0" min="0" max="59" step="5" id="tlt_seconds" class="tlt_input"/>
 				</div>
 			</div>
 		</div>
 
 		<div>
-			<p class="panel_section_title section_title_inline">Rango de edad: </p>
+			<p class="panel_section_title section_title_inline"><span i18n-key="i.metadata_age_range">Rango de edad</span>: </p>
 			<input type="text" id="metadata_age_range" class="slider_range_input" readonly/>
 			<div id="metadata_age_range_slider" class="slider_bar"></div>
 		</div>
@@ -307,13 +307,13 @@
 
 	<div id="file_url_dialog">
 		<div class="title">
-			<p>Introduzca la URL del fichero a cargar:</p>
+			<p i18n-key="i.loadFileURLBody">Introduzca la URL del fichero a cargar:</p>
 		</div>
 		<div>
 			URL: <input type="text"></input>
 		</div>
 		<div>
-			<div class="codeditor_button">Cargar</div>
+			<div class="codeditor_button" i18n-key="i.load">Cargar</div>
 		</div>
 	</div>
 

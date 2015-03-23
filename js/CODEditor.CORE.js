@@ -84,7 +84,7 @@ CODEditor.CORE = (function(C,$,undefined){
 			if(_isValidJSON(options.file)){
 				_initExerciseMode(options.file);
 			} else {
-				C.Utils.showDialog("El recurso cargado no es válido.");
+				C.Utils.showDialog(C.I18n.getTrans("i.invalidResourceToLoad"));
 				_initDefaultMode(URLparams);
 			}
 		} else {
@@ -98,7 +98,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _onGetExternalJSONFile = function(fileURL,initParams){
 		if((typeof fileURL !== "string")||(fileURL.trim() === "")){
-			return C.Utils.showDialog("La URL del fichero no es válida.");
+			return C.Utils.showDialog(C.I18n.getTrans("i.invalidResourceURL"));
 		}
 
 		//Allow to include default ViSH URLs for JSON files uploaded to http://vishub.org.
@@ -123,14 +123,14 @@ CODEditor.CORE = (function(C,$,undefined){
 				_currentLSKey = undefined;
 				_initExerciseMode(json);
 			} else {
-				C.Utils.showDialog("El recurso cargado no es válido.");
+				C.Utils.showDialog(C.I18n.getTrans("i.invalidResourceToLoad"));
 				if(typeof initParams !== "undefined"){
 					_initDefaultMode(initParams);
 				}
 			}
 		}, function(jqXHR,textStatus,errorThrown){
 			//On failure
-			C.Utils.showDialog("Error loading external script from " + fileURL);
+			C.Utils.showDialog(C.I18n.getTrans("i.errorLoadingResourceURL",{url: fileURL}));
 			if(typeof initParams !== "undefined"){
 				_initDefaultMode(initParams);
 			}
@@ -256,7 +256,7 @@ CODEditor.CORE = (function(C,$,undefined){
 					var key = localStorage.key(i);
 					var record = JSON.parse(localStorage.getItem(key));
 					var resource = record.resource;
-					var recordTitle = C.I18n.getTrans("i.untitled") + " (Salvado el " + CODEditor.Utils.getReadableDate(record.saved_at) +  ")";
+					var recordTitle = C.I18n.getTrans("i.untitled") + " (" + C.I18n.getTrans("i.savedAt",{date: C.Utils.getReadableDate(record.saved_at)}) + ")";
 					if((typeof resource.title == "string")&&(resource.title.trim()!=="")){
 						recordTitle = resource.title;
 					}
@@ -453,13 +453,13 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		$("#refresh").click(function(){
 			if(typeof _currentExercise != "undefined"){
-				var r = confirm("Si recargas el ejercicio perderás todos tus cambios. ¿Estás seguro de que deseas hacerlo?");
+				var r = confirm(C.I18n.getTrans("i.reloadExerciseConfirmation"));
 				if (r === true) {
 					_loadJSON(_currentExercise);
 					C.UI.cleanPreview();
 				}
 			} else {
-				C.Utils.showDialog("No hay ningún ejercicio que reiniciar.");
+				C.Utils.showDialog(C.I18n.getTrans("i.noExerciseToReload"));
 			}
 		});
 
@@ -535,7 +535,7 @@ CODEditor.CORE = (function(C,$,undefined){
 			if($(this).attr("disabled")!=="disabled"){
 
 				var dialogDOM = $("#file_url_dialog");
-				$(dialogDOM).attr("Title","Cargar fichero de Internet");
+				$(dialogDOM).attr("Title",C.I18n.getTrans("i.loadFileURLTitle"));
 
 				var dialogWidth = 400;
 				var dialogHeight = "auto";
@@ -598,7 +598,7 @@ CODEditor.CORE = (function(C,$,undefined){
 				return;
 			}
 
-			var r = confirm("¿Estás seguro de que quieres borrar este recurso?");
+			var r = confirm(C.I18n.getTrans("i.deleteResourceConfirmation"));
 			if (r === true) {
 				var lsKey = $("#lsfiles_select").val();
 				_deleteFileLS(lsKey);
@@ -704,7 +704,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		$("#exit").click(function(){
 			if(typeof _currentExercise !== "undefined"){
-				var r = confirm("Si abandonas el ejercicio perderás todos tus cambios. ¿Estás seguro de que deseas hacerlo?");
+				var r = confirm(C.I18n.getTrans("i.quitExerciseConfirmation"));
 				if (r === true) {
 					_exitFromCurrentExercise();
 				}
@@ -741,7 +741,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _openFile = function(){
 		if(!C.Utils.isFileReaderSupported()){
-			return C.Utils.showDialog("Lo siento, tu navegador no puede leer ficheros.");
+			return C.Utils.showDialog(C.I18n.getTrans("i.fileReaderSupportDeny"));
 		}
 
 		var fileInput = document.getElementById('openFileInput');
@@ -763,13 +763,13 @@ CODEditor.CORE = (function(C,$,undefined){
 
 			reader.onerror = function(e){
 				_resetFileHandler(fileInput);
-				C.Utils.showDialog("Se produjo un error leyendo el fichero.");
+				C.Utils.showDialog(C.I18n.getTrans("i.errorReadingFile"));
 			}
 
 			reader.readAsText(file);
 		} else {
 			_resetFileHandler(fileInput);
-			C.Utils.showDialog("Formato de fichero no soportado.");
+			C.Utils.showDialog(C.I18n.getTrans("i.fileFormatNotSupported"));
 		}
 	};
 
@@ -825,7 +825,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _processFile = function(fileContent,fileType){
 		if(typeof fileContent !== "string"){
-			return C.Utils.showDialog("Formato de fichero no soportado.");
+			return C.Utils.showDialog(C.I18n.getTrans("i.fileFormatNotSupported"));
 		}
 
 		//Look for valid JSON
@@ -842,7 +842,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 
 		if(isEditorMode()){
-			return C.Utils.showDialog("Formato de fichero no soportado.");;
+			return C.Utils.showDialog(C.I18n.getTrans("i.fileFormatNotSupported"));
 		}
 
 		var editorContent = undefined;
@@ -878,7 +878,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _saveFile = function(){
 		if(!CODEditor.Utils.isFileSaverSupported()){
-			C.Utils.showDialog("Lo siento, tu navegador no puede descargar ficheros.");
+			C.Utils.showDialog(C.I18n.getTrans("i.fileSaverSupportDeny"));
 		}
 
 		var filename = "file.txt";
@@ -900,7 +900,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var _saveFileEditor = function(){
 		if(!CODEditor.Utils.isFileSaverSupported()){
-			return C.Utils.showDialog("Lo siento, tu navegador no puede descargar ficheros.");
+			return C.Utils.showDialog(C.I18n.getTrans("i.fileSaverSupportDeny"));
 		}
 
 		var errors = _saveCurrentJSON({raise_errors: true});
@@ -917,7 +917,7 @@ CODEditor.CORE = (function(C,$,undefined){
 			var blob = new Blob([dataToDownload], {type: "text/plain;charset=utf-8"});
 			saveAs(blob, filename);
 
-			C.Utils.showDialog("Salvado correctamente");
+			C.Utils.showDialog(C.I18n.getTrans("i.savedSuccessfully"));
 		}
 	};
 
@@ -944,7 +944,7 @@ CODEditor.CORE = (function(C,$,undefined){
 			_currentLSKey = key;
 			localStorage.setItem(key,JSON.stringify(record));
 
-			C.Utils.showDialog("Salvado correctamente");
+			C.Utils.showDialog(C.I18n.getTrans("i.savedSuccessfully"));
 		}
 	};
 
@@ -957,7 +957,7 @@ CODEditor.CORE = (function(C,$,undefined){
 			_currentLSKey = key;
 			_initExerciseMode(json);
 		} else {
-			C.Utils.showDialog("Recurso inválido");
+			C.Utils.showDialog(C.I18n.getTrans("i.invalidResourceToLoad"));
 		}
 	};
 
@@ -1009,7 +1009,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		if(errors.length > 0){
 			if(options.raise_errors===true){
-				C.Utils.showDialogWithErrors("El elemento a salvar tiene errores", errors);
+				C.Utils.showDialogWithErrors(C.I18n.getTrans("i.resourceHasErrors"), errors);
 			}
 		}
 
@@ -1399,7 +1399,7 @@ CODEditor.CORE = (function(C,$,undefined){
 					case "HTML":
 						aceMode = "ace/mode/html";
 						$("#editor_tab p").html("index.html");
-						$("#preview_wrapper.HTML #preview_header").html("<p>Resultado</p>");
+						$("#preview_wrapper.HTML #preview_header").html("<p>" + C.I18n.getTrans("i.result") + "</p>");
 						break;
 					case "JavaScript":
 						aceMode = "ace/mode/javascript";
@@ -1419,10 +1419,10 @@ CODEditor.CORE = (function(C,$,undefined){
 
 				switch(previewMode){
 					case "HTML":
-						$("#preview_wrapper.HTML #preview_header").html("<p>Resultado</p>");
+						$("#preview_wrapper.HTML #preview_header").html("<p>" + C.I18n.getTrans("i.result") + "</p>");
 						break;
 					case "JavaScript":
-						$("#preview_wrapper.JavaScript #preview_header").html("<p>Consola</p><div id='consoleButtons'><img id='closeJSconsole' title='Cerrar consola' src='img/close_console.png'/></div>");
+						$("#preview_wrapper.JavaScript #preview_header").html("<p>" + C.I18n.getTrans("i.console") + "</p><div id='consoleButtons'><img id='closeJSconsole' title='" +  C.I18n.getTrans("i.closeConsole") + "' src='img/close_console.png'/></div>");
 						$("#closeJSconsole").click(function(){
 							if(_isScore){
 								_changeViewMode("SCORE");
@@ -1522,7 +1522,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		var errors = _validateJSON(json,{updateCurrent: true});
 
 		if(errors.length > 0){
-			return C.Utils.showDialogWithErrors("El elemento a cargar tiene errores", errors);
+			return C.Utils.showDialogWithErrors(C.I18n.getTrans("i.resourceHasErrors"), errors);
 		}
 
 		switch(json.type){
@@ -1539,7 +1539,7 @@ CODEditor.CORE = (function(C,$,undefined){
 					return _loadTestEditor(json);
 				}
 			default:
-				return C.Utils.showDialog("El elemento a cargar no es válido.");
+				return C.Utils.showDialog(C.I18n.getTrans("i.invalidResourceToLoad"));
 		}
 	};
 
@@ -1671,7 +1671,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 
 		//Menu
-		$("#test_settings").find("img").attr("title","Configuración del Test");
+		$("#test_settings").find("img").attr("title",C.I18n.getTrans("i.menuSetUpTest"));
 
 		_currentExerciseIndex = 0;
 		_loadNextTestExercise();
@@ -1706,12 +1706,12 @@ CODEditor.CORE = (function(C,$,undefined){
 		var errors = [];
 
 		if(typeof json !== "object"){
-			errors.push("Invalid json. Is not an object.");
+			errors.push(C.I18n.getTrans("i.validationInvalidJSON"));
 			return errors;
 		}
 
 		if((typeof json.type !== "string")||(["exercise","test"].indexOf(json.type)===-1)){
-			errors.push("Invalid 'type' value.");
+			errors.push(C.I18n.getTrans("i.validationInvalidType"));
 			return errors;
 		}
 
@@ -1721,7 +1721,7 @@ CODEditor.CORE = (function(C,$,undefined){
 			case "test":
 				return _validateTest(json,options);
 			default:
-				errors.push("Invalid 'type' value.");
+				errors.push(C.I18n.getTrans("i.validationInvalidType"));
 				return errors;
 		}
 	};
@@ -1730,36 +1730,36 @@ CODEditor.CORE = (function(C,$,undefined){
 		var errors = [];
 
 		if(typeof json !== "object"){
-			errors.push("Invalid json. Is not an object.");
+			errors.push(C.I18n.getTrans("i.validationInvalidJSON"));
 			return errors;
 		}
 		if(json.type !== "test"){
-			errors.push("Type is not 'test'.");
+			errors.push(C.I18n.getTrans("i.validationInvalidTestType"));
 		}
 		if(typeof json.title !== "string"){
-			errors.push("Invalid title.");
+			errors.push(C.I18n.getTrans("i.validationInvalidTitle"));
 		}
 
 		var validExercises = true;
 		try {
 			var exercises = JSON.parse(json.exercises);
 		} catch(e) {
-			errors.push("Invalid exercises.");
+			errors.push(C.I18n.getTrans("i.validationInvalidExercises"));
 			validExercises = false;
 		}
 
 		//Continue with the exercises validation
 		if(validExercises){
 			if(!(exercises instanceof Array)){
-				errors.push("Invalid exercises.");
+				errors.push(C.I18n.getTrans("i.validationInvalidExercises"));
 				validExercises = false;
 			} else {
 				if(exercises.length < 1){
-					errors.push("There are no exercises.");
+					errors.push(C.I18n.getTrans("i.validationNoExercises"));
 				} else {
 					for(var i=0; i<exercises.length; i++){
 						if(!_isValidJSON(exercises[i])){
-							errors.push("Exercise not valid found.");
+							errors.push(C.I18n.getTrans("i.ExerciseNotValidInTest"));
 							break;
 						}
 					}
@@ -1794,29 +1794,29 @@ CODEditor.CORE = (function(C,$,undefined){
 		var errors = [];
 
 		if(typeof json !== "object"){
-			errors.push("Invalid json. Is not an object.");
+			errors.push(C.I18n.getTrans("i.validationInvalidJSON"));
 			return errors;
 		}
 		if(json.type !== "exercise"){
-			errors.push("Type is not 'exercise'.");
+			errors.push(C.I18n.getTrans("i.validationInvalidExerciseType"));
 		}
 		if((typeof json.editorMode !== "string")||(_editorModes.indexOf(json.editorMode)===-1)){
-			errors.push("Invalid editorMode.");
+			errors.push(C.I18n.getTrans("i.validationInvalidEMode"));
 		}
 		if(typeof json.description !== "undefined"){
 			if(typeof json.description !== "string"){
-				errors.push("Invalid description.");
+				errors.push(C.I18n.getTrans("i.validationInvalidDescription"));
 			}
 		}
 		if(typeof json.content !== "undefined"){
 			if(typeof json.content !== "string"){
-				errors.push("Invalid content.");
+				errors.push(C.I18n.getTrans("i.validationInvalidContent"));
 			}
 		}
 		if(typeof json.score_function !== "undefined"){
 			//score_function is provided
 			if (typeof json.score_function !== "string"){
-				errors.push("Invalid score function.");
+				errors.push(C.I18n.getTrans("i.validationInvalidSFunction"));
 			} else {
 				//Check if score_function is well formed
 				//The score_function is retrieved in the scoreFunctionEvaluation.response var.
@@ -1827,7 +1827,7 @@ CODEditor.CORE = (function(C,$,undefined){
 					}
 				} else {
 					if(typeof scoreFunctionEvaluation.response !== "function"){
-						errors.push("The score function is not a function.");
+						errors.push(C.I18n.getTrans("i.validationInvalidSFunctionType"));
 					} else {
 						//Check if scoreFunction returns a valid score.
 						//score should be a number, or a object like {*score: {number}, errors: [], feedback: []}
@@ -1846,25 +1846,25 @@ CODEditor.CORE = (function(C,$,undefined){
 							if(typeof testScore !== "number"){
 								if(typeof testScore === "object"){
 									if(typeof testScore.score !== "number"){
-										errors.push("The score function returns an object with an invalid or missing 'score' field.");
+										errors.push(C.I18n.getTrans("i.validationInvalidSFunctionScore"));
 									}
 									if((typeof testScore.successes !== "undefined")&&(!testScore.successes instanceof Array)){
-										errors.push("The score function returns an object with an invalid 'successes' array.");
+										errors.push(C.I18n.getTrans("i.validationInvalidSFunctionSuccess"));
 									}
 									if((typeof testScore.errors !== "undefined")&&(!testScore.errors instanceof Array)){
-										errors.push("The score function returns an object with an invalid 'errors' array.");
+										errors.push(C.I18n.getTrans("i.validationInvalidSFunctionError"));
 									}
 									if((typeof testScore.feedback !== "undefined")&&(!testScore.feedback instanceof Array)){
-										errors.push("The score function returns an object with an invalid 'feedback' array.");
+										errors.push(C.I18n.getTrans("i.validationInvalidSFunctionFeedback"));
 									}
 								} else {
-									errors.push("The score function returns an invalid value.");
+									errors.push(C.I18n.getTrans("i.validationInvalidSFunctionValue"));
 								}
 							} else {
 								//Score is a number. Do nothing.
 							}
 						} catch(e) {
-							errors.push("Exception raised in score function: " + e.message);
+							errors.push(C.I18n.getTrans("i.validationInvalidSFunctionException", {exception: e.message}));
 						}
 					}
 				}
@@ -2008,7 +2008,7 @@ CODEditor.CORE = (function(C,$,undefined){
 						_currentExercise.progress.passed = true;
 
 						if((_hasNextExercise())&&(!_getNextExercise().progress.passed)){
-							var nextExerciseWrapper = $("<div class='nextExerciseButtonWrapper'><div class='nextExerciseButton'>Iniciar siguiente ejercicio</div></div>");
+							var nextExerciseWrapper = $("<div class='nextExerciseButtonWrapper'><div class='nextExerciseButton'>" + C.I18n.getTrans("i.initNextExercise") + "</div></div>");
 							if(typeof _currentExercise.parsed_score_function == "function"){
 								$(screenDOM).find("div.overall_score").after(nextExerciseWrapper);
 							}
@@ -2021,9 +2021,9 @@ CODEditor.CORE = (function(C,$,undefined){
 							var messageWrapper;
 
 							if(testCompleted){
-								messageWrapper = $("<div class='nextExerciseButtonWrapper'><div class='nextExerciseButton'>¡Enhorabuena, has completado el test '" + _currentTest.title + "'!</div></div>");
+								messageWrapper = $("<div class='nextExerciseButtonWrapper'><div class='nextExerciseButton'>" + C.I18n.getTrans("i.finishTest",{test: _currentTest.title}) + "</div></div>");
 							} else {
-								messageWrapper = $("<div class='nextExerciseButtonWrapper'><div class='nextExerciseButton'>Ver más ejercicios</div></div>");
+								messageWrapper = $("<div class='nextExerciseButtonWrapper'><div class='nextExerciseButton'>" + C.I18n.getTrans("i.viewMoreExercises") + "</div></div>");
 							}
 
 							if(typeof _currentExercise.parsed_score_function == "function"){
@@ -2053,7 +2053,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		if(typeof user == "object"){
 			_currentUser = user;
 			if(typeof _currentUser.name === "string"){
-				$("#login").html("Logueado como: " + _currentUser.name);
+				$("#login").html(C.I18n.getTrans("i.loginAs",{name: _currentUser.name}));
 				$("#login").show();
 				$("ul.menu li.mitemmode").addClass("logged");
 			}
@@ -2182,7 +2182,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 
 		if(position===-1){
-			C.Utils.showDialog("Debes incluir una cabecera <head> para añadir librerías.");
+			C.Utils.showDialog(C.I18n.getTrans("i.librariesHeadRequired"));
 			$('#html_panel table.libraries input[type="checkbox"][value="' + library + '"]').prop('checked', false);
 			return;
 		}

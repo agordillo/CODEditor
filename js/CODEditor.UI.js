@@ -1,14 +1,16 @@
 CODEditor.UI = (function(C,$,undefined){
 
 	var LOM_difficulty = [];
-	LOM_difficulty[0] = { value: "unspecified", text: "sin especificar"};
-	LOM_difficulty[1] = { value: "very easy", text: "muy fácil"};
-	LOM_difficulty[2] = { value: "easy", text: "fácil"};
-	LOM_difficulty[3] = { value: "medium", text: "media"};
-	LOM_difficulty[4] = { value: "difficult", text: "difícil"};
-	LOM_difficulty[5] = { value: "very difficult", text: "muy difícil"};
 
 	var init = function(options){
+
+		LOM_difficulty[0] = { value: "unspecified", text: C.I18n.getTrans("i.unspecified")};
+		LOM_difficulty[1] = { value: "very easy", text: C.I18n.getTrans("i.lom_difficulty_veasy")};
+		LOM_difficulty[2] = { value: "easy", text: C.I18n.getTrans("i.lom_difficulty_easy")};
+		LOM_difficulty[3] = { value: "medium", text: C.I18n.getTrans("i.lom_difficulty_medium")};
+		LOM_difficulty[4] = { value: "difficult", text: C.I18n.getTrans("i.lom_difficulty_difficult")};
+		LOM_difficulty[5] = { value: "very difficult", text: C.I18n.getTrans("i.lom_difficulty_vdifficult")};
+
 		if(CODEditor.CORE.isEditorMode()){
 			$("ul.menu li.viewer:not(.editor)").css("display","none");
 			$("#open").removeClass("first");
@@ -19,6 +21,7 @@ CODEditor.UI = (function(C,$,undefined){
 			$("ul.menu li.editor:not(.viewer)").css("display","none");
 			$("title").html("CODEditor: Viewer");
 		}
+		
 		adjustView();
 	};
 
@@ -39,9 +42,20 @@ CODEditor.UI = (function(C,$,undefined){
 			maxLength: 40,
 			maxTags: 8,
 			triggerKeys: ['enter', 'comma', 'tab'],
-			watermarkAllowMessage: "Añadir keywords",
-			watermarkDenyMessage: "No puedes añadir más keywords"
+			watermarkAllowMessage: C.I18n.getTrans("i.keywords.add"),
+			watermarkDenyMessage: C.I18n.getTrans("i.keywords.limitReached")
 		});
+
+		//Language
+		var userLanguage = C.I18n.getLanguage();
+		if(typeof userLanguage == "string"){
+			$("#metadata_language option").each(function(index,option){
+				if (userLanguage===$(option).attr("value")){
+					$(option).attr("selected","selected");
+					return false;
+				}
+			});
+		}
 
 		//Difficulty
 		$("#metadata_difficulty_slider").slider({
@@ -296,7 +310,7 @@ CODEditor.UI = (function(C,$,undefined){
 				var exerciseIndex = parseInt($(this).parents("li").attr("exerciseindex"));
 				switch($(this).attr("action")){
 					case "delete":
-						var r = confirm("¿Estás seguro de que deseas borrar este ejercicio?");
+						var r = confirm(C.I18n.getTrans("i.deleteExerciseConfirmation"));
 						if (r === true) {
 							C.CORE.deleteExercise(exerciseIndex);
 							updateUIAfterNewExerciseOnTest();
@@ -341,9 +355,9 @@ CODEditor.UI = (function(C,$,undefined){
 
 		var TLT = _getTLT();
 		if(TLT===null){
-			$("#tlt_current_value").val("valor inválido");
+			$("#tlt_current_value").val(C.I18n.getTrans("i.invalidValue"));
 		} else if(typeof TLT == "undefined"){
-			$("#tlt_current_value").val("sin especificar");
+			$("#tlt_current_value").val(C.I18n.getTrans("i.unspecified"));
 		} else if(typeof TLT == "string"){
 			$("#tlt_current_value").val(TLT);
 		}
