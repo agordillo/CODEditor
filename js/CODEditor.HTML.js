@@ -24,7 +24,7 @@ CODEditor.HTML = (function(C,$,undefined){
 						
 						var htmlResultWrapper = $("<div class='html_result_wrapper'></div>");
 						var htmlResultHeader = $("<div class='html_result_header'></div>");
-						$(htmlResultHeader).html("<p>Corrección</p><div id='consoleButtons'><img id='closeHTMLconsole' title='" + C.I18n.getTrans("i.closeConsole") + "' src='img/close_console.png'/><img id='minimizeHTMLconsole' title='" + C.I18n.getTrans("i.minimizeConsole") + "' src='img/minimize_console.png'/><img id='maximizeHTMLconsole' title='" + C.I18n.getTrans("i.maximizeConsole") + "' src='img/maximize_console.png'/></div>");
+						$(htmlResultHeader).html("<p>" + C.I18n.getTrans("i.correction") + "</p><div id='consoleButtons'><img id='closeHTMLconsole' title='" + C.I18n.getTrans("i.closeConsole") + "' src='img/close_console.png'/><img id='minimizeHTMLconsole' title='" + C.I18n.getTrans("i.minimizeConsole") + "' src='img/minimize_console.png'/><img id='maximizeHTMLconsole' title='" + C.I18n.getTrans("i.maximizeConsole") + "' src='img/maximize_console.png'/></div>");
 						var htmlResultContent = $("<div class='html_resultContent'></div>");
 						$(htmlResultWrapper).append(htmlResultHeader);
 						$(htmlResultWrapper).append(htmlResultContent);
