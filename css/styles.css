@@ -47,7 +47,6 @@ html, body {
 }
 
 #editor_wrapper.HYBRID {
-	width: 49% !important;
 	border-right: 2px solid black;
 }
 

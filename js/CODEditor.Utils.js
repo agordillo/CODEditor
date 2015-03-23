@@ -16,7 +16,7 @@ CODEditor.Utils = (function(C,$,undefined){
 	var _defineExtraFunctions = function(){
 		//Extend JQuery functionality
 		jQuery.fn.cssNumber = function(prop){
-			var v = parseInt(this.css(prop),10);
+			var v = parseFloat(this.css(prop),10);
 			return isNaN(v) ? 0 : v;
 		};
 

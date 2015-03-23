@@ -205,7 +205,7 @@ CODEditor.UI = (function(C,$,undefined){
 
 		//Adjust widhts in hybrid mode
 		if(C.CORE.getCurrentViewMode()==="HYBRID"){
-			var totalWidth = $("#content").outerWidth();
+			var totalWidth = $("#content").width();
 			var editorWrapperWidth = Math.floor(totalWidth/2);
 			$("#editor_wrapper").width(editorWrapperWidth);
 			var newEditorWrapperWidth = $("#editor_wrapper").outerWidth();
