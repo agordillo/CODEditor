@@ -1635,12 +1635,12 @@ CODEditor.CORE = (function(C,$,undefined){
 
 		//Load description
 		if(typeof json.description === "string"){
-			json.description = C.Utils.purgeTextString(json.description);
+			var descriptionToShow = C.Utils.purgeTextString(json.description);
 			//Look for code tags.
-			json.description = json.description.replace(/&lt;code&gt;/g, '<pre class="code">');
-			json.description = json.description.replace(/&lt;\/code&gt;/g, '</pre>');
+			descriptionToShow = descriptionToShow.replace(/&lt;code&gt;/g, '<pre class="code">');
+			descriptionToShow = descriptionToShow.replace(/&lt;\/code&gt;/g, '</pre>');
 			$("#exercise_description").show();
-			$("#exercise_description").html("<pre>" + json.description + "</pre>");
+			$("#exercise_description").html("<pre>" + descriptionToShow + "</pre>");
 		} else {
 			$("#exercise_description").hide();
 		}
