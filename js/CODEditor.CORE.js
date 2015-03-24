@@ -1021,6 +1021,10 @@ CODEditor.CORE = (function(C,$,undefined){
 			if(_isValidScoreFunctionValue(scoreFunctionValue)){
 				_currentExercise.score_function = scoreFunctionValue;
 				_inferScoreFunctionVars();
+			} else {
+				delete _currentExercise.score_function;
+				delete _currentExercise.parsed_score_function;
+				delete _currentExercise.score_function_vars;
 			}
 		} else {
 			_currentExercise.content = _editor.getValue();
@@ -2177,7 +2181,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		if(typeof scoreFunctionText != "string"){
 			return false;
 		}
-		if(scoreFunctionText.trim()===""){
+		if((scoreFunctionText.trim()==="")||(C.Utils.isCodeEmpty(scoreFunctionText))){
 			return false;
 		}
 		for(var key in defaultValues["SCORE"]){
