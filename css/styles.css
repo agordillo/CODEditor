@@ -108,6 +108,7 @@ html, body {
 	color: white;
 	overflow: auto;
 	display: none;
+	overflow-x: hidden;
 }
 
 #exercise_wrapper.open {
@@ -142,6 +143,7 @@ html, body {
 	display: "inline-block";
 	font-size: 1.2rem;
 	float: left;
+	cursor: pointer;
 }
 
 #test_menu_wrapper {
@@ -201,6 +203,7 @@ html, body {
 #exercise_description > pre {
 	margin: 0px;
 	padding: 0px;
+	max-width: 100%;
 }
 
 #exercise_description pre.code {

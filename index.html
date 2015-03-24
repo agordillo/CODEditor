@@ -340,6 +340,7 @@
 				if (typeof window.parent.CODEditor.CORE.getPreview === "function"){
 					//Preview mode
 					CODEditor.File = window.parent.CODEditor.CORE.getPreview();
+					CODEditor.Index = window.parent.CODEditor.CORE.getCurrentExerciseIndex();
 					CODEditor.Viewer = true;
 				}
 			} 
@@ -348,7 +349,7 @@
 		// //Activate Viewer
 		// CODEditor.Viewer = true;
 
-		CODEditor.CORE.init({viewer: CODEditor.Viewer, file: CODEditor.File});
+		CODEditor.CORE.init({viewer: CODEditor.Viewer, file: CODEditor.File, index: CODEditor.Index});
 	});
 </script>
 </html>

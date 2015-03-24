@@ -42,6 +42,7 @@ CODEditor.CORE = (function(C,$,undefined){
 	//Enable debugging
 	var _debug = false;
 
+	_initOptions = {};
 	_URLparams = {};
 
 
@@ -51,6 +52,8 @@ CODEditor.CORE = (function(C,$,undefined){
 		if(typeof options !== "object") {
 			options = {};
 		}
+
+		_initOptions = options;
 
 		if(typeof options.viewer == "boolean") {
 			_isViewer = options.viewer;
@@ -543,6 +546,10 @@ CODEditor.CORE = (function(C,$,undefined){
 			$("#test_menu_wrapper > div").addClass("open");
 
 			return false;
+		});
+
+		$("#test_title").click(function(){
+			$("#test_menu_wrapper").trigger("click");
 		});
 
 		$("#openurl").click(function(){
@@ -1603,7 +1610,11 @@ CODEditor.CORE = (function(C,$,undefined){
 		var testMenuWrapper = $("#test_menu_wrapper");
 		$(testMenuWrapper).css("display","inline-block");
 
-		_loadNextTestExercise();
+		if((_isDefaultMode===false)&&(typeof _initOptions.index === "number")){
+			loadTestExercise(_initOptions.index);
+		} else {
+			_loadNextTestExercise();
+		}
 
 		//Populate MenuWrapper
 		C.UI.updateTestMenuDialog();
