@@ -995,8 +995,73 @@ p.panel_section_title {
 
 /* Media Queries */
 
-@media (max-width: 700px) {
-	#editorModeMenu, #login {
+/* Viewer */
+@media (max-width: 625px) {
+	body.viewer #editorModeMenu, body.viewer #login {
 		display: none !important;
+	}
+}
+
+@media (max-width: 550px) {
+	body.viewer ul.menu li.first {
+		padding-left: 3px;
+	}
+
+	body.viewer ul.menu li.last{
+		padding-right: 1px;
+	}
+
+	body.viewer ul.menu li.unique {
+		padding-right: 2px;
+		margin-left: 0px
+	}
+
+	body.viewer ul.menu img {
+		margin: 5px 2px 5px 2px;
+	}
+}
+
+/* Editor */
+@media (max-width: 875px) {
+	body.editor #editorModeMenu, body.editor #login {
+		display: none !important;
+	}
+}
+
+@media (max-width: 800px) {
+	body.editor #examples {
+		display: none !important;
+	}
+
+	body.editor ul.menu li.first {
+		padding-left: 6px;
+	}
+
+	body.editor ul.menu li.last{
+		padding-right: 1px;
+	}
+
+	body.editor ul.menu li.unique {
+		padding-right: 4px;
+		margin-left: 5px
+	}
+}
+
+@media (max-width: 680px) {
+	body.editor ul.menu li.first {
+		padding-left: 3px;
+	}
+
+	body.editor ul.menu li.last{
+		padding-right: 1px;
+	}
+
+	body.editor ul.menu li.unique {
+		padding-right: 2px;
+  		margin-left: 0px
+	}
+
+	body.editor ul.menu img {
+		margin: 5px 2px 5px 2px;
 	}
 }

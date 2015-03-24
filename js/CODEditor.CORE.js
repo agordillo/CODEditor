@@ -59,6 +59,12 @@ CODEditor.CORE = (function(C,$,undefined){
 			_isViewer = options.viewer;
 		}
 
+		if(isEditorMode()){
+			$("body").addClass("editor");
+		}else{
+			$("body").addClass("viewer");
+		}
+
 		_URLparams = C.Utils.readURLparams();
 
 		if(_URLparams["debug"] === "true"){
