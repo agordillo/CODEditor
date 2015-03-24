@@ -89,7 +89,7 @@ CODEditor.Utils = (function(C,$,undefined){
 		if(typeof text !== "string"){
 			return text;
 		}
-		return text.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&lt;b&gt;/g, '<b>').replace(/&lt;\/b&gt;/g, '</b>');
+		return text.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&lt;b&gt;/g, '<b>').replace(/&lt;\/b&gt;/g, '</b>').replace(/&lt;i&gt;/g, '<i>').replace(/&lt;\/i&gt;/g, '</i>');
 	};
 
 	var showDialog = function(message,options){
