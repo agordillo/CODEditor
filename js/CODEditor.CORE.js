@@ -83,6 +83,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 
 		_populateExamples();
+		_populateAbout();
 
 		if(typeof _URLparams["file"] === "string"){
 			_onGetExternalJSONFile(_URLparams["file"],{initExerciseMode: true});
@@ -237,6 +238,10 @@ CODEditor.CORE = (function(C,$,undefined){
 			$(selector).append('<option group="'+ eEditorMode + '" value="'+ i.toString() +'">' + eTitle + '</option>');
 			_examples[i] = example;
 		}
+	};
+
+	var _populateAbout = function(){
+		$("#about_codeditor_version span").html("CODEditor v" + CODEditor.VERSION);
 	};
 
 	var _loadExamples = function(editorMode){

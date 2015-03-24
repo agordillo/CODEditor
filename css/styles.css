@@ -792,6 +792,23 @@ iframe.preview_iframe {
 	padding: 0px !important;
 }
 
+#about_codeditor {
+	width: 100%;
+	margin-top: 20px;
+	font-size: 0.9rem;
+}
+
+#about_codeditor_version { 
+	text-align: right;
+	padding-right: 5px;
+}
+
+#about_codeditor_version a {
+	text-decoration: none;
+	cursor: pointer;
+	color: inherit;
+}
+
 /* Themes */
 
 body[theme='Twilight'] #editor_wrapper.HYBRID{
