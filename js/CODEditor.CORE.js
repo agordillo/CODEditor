@@ -82,6 +82,8 @@ CODEditor.CORE = (function(C,$,undefined){
 			_initEditor();
 		}
 
+		_populateExamples();
+
 		if(typeof _URLparams["file"] === "string"){
 			_onGetExternalJSONFile(_URLparams["file"],{initExerciseMode: true});
 		} else if(typeof options.file == "object") {
@@ -144,9 +146,6 @@ CODEditor.CORE = (function(C,$,undefined){
 		_isDefaultMode = true;
 
 		if(isViewerMode()){
-			$("ul.menu li[group*='examples']").css("display","inline-block");
-			_populateExamples();
-
 			if(typeof _URLparams["emode"] === "string"){
 				_changeEditorMode(_URLparams["emode"]);
 			}
@@ -198,12 +197,10 @@ CODEditor.CORE = (function(C,$,undefined){
 	var _initExerciseMode = function(json){
 		_isDefaultMode = false;
 
-		//Hide examples
-		$("ul.menu li[group*='examples']").css("display","none");
-
 		_loadJSON(json);
 
 		if(isViewerMode()){
+			$("ul.menu li[group*='examples']").css("display","none"); //Hide examples
 			C.SCORM.init();
 		} else {
 			C.UI.loadMetadata();
@@ -2210,19 +2207,20 @@ CODEditor.CORE = (function(C,$,undefined){
 	};
 
 	var _loadHTMLPanel = function(){
-		var libs = _getAppliedLibraries();
-		$('#html_panel table.libraries input[type="checkbox"]').each(function(index,checkbox){
-			var libname = $(checkbox).attr("value");
-			if(libs.indexOf(libname)!==-1){
-				$(checkbox).prop('checked', true);
-			} else {
-				$(checkbox).prop('checked', false);
-			}
+		var libs = _getAppliedLibraries(function(libs){
+			$('#html_panel table.libraries input[type="checkbox"]').each(function(index,checkbox){
+				var libname = $(checkbox).attr("value");
+				if(libs.indexOf(libname)!==-1){
+					$(checkbox).prop('checked', true);
+				} else {
+					$(checkbox).prop('checked', false);
+				}
+			});
 		});
 	};
 
 	var _applyLibrary = function(library,enable,reload){
-		if(_currentEditorMode!="HTML"){
+		if((_currentEditorMode!="HTML")||(typeof library != "string")){
 			return;
 		}
 
@@ -2234,7 +2232,12 @@ CODEditor.CORE = (function(C,$,undefined){
 			reload = false;
 		}
 
-		var libs = _getAppliedLibraries();
+		var libs = _getAppliedLibraries(function(libs){
+			_applyLibraryWithLibs(library,enable,reload,libs);
+		});
+	};
+
+	var _applyLibraryWithLibs = function(library,enable,reload,libs){
 		if(((enable)&&(libs.indexOf(library)!==-1))||((!enable)&&(libs.indexOf(library)===-1))){
 			return;
 		}
@@ -2271,17 +2274,19 @@ CODEditor.CORE = (function(C,$,undefined){
 				break;
 			case "gmaps":
 				if((enable)&&(libs.indexOf("gmapsapi")===-1)&&(!reload)){
-					_applyLibrary("gmapsapi",true);
+					_applyLibraryWithLibs("gmapsapi",true,false,libs);
 					$('#html_panel table.libraries input[type="checkbox"][value="' + "gmapsapi" + '"]').prop('checked', true);
-					return _applyLibrary("gmaps",true,true);
+					_applyLibraryWithLibs("gmaps",true,true,libs);
+					return;
 				}
 				files.push('<script libname="gmaps" src="//hpneo.github.io/gmaps/gmaps.js"></script>');
 				break;
 			case "bootstrap":
 				if((enable)&&(libs.indexOf("jquery")===-1)&&(!reload)){
-					_applyLibrary("jquery",true);
+					_applyLibraryWithLibs("jquery",true,false,libs);
 					$('#html_panel table.libraries input[type="checkbox"][value="' + "jquery" + '"]').prop('checked', true);
-					return _applyLibrary("bootstrap",true,true);
+					_applyLibraryWithLibs("bootstrap",true,true,libs);
+					return;
 				}
 				files.push('<link libname="bootstrap" rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">');
 				files.push('<link libname="bootstrap" rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">');
@@ -2315,45 +2320,27 @@ CODEditor.CORE = (function(C,$,undefined){
 		_editor.setValue(editorContent,1);
 	};
 
-	var _getAppliedLibraries = function(){
+	var _getAppliedLibraries = function(callback){
 		var libs = [];
 
 		if(_currentEditorMode!="HTML"){
-			return libs;
+			if(typeof callback==="function"){
+				callback(libs);
+			}
 		}
 
-		var doc = _getCurrentHTMLdocument();
-		$(doc).find("head > [libname]").each(function(index,el){
-			var libname = $(el).attr("libname");
-			if(libs.indexOf(libname)===-1){
-				libs.push(libname);
+		C.HTML.getHTMLdocument(_editor.getValue(),undefined,function(doc){
+			$(doc).find("head > [libname]").each(function(index,el){
+				var libname = $(el).attr("libname");
+				if(libs.indexOf(libname)===-1){
+					libs.push(libname);
+				}
+			});
+
+			if(typeof callback==="function"){
+				callback(libs);
 			}
 		});
-
-		// //Look for sources
-		// $(doc).find("head > script").each(function(index,el){
-		// 	var source = $(el).attr("src");
-		// 	var libname;
-
-		// 	if(source.match(/jquery[.aA-zZ0-9]*js/g) !== null){
-		// 		libname = "jquery";
-		// 	}
-
-		// 	if((typeof libname == "string")&&(libs.indexOf(libname)===-1)){
-		// 		libs.push(libname);
-		// 	}
-		// });
-		
-		return libs;
-	};
-
-	var _getCurrentHTMLdocument = function(){
-		var iframe = $("#hiddenIframe");
-		var doc = $(iframe).contents()[0];
-		doc.open();
-		doc.writeln(_editor.getValue());
-		doc.close();
-		return doc;
 	};
 
 	var getPreview = function(){

@@ -312,6 +312,10 @@ ul.menu li.withoutRightBorder {
 	border-right: none !important;
 }
 
+#examples {
+	padding-right: 1px;
+}
+
 #preview_button {
 	padding-top: 3px;
 }
@@ -340,7 +344,7 @@ ul.menu li[group='exercise'] {
 }
 
 ul.menu li[group='examples'] {
-	display: none;
+	display: inline-block;
 }
 
 ul.menu label[for=openFileInput][disabled=disabled], ul.menu label[for=openFileInput][disabled=disabled] img:hover, ul.menu li#openurl[disabled=disabled], ul.menu li#openurl[disabled=disabled] img:hover {

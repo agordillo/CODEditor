@@ -6,18 +6,16 @@ CODEditor.HTML = (function(C,$,undefined){
 	var runHTMLcode = function(HTMLcode){
 		var iframe = $("<iframe class='iframe_code'></iframe>");
 		$("#preview").append(iframe);
-		
-		var doc = $("#preview").find("iframe").contents()[0];
-		doc.open();
-		doc.writeln(HTMLcode);
-		doc.close();
+		iframe = $("#preview").find("iframe");
 
-		//Check if an excercise is currently tried
-		var currentExercise = C.CORE.getCurrentExercise();
+		getHTMLdocument(HTMLcode,iframe,function(doc){
+			//onIframeLoad
 
-		if(typeof currentExercise !== "undefined"){
-			if(typeof currentExercise.parsed_score_function == "function"){
-				setTimeout(function(){
+			//Check if an excercise is currently tried
+			var currentExercise = C.CORE.getCurrentExercise();
+
+			if(typeof currentExercise !== "undefined"){
+				if(typeof currentExercise.parsed_score_function == "function"){
 					var score = C.Score.getScoreFromScoreFunction(currentExercise.parsed_score_function,doc,{});
 					if(typeof score == "object"){
 						//Adjust UI when exercise. Show a new window with evaluation results.
@@ -38,11 +36,28 @@ CODEditor.HTML = (function(C,$,undefined){
 
 						C.CORE.onDoCurrentExercise(score.score,htmlResultContent);
 					}
-				},500);
-			} else {
-				C.CORE.onDoCurrentExercise();
-			}	
+				} else {
+					C.CORE.onDoCurrentExercise();
+				}	
+			}
+		});
+	};
+
+	var getHTMLdocument = function(HTMLcode,iframe,callback){
+		if(typeof iframe != "object"){
+			iframe = $("#hiddenIframe");
 		}
+
+		$(iframe)[0].onload = function(){
+			if(typeof callback == "function"){
+				callback($(iframe).contents()[0]);
+			}
+		};
+
+		var doc = $(iframe).contents()[0];
+		doc.open();
+		doc.writeln(HTMLcode);
+		doc.close();
 	};
 
 	var adjustHTMLPreviewUI = function(showHTMLconsole,showHTMLconsoleStatus){
@@ -148,7 +163,8 @@ CODEditor.HTML = (function(C,$,undefined){
 	return {
 		init 					: init,
 		runHTMLcode				: runHTMLcode,
-		adjustHTMLPreviewUI 	: adjustHTMLPreviewUI
+		adjustHTMLPreviewUI 	: adjustHTMLPreviewUI,
+		getHTMLdocument			: getHTMLdocument
 	};
 
 }) (CODEditor,jQuery);
