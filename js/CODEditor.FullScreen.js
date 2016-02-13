@@ -8,7 +8,8 @@ CODEditor.FullScreen = (function(C,$,undefined){
 	var _canFullScreen;
 
 	var init = function(){
-		_canFullScreen = ((_isFullScreenSupported())&&(_getFsEnabled(document)));
+		_addContainerFSAttributes();
+		_canFullScreen = ((_isFullScreenSupported())&&(_getFsEnabled(_getFSDocumentTarget()))&&(!C.Environment.isPreview())&&(!_isFullScreenExplicitlyDisabled()));
 		if(_canFullScreen){
 			_updateFsButtons();
 			_enableFullScreen();
@@ -17,6 +18,14 @@ CODEditor.FullScreen = (function(C,$,undefined){
 
 	var canFullScreen = function(){
 		return _canFullScreen;
+	};
+
+	var _getFSDocumentTarget = function(){
+		return (C.Environment.getContainerType()=="OBJECT" ? window.parent.document : document);
+	};
+
+	var _getFSElementTarget = function(){
+		return (C.Environment.getContainerType()=="OBJECT" ? C.Environment.getContainer().parentElement : document.documentElement);
 	};
 
 	var _updateFsButtons = function(){
@@ -48,8 +57,8 @@ CODEditor.FullScreen = (function(C,$,undefined){
 	};
 
 	var _toggleFullScreen = function (){
-		var myDoc = document;
-		var myElem = document.documentElement;
+		var myDoc = _getFSDocumentTarget();
+		var myElem = _getFSElementTarget();
 		
 		if(isFullScreen()){
 			_cancelFullscreen(myDoc);
@@ -63,7 +72,7 @@ CODEditor.FullScreen = (function(C,$,undefined){
 	 */
 
 	var isFullScreen = function(){
-		var myDoc = document;
+		var myDoc = _getFSDocumentTarget();
 		if(typeof myDoc.mozFullScreen == "boolean"){
 			return myDoc.mozFullScreen;
 		} else if(typeof myDoc.webkitIsFullScreen == "boolean"){
@@ -125,6 +134,39 @@ CODEditor.FullScreen = (function(C,$,undefined){
 		} else {
 			return false;
 		}
+	};
+
+	var _isFullScreenExplicitlyDisabled = function(){
+		var urlParams = C.CORE.getURLParams();
+		if(typeof urlParams == "object"){
+			return urlParams["fs"] === "false";
+		}
+		return false;
+	};
+
+	/* Add container attributes for enable FS when possible */
+	var _addContainerFSAttributes = function(){
+		try {
+			var container = C.Environment.getContainer();
+			if(typeof container != "undefined"){
+				//CODEditor is embed, but not in external domain
+				if(typeof $(container).attr("allowfullscreen") == "undefined"){
+					$(container).attr("allowfullscreen","true");
+					$(container).attr("webkitAllowFullScreen","true");
+					$(container).attr("mozallowfullscreen","true");
+				}
+
+				var fsElementTarget = _getFSElementTarget();
+				if(fsElementTarget != document.documentElement){
+					//Add FS style
+					$(container).addClass("CODEditorFS");
+					$(fsElementTarget).addClass("CODEditorFS");
+					$(window.parent.document).find("head").append("<style>.CODEditorFS:full-screen, :full-screen > object.CODEditorFS {width: 100% !important;height: 100% !important;}</style>");
+					$(window.parent.document).find("head").append("<style>.CODEditorFS:-webkit-full-screen, :-webkit-full-screen > object.CODEditorFS {width: 100% !important;height: 100% !important;}</style>");
+					$(window.parent.document).find("head").append("<style>.CODEditorFS:-moz-full-screen, :-moz-full-screen > object.CODEditorFS {width: 100% !important;height: 100% !important;}</style>");
+				}
+			}
+		} catch(e){}
 	};
 
 	return {

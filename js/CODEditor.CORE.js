@@ -47,6 +47,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 
 	var init = function(options){
+		C.Environment.init();
 		C.I18n.init();
 
 		if(typeof options !== "object") {
@@ -147,7 +148,6 @@ CODEditor.CORE = (function(C,$,undefined){
 		}, function(jqXHR,textStatus,errorThrown){
 			//On failure
 			C.Utils.showDialog(C.I18n.getTrans("i.errorLoadingResourceURL",{url: fileURL}));
-			__URLparams();
 		});
 	};
 
@@ -310,6 +310,10 @@ CODEditor.CORE = (function(C,$,undefined){
 
 	var getEditor = function(){
 		return _editor;
+	};
+
+	var getURLParams = function(){
+		return _URLparams;
 	};
 
 	var getCurrentTest = function(){
@@ -1109,7 +1113,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		});
 
 		//Extra images
-		var extraImages = ["img/error_icon.png","img/success_icon.png","img/fullscreen_off.png","img/maximize_console.png","img/minimize_console.png"];
+		var extraImages = ["img/error_icon.png","img/success_icon.png","img/fullscreen_on.png","img/fullscreen_off.png","img/maximize_console.png","img/minimize_console.png"];
 		for(var ii=0; ii<extraImages.length; ii++){
 			filesSources.push(extraImages[ii]);
 		}
@@ -2525,6 +2529,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		getCurrentEditorMode 	: getCurrentEditorMode,
 		getCurrentEditorTheme	: getCurrentEditorTheme,
 		getEditor 				: getEditor,
+		getURLParams			: getURLParams,
 		getCurrentTest			: getCurrentTest,
 		getCurrentExercise 		: getCurrentExercise,
 		getCurrentExerciseIndex	: getCurrentExerciseIndex,

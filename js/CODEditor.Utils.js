@@ -155,7 +155,7 @@ CODEditor.Utils = (function(C,$,undefined){
 	};
 
 	var buildURLwithParams = function(URLparams){
-		var url = (C.CORE.isViewerMode() ? "viewer.html" : "index.html");
+		var url = "index.html";
 		var index = 0;
 
 		if(typeof URLparams === "object"){

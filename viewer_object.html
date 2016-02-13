@@ -15,19 +15,18 @@
 		}
 	</style>
 
-	<!-- init with "google-chrome --allow-file-access-from-files" in local -->
-	<iframe style="width:100%; height:100%; border: none"></iframe>
+	<object id="scorm_object" type="text/html" style="width: 725px; height: 583px;"></object>
 
 	<script type="text/javascript">
 		var CODEditor = CODEditor || {};
 		CODEditor.Viewer = true;
 
-		var iframeSrc = "index.html";
+		var iframeSrc = "index.html?allowfullscreen=true";
 		if(typeof window.location.search == "string"){
 			iframeSrc += window.location.search;
 		}
 		
-		$("iframe").attr("src",iframeSrc);
+		$("object").attr("data",iframeSrc);
 	</script>
 </body>
 </html>
