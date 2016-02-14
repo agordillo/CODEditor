@@ -1113,7 +1113,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		});
 
 		//Extra images
-		var extraImages = ["img/error_icon.png","img/success_icon.png","img/fullscreen_on.png","img/fullscreen_off.png","img/maximize_console.png","img/minimize_console.png"];
+		var extraImages = ["img/error_icon.png","img/success_icon.png","img/fullscreen_on.png","img/fullscreen_off.png","img/close_console.png","img/maximize_console.png","img/minimize_console.png"];
 		for(var ii=0; ii<extraImages.length; ii++){
 			filesSources.push(extraImages[ii]);
 		}

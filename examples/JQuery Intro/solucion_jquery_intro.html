@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+        <meta charset="UTF-8">
+        <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function(){
+                //Escribe tu solución aquí
+                $("head").append("<title>JQuery</title>");
+                $("header").css("text-align","center");
+                $("p.title").css("font-size","20px");
+                $("#news div").css("background","black");
+                $("#news div").css("color","white");
+                $("li[alert='yes']").click(function(e){
+                	$("footer").html($(this).html());
+                });
+            });
+      </script>
+  </head>
+  <body>
+    <header>Aprendiendo a utilizar los selectores de JQuery</header>
+    <article>
+        <div>
+            <p class="title">Características de JQuery</p>
+            <ul>
+                <li>Rápido</li>
+                <li alert="yes">Ligero</li>
+                <li>Multi-navegador</li>
+            </ul>
+        </div>
+    </article>
+    <article id="news">
+        <div class="title">
+            <a target="_blank" href="http://jquery.com/">JQuery website</a>
+        </div>
+    </article>
+    <footer></footer>
+  </body>
+</html>
