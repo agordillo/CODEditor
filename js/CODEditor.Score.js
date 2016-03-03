@@ -3,15 +3,41 @@ CODEditor.Score = (function(C,$,undefined){
 	var init = function(options){
 	};
 
-	var getScoreFromScoreFunction = function(scoreFunction,response,variablesHash){
+	var getScoreFromScoreFunction = function(scoreFunction,response,variablesHash,callback){
 		var score;
+		var callbackTriggered = false;
 
 		try {
-			score = scoreFunction(response,variablesHash);
+			score = scoreFunction(response,variablesHash,function(score){
+				if(callbackTriggered === false){
+					callbackTriggered = true;
+					callback(_getNormalizedScore(score));
+				}
+			});
+			if((typeof score == "object")||(typeof score == "number")){
+				if(callbackTriggered === false){
+					callbackTriggered = true;
+					callback(_getNormalizedScore(score));
+				}
+			}
 		} catch (e){
 			// console.log(e.message);
+			if(callbackTriggered === false){
+				callbackTriggered = true;
+				callback(_getNormalizedScore());
+			}
 		}
 
+		setTimeout(function(){
+			//Timeout triggered
+			if(callbackTriggered === false){
+				callbackTriggered = true;
+				callback(_getNormalizedScore());
+			}
+		},9000);
+	};
+
+	var _getNormalizedScore = function(score){
 		var normalizedScore = {};
 		normalizedScore.score = undefined;
 		normalizedScore.successes = [];

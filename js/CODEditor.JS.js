@@ -62,9 +62,10 @@ CODEditor.JS = (function(C,$,undefined){
 		if(!hasErrors){
 			if(typeof currentExercise !== "undefined"){
 				if(typeof currentExercise.parsed_score_function == "function"){
-					var score = C.Score.getScoreFromScoreFunction(currentExercise.parsed_score_function,evaluation.response,evaluation.variablesHash);
-					C.Score.displayScore(score,wrapper);
-					C.CORE.onDoCurrentExercise(score.score,wrapper);
+					C.Score.getScoreFromScoreFunction(currentExercise.parsed_score_function,evaluation.response,evaluation.variablesHash,function(score){
+						C.Score.displayScore(score,wrapper);
+						C.CORE.onDoCurrentExercise(score.score,wrapper);
+					});
 				} else {
 					C.CORE.onDoCurrentExercise(undefined,wrapper);
 				}

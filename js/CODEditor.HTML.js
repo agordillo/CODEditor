@@ -16,26 +16,27 @@ CODEditor.HTML = (function(C,$,undefined){
 
 			if(typeof currentExercise !== "undefined"){
 				if(typeof currentExercise.parsed_score_function == "function"){
-					var score = C.Score.getScoreFromScoreFunction(currentExercise.parsed_score_function,doc,{});
-					if(typeof score == "object"){
-						//Adjust UI when exercise. Show a new window with evaluation results.
-						
-						var htmlResultWrapper = $("<div class='html_result_wrapper'></div>");
-						var htmlResultHeader = $("<div class='html_result_header'></div>");
-						$(htmlResultHeader).html("<p>" + C.I18n.getTrans("i.correction") + "</p><div id='consoleButtons'><img id='closeHTMLconsole' title='" + C.I18n.getTrans("i.closeConsole") + "' src='img/close_console.png'/><img id='minimizeHTMLconsole' title='" + C.I18n.getTrans("i.minimizeConsole") + "' src='img/minimize_console.png'/><img id='maximizeHTMLconsole' title='" + C.I18n.getTrans("i.maximizeConsole") + "' src='img/maximize_console.png'/></div>");
-						var htmlResultContent = $("<div class='html_resultContent'></div>");
-						$(htmlResultWrapper).append(htmlResultHeader);
-						$(htmlResultWrapper).append(htmlResultContent);
-						$("#preview").append(htmlResultWrapper);
+					C.Score.getScoreFromScoreFunction(currentExercise.parsed_score_function,doc,{},function(score){
+						if(typeof score == "object"){
+							//Adjust UI when exercise. Show a new window with evaluation results.
+							
+							var htmlResultWrapper = $("<div class='html_result_wrapper'></div>");
+							var htmlResultHeader = $("<div class='html_result_header'></div>");
+							$(htmlResultHeader).html("<p>" + C.I18n.getTrans("i.correction") + "</p><div id='consoleButtons'><img id='closeHTMLconsole' title='" + C.I18n.getTrans("i.closeConsole") + "' src='img/close_console.png'/><img id='minimizeHTMLconsole' title='" + C.I18n.getTrans("i.minimizeConsole") + "' src='img/minimize_console.png'/><img id='maximizeHTMLconsole' title='" + C.I18n.getTrans("i.maximizeConsole") + "' src='img/maximize_console.png'/></div>");
+							var htmlResultContent = $("<div class='html_resultContent'></div>");
+							$(htmlResultWrapper).append(htmlResultHeader);
+							$(htmlResultWrapper).append(htmlResultContent);
+							$("#preview").append(htmlResultWrapper);
 
-						_loadEvents();
+							_loadEvents();
 
-						adjustHTMLPreviewUI();
+							adjustHTMLPreviewUI();
 
-						C.Score.displayScore(score,htmlResultContent);
+							C.Score.displayScore(score,htmlResultContent);
 
-						C.CORE.onDoCurrentExercise(score.score,htmlResultContent);
-					}
+							C.CORE.onDoCurrentExercise(score.score,htmlResultContent);
+						}
+					});
 				} else {
 					C.CORE.onDoCurrentExercise();
 				}	
