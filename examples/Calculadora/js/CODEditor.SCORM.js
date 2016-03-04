@@ -10,7 +10,7 @@ CODEditor.SCORM = (function(C,$,undefined){
 	var user;
 
 	//Vars
-	var COMPLETION_THRESHOLD = 0; //Force attempt completion!
+	var COMPLETION_THRESHOLD = 0;
 	var COMPLETION_ATTEMPT_THRESHOLD = 0;
 	var SCORE_THRESHOLD = 0.5;
 
@@ -68,19 +68,31 @@ CODEditor.SCORM = (function(C,$,undefined){
 	};
 
 	var onExit = function(objective){
+		console.log("EXIT EXIT EXIT");
+		localStorage.setItem("onExit", "true");
+		localStorage.setItem("lastpm", C.ProgressTracking.getProgressMeasure().toString());
+		localStorage.setItem("lastpmn", C.ProgressTracking.getProgressMeasure());
+		// localStorage.getItem("lastpm");
 		_updateProgressMeasure(C.ProgressTracking.getProgressMeasure());
 		// scorm.commit(); terminate will call commit
 		scorm.terminate();
 	};
 
 	var _updateProgressMeasure = function(progressMeasure){
+		console.log("_updateProgressMeasure");
 		if(typeof progressMeasure == "number"){
 			scorm.setvalue('cmi.progress_measure',progressMeasure.toString());
 			_updateCompletionStatus(progressMeasure);
+		} else {
+			console.log("progressMeasure is not number");
+			console.log(progressMeasure);
 		}
 	};
 
 	var _updateCompletionStatus = function(progressMeasure){
+		console.log("updateCompletionStatus");
+		console.log(progressMeasure);
+
 		if(typeof progressMeasure != "number"){
 			progressMeasure = 0;
 		}
@@ -94,6 +106,9 @@ CODEditor.SCORM = (function(C,$,undefined){
 		} else {
 			completionStatus = "not attempted";
 		}
+
+		console.log("completionStatus");
+		console.log(completionStatus);
 
 		scorm.setvalue('cmi.completion_status',completionStatus);
 	};
