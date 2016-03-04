@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest identifier="CODEditor_v2" version="1.0" xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2" xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd http://www.imsglobal.org/xsd/imsmd_rootv1p2p1 imsmd_rootv1p2p1.xsd http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd">
+  <metadata>
+    <schema>ADL SCORM</schema>
+    <schemaversion>1.2</schemaversion>
+    <lom xmlns="http://www.imsglobal.org/xsd/imsmd_rootv1p2p1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsmd_rootv1p2p1 imsmd_rootv1p2p1.xsd">
+      <general>
+        <title>
+          <langstring xml:lang="es">Calculadora</langstring>
+        </title>
+        <language>es</language>
+      </general>
+      <metametadata>
+        <metadatascheme>ADL SCORM 1.2</metadatascheme>
+      </metametadata>
+      <rights>
+        <cost>
+          <source>
+            <langstring xml:lang="es">LOMv1.0</langstring>
+          </source>
+          <value>
+            <langstring xml:lang="es">no</langstring>
+          </value>
+        </cost>
+        <copyrightandotherrestrictions>
+          <source>
+            <langstring xml:lang="es">LOMv1.0</langstring>
+          </source>
+          <value>
+            <langstring xml:lang="es">no</langstring>
+          </value>
+        </copyrightandotherrestrictions>
+      </rights>
+    </lom>
+  </metadata>
+  <organizations default="defaultOrganization">
+    <organization identifier="defaultOrganization">
+      <title>CODEditor</title>
+      <item identifier="CODEditor" isvisible="true" identifierref="CODEditor_resource">
+        <title>CODEditor</title>
+      </item>
+    </organization>
+  </organizations>
+  <resources>
+    <resource identifier="CODEditor_resource" type="webcontent" href="index.html" adlcp:scormtype="sco">
+      <file href="index.html" />
+    </resource>
+  </resources>
+</manifest>
