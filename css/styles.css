@@ -250,6 +250,7 @@ html, body {
 }
 
 #preview_wrapper.HTML #preview {
+	background: white;
 	overflow: hidden;
 }
 
