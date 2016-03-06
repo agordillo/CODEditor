@@ -830,6 +830,12 @@ CODEditor.SCORM = (function(C,$,undefined){
 	                case "cmi.location":
 	                    nn = "cmi.core.lesson_location";
 	                    break;
+	                case "cmi.learner_name":
+	                    nn = "cmi.core.student_name";
+	                    break;
+	                case "cmi.learner_id":
+	                	nn = "cmi.core.student_id";
+	                	break;
 	                case "cmi.completion_threshold":
 	                    // unsupported
 	                    ig = true;
