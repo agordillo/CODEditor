@@ -1,35 +1,74 @@
-<?xml version="1.0" encoding="utf-8"?>
-<manifest identifier="CODEditor_v2" version="1.0" xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2" xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd http://www.imsglobal.org/xsd/imsmd_rootv1p2p1 imsmd_rootv1p2p1.xsd http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd">
+<?xml version="1.0" encoding="utf-8" ?>
+<manifest identifier="CODEditor_v0.0.3" version="1.0" xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2" xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd http://www.imsglobal.org/xsd/imsmd_rootv1p2p1 imsmd_rootv1p2p1.xsd http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd">
   <metadata>
     <schema>ADL SCORM</schema>
     <schemaversion>1.2</schemaversion>
-    <lom xmlns="http://www.imsglobal.org/xsd/imsmd_rootv1p2p1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsmd_rootv1p2p1 imsmd_rootv1p2p1.xsd">
+    <lom xmlns="http://ltsc.ieee.org/xsd/LOM" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ltsc.ieee.org/xsd/LOM lom.xsd">
       <general>
         <title>
-          <langstring xml:lang="es">Calculadora</langstring>
+          <string language="es">Calculadora</string>
         </title>
         <language>es</language>
+        <structure>
+          <source>LOMv1.0</source>
+          <value>linear</value>
+        </structure>
+        <aggregationLevel>
+          <source>LOMv1.0</source>
+          <value>2</value>
+        </aggregationLevel>
       </general>
-      <metametadata>
-        <metadatascheme>ADL SCORM 1.2</metadatascheme>
-      </metametadata>
+      <technical>
+        <format>text/html</format>
+        <requirement>
+          <orComposite>
+            <type>
+              <source>LOMv1.0</source>
+              <value>browser</value>
+            </type>
+            <name>
+              <source>LOMv1.0</source>
+              <value>any</value>
+            </name>
+          </orComposite>
+        </requirement>
+        <otherPlatformRequirements>
+          <string language="en">HTML5-compliant web browser</string>
+          <string language="en">CODEditor 0.0.3 (http://github.com/agordillo/CodeEditorApp)</string>
+        </otherPlatformRequirements>
+      </technical>
+      <educational>
+        <interactivityType>
+          <source>LOMv1.0</source>
+          <value>active</value>
+        </interactivityType>
+        <learningResourceType>
+          <source>LOMv1.0</source>
+          <value>exercise</value>
+        </learningResourceType>
+        <interactivityLevel>
+          <source>LOMv1.0</source>
+          <value>very high</value>
+        </interactivityLevel>
+        <intendedEndUserRole>
+          <source>LOMv1.0</source>
+          <value>learner</value>
+        </intendedEndUserRole>
+        <context>
+          <source>LOMv1.0</source>
+          <value>higher education</value>
+        </context>
+        <language>es</language>
+      </educational>
       <rights>
         <cost>
-          <source>
-            <langstring xml:lang="es">LOMv1.0</langstring>
-          </source>
-          <value>
-            <langstring xml:lang="es">no</langstring>
-          </value>
+          <source>LOMv1.0</source>
+          <value>no</value>
         </cost>
-        <copyrightandotherrestrictions>
-          <source>
-            <langstring xml:lang="es">LOMv1.0</langstring>
-          </source>
-          <value>
-            <langstring xml:lang="es">no</langstring>
-          </value>
-        </copyrightandotherrestrictions>
+        <copyrightAndOtherRestrictions>
+          <source>LOMv1.0</source>
+          <value>no</value>
+        </copyrightAndOtherRestrictions>
       </rights>
     </lom>
   </metadata>

@@ -60,8 +60,13 @@
 
 			<li id="save_editor" class="mitem first editor" group="editor"><img src="img/glyphicons-444-floppy-disk.png" i18n-key-title="i.menuSaveLS" title="Salvar recurso"/></li>
 			<li id="save_file_editor" class="mitem editor" group="editor"><img src="img/glyphicons-416-disk-open.png" i18n-key-title="i.menuSaveFile" title="Salvar"/></li>
-			<li id="save_scorm" class="mitem last withoutRightBorder editor" group="editor"><img src="img/glyphicons-364-cloud-download.png" i18n-key-title="i.menuExportSCORM" title="Exportar a SCORM"/></li>
-
+			<li class="mitem last withoutRightBorder editor withSubmenu" group="editor">
+				<img src="img/glyphicons-364-cloud-download.png" i18n-key-title="i.menuExportSCORM" title="Exportar a SCORM"/>
+				<ul>
+					<li id="save_scorm_12">SCORM 1.2</li>
+					<li id="save_scorm_2004">SCORM 2004</li>
+				</ul>
+			</li>
 			<li id="open_lsfile" class="mitem first editor cpanelicon" group="files"><img src="img/glyphicons-447-floppy-save.png" i18n-key-title="i.menuLoadLS" title="Cargar recurso"/></li>
 			<li id="open" class="mitem first viewer editor" group="files">
 				<label for="openFileInput">

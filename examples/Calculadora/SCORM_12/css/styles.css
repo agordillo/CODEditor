@@ -271,6 +271,7 @@ ul.menu {
 	border-left-width: 1px;
 	border-left-style: solid;
 	border-left-color: #CCC;
+	position: relative;
 }
 
 ul.menu img {
@@ -289,6 +290,7 @@ ul.menu li.active img {
 }
 
 ul.menu li {
+	position: relative;
 	display: inline-block;
 }
 
@@ -358,6 +360,48 @@ ul.menu label[for=openFileInput][disabled=disabled], ul.menu label[for=openFileI
 
 ul.menu li#exit {
 	display: none;
+}
+
+/* Submenus */
+ul.menu ul {
+	display: none;
+	position: absolute;
+    left: 0px;
+    margin: 0px;
+    margin-top: 2px;
+    padding: 0px;
+    background: #ccc;
+}
+
+ul.menu ul li {
+	list-style: none;
+	position: relative;
+	float: left;
+	text-align: left;
+	z-index: 2;
+	padding: 8px 2px 8px 5px;
+	vertical-align: middle;
+	width: auto;
+	min-width: 85px;
+	background: #ccc;
+	border-left: 2px solid black;
+    border-right: 2px solid black;
+}
+
+ul.menu ul li:hover {
+	font-weight: bold;
+}
+
+ul.menu ul li:last-child {
+	border-bottom: 2px solid black;
+}
+
+ul.menu ul li[id] {
+	cursor: pointer;
+}
+
+ul.menu ul.menu_active {
+	display: inline-block;
 }
 
 .cpanel {
