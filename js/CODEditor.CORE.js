@@ -401,6 +401,19 @@ CODEditor.CORE = (function(C,$,undefined){
 			}
 		};
 
+		$("ul.menu > li:not('.withSubmenu')").click(function(){
+			$("ul.menu > li.withSubmenu").find("> ul").removeClass("menu_active");
+		});
+
+		$("ul.menu > li.withSubmenu").click(function(){
+			$("ul.menu > li.withSubmenu").not(this).find("> ul").removeClass("menu_active");
+			if($(this).find("> ul").hasClass("menu_active")){
+				$(this).find("> ul").removeClass("menu_active");
+			} else {
+				$(this).find("> ul").addClass("menu_active");
+			}
+		});
+
 		$("ul.menu > li[group='view']").click(function(){
 			$("ul.menu li[group=view]").removeClass("active");
 			$(this).addClass("active");
@@ -474,8 +487,12 @@ CODEditor.CORE = (function(C,$,undefined){
 			_saveFileLS();
 		});
 
-		$("#save_scorm").click(function(){
+		$("#save_scorm_12").click(function(){
 			exportToSCORM("1.2");
+		});
+
+		$("#save_scorm_2004").click(function(){
+			exportToSCORM("2004");
 		});
 
 		$("#refresh").click(function(){
@@ -1230,10 +1247,11 @@ CODEditor.CORE = (function(C,$,undefined){
 					//ArrayBuffer to String
 					var xmlContent = String.fromCharCode.apply(null, new Uint8Array(data));
 
-					//Generate LOM Metadata in XML format (using marknote library: https://code.google.com/p/marknote/wiki/DevelopersGuide)
+					//Generate SCORM Manifest and LOM Metadata in XML format (using marknote library: https://code.google.com/p/marknote/wiki/DevelopersGuide)
 					var parser = new marknote.Parser();
-					var XML_LOM_Metadata = parser.parse(xmlContent);
-					var LOM_element = XML_LOM_Metadata.rootElement.getChildElement("metadata").getChildElement("lom");
+					var XML_SCORM_Manifest = parser.parse(xmlContent);
+					XML_SCORM_Manifest.rootElement.setAttribute("identifier","CODEditor_v" + CODEditor.VERSION);
+					var LOM_element = XML_SCORM_Manifest.rootElement.getChildElement("metadata").getChildElement("lom");
 
 					//Extra vars
 					var metadata_language = (typeof metadata.language == "string") ? metadata.language : "en";
@@ -1357,7 +1375,7 @@ CODEditor.CORE = (function(C,$,undefined){
 					}
 
 
-					xmlContent = XML_LOM_Metadata.toString("  ");
+					xmlContent = XML_SCORM_Manifest.toString("  ");
 					zip.file("imsmanifest.xml", xmlContent);
 
 					filesCount -= 1;
