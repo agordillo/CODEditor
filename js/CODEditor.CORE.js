@@ -475,7 +475,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		});
 
 		$("#save_scorm").click(function(){
-			exportToSCORM();
+			exportToSCORM("1.2");
 		});
 
 		$("#refresh").click(function(){
@@ -1079,25 +1079,35 @@ CODEditor.CORE = (function(C,$,undefined){
 	var fileSourcesCounter;
 	var fileSourcesLength;
 
-	var exportToSCORM = function(){
+	var exportToSCORM = function(version){
 		var errors = _saveCurrentJSON({raise_errors: true});
 
 		if(errors.length > 0){
 			return;
 		}
 
-		var zip = new JSZip();
-
-		var packageFileTree = {};
 		var filesSources = [];
-
 		filesSources.push("index.html");
-		// filesSources.push("lms_index.html");
 		
-		filesSources.push("imsmanifest.xml");
-		var scormConstantFiles = ["adlcp_v1p3.xsd","adlnav_v1p3.xsd","adlseq_v1p3.xsd","imscp_v1p1.xsd","imsss_v1p0.xsd","lom.xsd",	"common/anyElement.xsd", "common/dataTypes.xsd", "common/elementNames.xsd", "common/elementTypes.xsd", "common/rootElement.xsd", "common/vocabTypes.xsd", "common/vocabValues.xsd", "extend/custom.xsd", "extend/strict.xsd", "unique/loose.xsd", "unique/strict.xsd", "vocab/adlmd_vocabv1p0.xsd", "vocab/custom.xsd", "vocab/loose.xsd", "vocab/strict.xsd"];
+		//SCORM files
+		if(["1.2","2004"].indexOf(version)==-1){
+			version = "1.2";
+		}
+
+		var scormConstantFiles;
+		switch(version){
+			case "1.2":
+				scormConstantFiles = ["imsmanifest.xml","adlcp_rootv1p2.xsd","imscp_rootv1p1p2.xsd","imsmd_rootv1p2p1.xsd","lom.xsd"];
+				break;
+			case "2004":
+				scormConstantFiles = ["imsmanifest.xml", "adlcp_v1p3.xsd","adlnav_v1p3.xsd","adlseq_v1p3.xsd","imscp_v1p1.xsd","imsss_v1p0.xsd","lom.xsd",	"common/anyElement.xsd", "common/dataTypes.xsd", "common/elementNames.xsd", "common/elementTypes.xsd", "common/rootElement.xsd", "common/vocabTypes.xsd", "common/vocabValues.xsd", "extend/custom.xsd", "extend/strict.xsd", "unique/loose.xsd", "unique/strict.xsd", "vocab/adlmd_vocabv1p0.xsd", "vocab/custom.xsd", "vocab/loose.xsd", "vocab/strict.xsd"];
+				break;
+			default:
+				return;
+		}
+
 		for(var s=0; s<scormConstantFiles.length; s++){
-			filesSources.push(scormConstantFiles[s]);
+			filesSources.push("schemas/" + ("SCORM_" + version.replace(".","")) + "/" + scormConstantFiles[s]);
 		}
 
 		$("link[href]").each(function(index,value){
@@ -1130,6 +1140,10 @@ CODEditor.CORE = (function(C,$,undefined){
 		fileSourcesCounter = 0;
 		fileSourcesLength = filesSources.length;
 
+
+		var zip = new JSZip();
+		var packageFileTree = {};
+
 		for(var i=0; i<filesSources.length; i++){
 			var splitValue = filesSources[i].split("/");
 			var splitLength = splitValue.length;
@@ -1146,50 +1160,57 @@ CODEditor.CORE = (function(C,$,undefined){
 				}
 			}
 		};
-
-		_zipFolder(zip,undefined,undefined,packageFileTree,"");
+		_zipFolder(zip,undefined,undefined,packageFileTree,"",version);
 	};
 
-	var _zipFolder = function(zipRoot,zipParent,folderName,folderContent,path){
+	var _zipFolder = function(zipRoot,zipParent,folderName,folderContent,path,version){
 		if(typeof zipParent !== "undefined"){
+			if((typeof path != "undefined")&&(path != "")&&((/^schemas/).test(path))){
+				//Keep SCORM schemas in the root path
+				folderName = folderName.replace("schemas","").replace(("SCORM_" + version.replace(".","")),"");
+			}
 			window["folder_" + folderName] = zipParent.folder(folderName);
 			var folder = window["folder_" + folderName];
 		} else {
 			var folder = zipRoot;
 		}
+
 		for(var key in folderContent){
 			var file = folderContent[key];
+
 			if(path !== ""){
 				var fileFullPath = path+"/"+key;
 			} else {
 				var fileFullPath = key;
 			}
+
 			if(typeof file === "object"){
-				_zipFolder(zipRoot,folder,key,file,fileFullPath);
-			} else {
-				_zipFile(zipRoot,folder,key,fileFullPath);
+				_zipFolder(zipRoot,folder,key,file,fileFullPath,version);
+			} else if(typeof file == "string"){
+				_zipFile(zipRoot,folder,key,fileFullPath,version);
 			}
 		}
 	};
 
-	var _zipFile = function(zipRoot,zipParent,fileName,fileFullPath){
+	var _zipFile = function(zipRoot,zipParent,fileName,fileFullPath,version){
 		JSZipUtils.getBinaryContent(fileFullPath, function (err, data) {
 			if(err) {
 				throw err;
 			}
+
 			zipParent.file(fileName, data, {binary:true});
-			_onZipFileInSCORM(zipRoot);
+			_onZipFileInSCORM(zipRoot,version);
 		});
 	};
 
-	var _onZipFileInSCORM = function(zip){
+	var _onZipFileInSCORM = function(zip,version){
 		fileSourcesCounter++;
 		if(fileSourcesCounter>=fileSourcesLength){
-			_onFinishExportSCORMStep1(zip);
+			_onFinishExportSCORMStep1(zip,version);
 		}
 	};
 
-	var _onFinishExportSCORMStep1 = function(zip){
+	var _onFinishExportSCORMStep1 = function(zip,version){
 		var currentResource = getCurrentResource();
 
 		if(typeof currentResource != "undefined"){
@@ -1201,7 +1222,7 @@ CODEditor.CORE = (function(C,$,undefined){
 			var metadata = C.UI.getMetadataFromUI();
 			if((typeof metadata == "object")&&(Object.keys(metadata).length > 0)){
 				//Modify imsmanifest.xml
-				JSZipUtils.getBinaryContent("imsmanifest.xml", function (err, data) {
+				JSZipUtils.getBinaryContent("schemas/"+ ("SCORM_" + version.replace(".","")) + "/imsmanifest.xml", function (err, data) {
 					if(err) {
 						throw err;
 					}
@@ -1341,7 +1362,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 					filesCount -= 1;
 					if(filesCount===0){
-						_onFinishExportSCORM(zip);
+						_onFinishExportSCORM(zip,version);
 					}
 				});
 			} else {
@@ -1365,7 +1386,7 @@ CODEditor.CORE = (function(C,$,undefined){
 
 				filesCount -= 1;
 				if(filesCount===0){
-					_onFinishExportSCORM(zip);
+					_onFinishExportSCORM(zip,version);
 				}
 			});
 
@@ -1374,9 +1395,9 @@ CODEditor.CORE = (function(C,$,undefined){
 		}
 	};
 
-	var _onFinishExportSCORM = function(zip){
+	var _onFinishExportSCORM = function(zip,version){
 		var content = zip.generate({type:"blob"});
-		saveAs(content, (getCurrentResourceTitle() + ".zip"));
+		saveAs(content, (getCurrentResourceTitle() + " (SCORM " + version + ").zip"));
 	};
 
 	var getCurrentResource = function(){
