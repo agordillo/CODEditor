@@ -64,12 +64,13 @@
       <title>CODEditor</title>
       <item identifier="CODEditor" isvisible="true" identifierref="CODEditor_resource">
         <title>CODEditor</title>
+        <adlcp:masteryscore>50</adlcp:masteryscore>
       </item>
     </organization>
   </organizations>
   <resources>
     <resource identifier="CODEditor_resource" type="webcontent" href="index.html" adlcp:scormtype="sco">
-      <file href="index.html" />
+      <file href="index.html"/>
     </resource>
   </resources>
 </manifest>

@@ -60,7 +60,7 @@
     </lom>
   </metadata>
   <organizations default="defaultOrganization">
-    <organization identifier="defaultOrganization" structure="hierarchical">
+    <organization identifier="defaultOrganization">
       <title>CODEditor</title>
       <item identifier="CODEditor" identifierref="CODEditor_resource">
         <title>CODEditor</title>
