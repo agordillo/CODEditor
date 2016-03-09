@@ -1251,6 +1251,14 @@ CODEditor.CORE = (function(C,$,undefined){
 					var parser = new marknote.Parser();
 					var XML_SCORM_Manifest = parser.parse(xmlContent);
 					XML_SCORM_Manifest.rootElement.setAttribute("identifier","CODEditor_v" + CODEditor.VERSION);
+					
+					//Organization and item title
+					var scormTitle = C.Utils.encodeForXML(metadata.title);
+					var organizationElement = XML_SCORM_Manifest.rootElement.getChildElement("organizations").getChildElement("organization");
+					organizationElement.getChildElement("title").setText(scormTitle);
+					organizationElement.getChildElement("item").getChildElement("title").setText(scormTitle);
+
+					//LOM Metadata
 					var LOM_element = XML_SCORM_Manifest.rootElement.getChildElement("metadata").getChildElement("lom");
 
 					//Extra vars
