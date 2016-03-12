@@ -73,10 +73,10 @@
     </lom>
   </metadata>
   <organizations default="defaultOrganization">
-    <organization identifier="defaultOrganization" structure="hierarchical">
-      <title>CODEditor</title>
+    <organization identifier="defaultOrganization">
+      <title>Calculadora</title>
       <item identifier="CODEditor" identifierref="CODEditor_resource">
-        <title>CODEditor</title>
+        <title>Calculadora</title>
       </item>
     </organization>
   </organizations>

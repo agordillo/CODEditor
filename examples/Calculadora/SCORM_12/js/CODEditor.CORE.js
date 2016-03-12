@@ -1114,7 +1114,7 @@ CODEditor.CORE = (function(C,$,undefined){
 		var scormConstantFiles;
 		switch(version){
 			case "1.2":
-				scormConstantFiles = ["imsmanifest.xml","adlcp_rootv1p2.xsd","imscp_rootv1p1p2.xsd","imsmd_rootv1p2p1.xsd","lom.xsd"];
+				scormConstantFiles = ["imsmanifest.xml","adlcp_rootv1p2.xsd","imscp_rootv1p1p2.xsd","imsmd_rootv1p2p1.xsd","ims_xml.xsd","lom.xsd"];
 				break;
 			case "2004":
 				scormConstantFiles = ["imsmanifest.xml", "adlcp_v1p3.xsd","adlnav_v1p3.xsd","adlseq_v1p3.xsd","imscp_v1p1.xsd","imsss_v1p0.xsd","lom.xsd",	"common/anyElement.xsd", "common/dataTypes.xsd", "common/elementNames.xsd", "common/elementTypes.xsd", "common/rootElement.xsd", "common/vocabTypes.xsd", "common/vocabValues.xsd", "extend/custom.xsd", "extend/strict.xsd", "unique/loose.xsd", "unique/strict.xsd", "vocab/adlmd_vocabv1p0.xsd", "vocab/custom.xsd", "vocab/loose.xsd", "vocab/strict.xsd"];
@@ -1251,6 +1251,14 @@ CODEditor.CORE = (function(C,$,undefined){
 					var parser = new marknote.Parser();
 					var XML_SCORM_Manifest = parser.parse(xmlContent);
 					XML_SCORM_Manifest.rootElement.setAttribute("identifier","CODEditor_v" + CODEditor.VERSION);
+					
+					//Organization and item title
+					var scormTitle = C.Utils.encodeForXML(metadata.title);
+					var organizationElement = XML_SCORM_Manifest.rootElement.getChildElement("organizations").getChildElement("organization");
+					organizationElement.getChildElement("title").setText(scormTitle);
+					organizationElement.getChildElement("item").getChildElement("title").setText(scormTitle);
+
+					//LOM Metadata
 					var LOM_element = XML_SCORM_Manifest.rootElement.getChildElement("metadata").getChildElement("lom");
 
 					//Extra vars

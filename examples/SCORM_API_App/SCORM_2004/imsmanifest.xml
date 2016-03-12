@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<manifest identifier="CODEditor_v0.0.3" version="1.0" xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2" xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd http://www.imsglobal.org/xsd/imsmd_rootv1p2p1 imsmd_rootv1p2p1.xsd http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd">
+<?xml version="1.0" encoding="UTF-8" ?>
+<manifest identifier="CODEditor_v0.0.3" version="1.3" xmlns="http://www.imsglobal.org/xsd/imscp_v1p1" xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_v1p3" xmlns:adlseq="http://www.adlnet.org/xsd/adlseq_v1p3" xmlns:adlnav="http://www.adlnet.org/xsd/adlnav_v1p3" xmlns:imsss="http://www.imsglobal.org/xsd/imsss" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imscp_v1p1 imscp_v1p1.xsd http://www.adlnet.org/xsd/adlcp_v1p3 adlcp_v1p3.xsd http://www.adlnet.org/xsd/adlseq_v1p3 adlseq_v1p3.xsd http://www.adlnet.org/xsd/adlnav_v1p3 adlnav_v1p3.xsd http://www.imsglobal.org/xsd/imsss imsss_v1p0.xsd">
   <metadata>
     <schema>ADL SCORM</schema>
-    <schemaversion>1.2</schemaversion>
+    <schemaversion>2004 4th Edition</schemaversion>
     <lom xmlns="http://ltsc.ieee.org/xsd/LOM" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ltsc.ieee.org/xsd/LOM lom.xsd">
       <general>
         <title>
-          <string language="es">Calculadora</string>
+          <string language="es">CODEditor</string>
         </title>
         <language>es</language>
         <structure>
@@ -73,16 +73,15 @@
     </lom>
   </metadata>
   <organizations default="defaultOrganization">
-    <organization identifier="defaultOrganization">
-      <title>Calculadora</title>
-      <item identifier="CODEditor" isvisible="true" identifierref="CODEditor_resource">
-        <title>Calculadora</title>
-        <adlcp:masteryscore>50</adlcp:masteryscore>
+    <organization identifier="defaultOrganization" structure="hierarchical">
+      <title>CODEditor</title>
+      <item identifier="CODEditor" identifierref="CODEditor_resource">
+        <title>CODEditor</title>
       </item>
     </organization>
   </organizations>
   <resources>
-    <resource identifier="CODEditor_resource" type="webcontent" href="index.html" adlcp:scormtype="sco">
+    <resource identifier="CODEditor_resource" type="webcontent" href="index.html" adlcp:scormType="sco">
       <file href="index.html" />
     </resource>
   </resources>

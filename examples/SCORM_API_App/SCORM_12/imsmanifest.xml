@@ -6,7 +6,7 @@
     <lom xmlns="http://ltsc.ieee.org/xsd/LOM" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ltsc.ieee.org/xsd/LOM lom.xsd">
       <general>
         <title>
-          <string language="es">Calculadora</string>
+          <string language="es">CODEditor</string>
         </title>
         <language>es</language>
         <structure>
@@ -74,10 +74,9 @@
   </metadata>
   <organizations default="defaultOrganization">
     <organization identifier="defaultOrganization">
-      <title>Calculadora</title>
+      <title>CODEditor</title>
       <item identifier="CODEditor" isvisible="true" identifierref="CODEditor_resource">
-        <title>Calculadora</title>
-        <adlcp:masteryscore>50</adlcp:masteryscore>
+        <title>CODEditor</title>
       </item>
     </organization>
   </organizations>
